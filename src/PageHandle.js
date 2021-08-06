@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import {Route, HashRouter, Redirect} from 'react-router-dom'
 import LoginScreen from './loginPackage/LoginScreen'
+import HomePage from './HomePage'
 
 class PageHandle extends Component {
     constructor(props) {
@@ -11,13 +12,18 @@ class PageHandle extends Component {
         }
     }
 
-    // Put handle User change here
+    handleUserChange = (output) => {
+        console.log(output)
+        this.setState({currentUser: output})
+        this.setState({redirect: "/home"})
+    }
 
     render() {
         return ( 
             <HashRouter>
                 <Redirect to={this.state.redirect}/>
-                <Route path="/login" component={(props) => <LoginScreen/>} />
+                <Route path="/login" component={(props) => <LoginScreen newUser={this.state.currentUser} onChange={this.handleUserChange}/>} />
+                <Route path="/home" component={(props) => <HomePage user={this.state.currentUser} />} />
             </HashRouter>
         )
     }

@@ -5,7 +5,38 @@ import { Button, Form, Grid, Header, Message, Segment } from 'semantic-ui-react'
 
 
 class LoginScreen extends Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            username: "",
+            password: "",
+            newUserChange: props.onChange
+        }
+    }
 
+    handleOutput = (output) => {
+        if(output !== false) {
+            this.state.newUserChange(output)
+        }
+    }
+
+    tryLogin = () => {
+        console.log(this.state.username + " " + this.state.password)
+        const getURL = '/login/' + this.state.username + '/' + this.state.password
+        fetch(getURL).then(
+            response => response.json()
+        ).then(jsonOutput => {
+            this.handleOutput(jsonOutput)
+        })
+    }
+
+    updateUsername = (event) => {
+        this.setState({username: event.target.value})
+    }
+
+    updatePassword = (event) => {
+        this.setState({password: event.target.value})
+    }
 
     render() {
         return (
@@ -16,9 +47,9 @@ class LoginScreen extends Component {
                     </Header>
                     <Form size='large'>
                         <Segment stacked>
-                            <Form.Input fluid icon='user' iconPosition='left' placeholder='Username' />
-                            <Form.Input fluid icon='lock' iconPosition='left' placeholder='Password' type='password' />
-                            <Button color='orange' fluid size='large'>Login</Button>
+                            <Form.Input fluid icon='user' iconPosition='left' placeholder='Username' onChange={this.updateUsername} />
+                            <Form.Input fluid icon='lock' iconPosition='left' placeholder='Password' type='password' onChange={this.updatePassword} />
+                            <Button color='orange' fluid size='large' onClick={this.tryLogin}>Login</Button>
                         </Segment>
                     </Form>
                     <Message>New user? <CreateNewAccount /></Message>
