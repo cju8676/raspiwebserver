@@ -1,0 +1,3 @@
+FLASK_APP=api
+FLASK_ENV=development
+FLASK_RUN_HOST=192.168.1.37
