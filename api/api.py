@@ -15,4 +15,4 @@ api.add_resource(LoginUser, '/login/<string:username>/<string:password>')
 
 if __name__ == '__main__':
     print("Starting Flask backend")
-    app.run(debug=True, host='192.168.1.37')
+    app.run

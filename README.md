@@ -1,3 +1,18 @@
+# Use the virtual environment to run the Flask backend
+cd ~/raspiwebserver/
+source venv/bin/activate
+cd api
+flask run --host=0.0.0.0
+
+deactivate
+
+# Configuration at school
+
+Raspi runs off Laptop hotspot which branches off Ethernet network
+Raspi - runs the commands above, hosts flask backend
+Laptop - npm start
+add password to sftp client
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
