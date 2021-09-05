@@ -1,10 +1,9 @@
 import React, { Component } from 'react'
-
-import Dashboard from './Dashboard'
-
+import { Image } from 'semantic-ui-react'
 
 
-class HomePage extends Component {
+
+class Dashboard extends Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -15,11 +14,11 @@ class HomePage extends Component {
     render() {
         return (
             <div>
-                <p>WELCOME {this.state.currentUser}!!!! </p>
-                <Dashboard user={this.state.currentUser}/>
+                <p>Hello, {this.state.currentUser}!!!! </p>
+                <Image src="/getImage/juicewrld.jpg" bordered />
             </div>
         )
     }
 }
 
-export default HomePage;
+export default Dashboard;
