@@ -6,6 +6,14 @@ flask run --host=0.0.0.0
 
 deactivate
 
+# Run virtual environment and flask backend on Windows
+if scripts gives you an issue, run Set-ExecutionPolicy Unrestricted -Force in a PowerShell
+uncomment test environment in db.yml
+change proxy in package.JSON
+cd api
+venv/Scripts/activate
+flask run --host=0.0.0.0
+
 # Configuration at school
 
 Raspi runs off Laptop hotspot which branches off Ethernet network

@@ -1,5 +1,11 @@
-host: 192.168.137.225
-database: urbankedb
-user: pi
-password: Urbanke
+# host: 192.168.137.225
+# database: urbankedb
+# user: pi
+# password: Urbanke
+# port: 5432
+
+host: 127.0.0.1
+database: postgres
+user: vscode
+password: vscode
 port: 5432

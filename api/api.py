@@ -18,4 +18,4 @@ api.add_resource(GetImage, '/getImage/<string:filename>')
 
 if __name__ == '__main__':
     print("Starting Flask backend")
-    app.run
+    app.run(debug=True)

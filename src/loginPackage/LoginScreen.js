@@ -42,8 +42,11 @@ class LoginScreen extends Component {
         return (
             <Grid textAlign='center' style={{ height: '50vh' }} verticalAlign='middle'>
                 <Grid.Column style={{ maxWidth: 450 }}>
+                    <Header >
+
+                    </Header>
                     <Header as='h2' color='orange' textAlign='center'>
-                        Login to your account
+                        Login
                     </Header>
                     <Form size='large'>
                         <Segment stacked>

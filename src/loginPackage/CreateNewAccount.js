@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import {Button} from 'semantic-ui-react'
 
 class CreateNewAccount extends Component {
 
@@ -15,7 +16,7 @@ class CreateNewAccount extends Component {
     render () {
         return (
             <div>
-                Create New Account!
+                <Button>Create New Account</Button>
             </div>
         )
     }

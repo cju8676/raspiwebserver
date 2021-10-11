@@ -1,8 +1,9 @@
-from flask.helpers import send_file
+from flask.helpers import send_from_directory
 from flask_restful import Resource
 
 from db_utils import *
-import requests
+import werkzeug
+
 
 class LoginUser(Resource):
     def get(self, username, password):
@@ -14,11 +15,11 @@ class LoginUser(Resource):
         return user
 
 class GetImage(Resource):
-    def post(self, filename):
+    def get(self, filename):
         #takes in name, get the file path from sql call
         sql = """
             SELECT filepath FROM files
             WHERE name = %s
         """
-        path = exec_get_one(sql, (filename))
-        return send_file(path, mimetype='image/jpg')
+        path = exec_get_one(sql, (filename,))
+        return send_from_directory(path[0], filename, as_attachment=True)
