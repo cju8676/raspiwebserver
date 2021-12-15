@@ -15,3 +15,38 @@ code {
 h1 {
   color: purple;
 }
+
+.imgPane {
+  position: relative;
+  width: 50%
+}
+
+.imgPane img {
+  width: 100%;
+  height: auto;
+  -webkit-filter: brightness(100%);
+}
+
+.imgPane img:hover {
+  -webkit-filter: brightness(70%);
+  -webkit-transition: all 1s ease;
+  -moz-transition: all 1s ease;
+  -o-transition: all 1s ease;
+  -ms-transition: all 1s ease;
+  transition: all 1s ease;
+}
+
+.imgPane Button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  background-color: #555;
+  color: white;
+  font-size: 16px;
+  padding: 12px 24px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}

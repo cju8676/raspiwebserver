@@ -15,6 +15,7 @@ def home():
 
 api.add_resource(LoginUser, '/login/<string:username>/<string:password>')
 api.add_resource(GetImage, '/getImage/<string:filename>')
+api.add_resource(GetAllImages, '/getAllImages/')
 
 if __name__ == '__main__':
     print("Starting Flask backend")

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-import { Header, Image } from 'semantic-ui-react'
+import { Header, Tab } from 'semantic-ui-react'
 
-import Dashboard from './Dashboard'
+import Gallery from './Gallery'
 
 
 
@@ -14,12 +14,19 @@ class HomePage extends Component {
     }
 
     render() {
+
+        const panes = [
+            { menuItem: 'Gallery', render: () => <Tab.Pane attached ={false}><Gallery user={this.state.currentUser}/></Tab.Pane> },
+            { menuItem: 'Favorites', render: () => <Tab.Pane attached ={false}>Favorites coming soon..</Tab.Pane> },
+            { menuItem: 'Albums', render: () => <Tab.Pane attached ={false}>albums coming soon..</Tab.Pane> },
+        ]
+
         return (
             <div>
                 <Header as='h2'>
-                    <Image circular src='/getImage/juicewrld.jpg' /> {this.state.currentUser}
+                    Welcome, {this.state.currentUser}.
+                    <Tab menu={{color:'orange',tabular:false, attached:false, inverted:true}} panes={panes} />
                 </Header>
-                <Dashboard user={this.state.currentUser}/>
             </div>
         )
     }
