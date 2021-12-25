@@ -21,7 +21,6 @@ class LoginScreen extends Component {
     }
 
     tryLogin = () => {
-        console.log(this.state.username + " " + this.state.password)
         const getURL = '/login/' + this.state.username + '/' + this.state.password
         fetch(getURL).then(
             response => response.json()

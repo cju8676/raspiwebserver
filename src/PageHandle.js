@@ -13,7 +13,6 @@ class PageHandle extends Component {
     }
 
     handleUserChange = (output) => {
-        console.log(output)
         this.setState({currentUser: output})
         this.setState({redirect: "/home"})
     }

@@ -33,9 +33,8 @@ class GetAllImages(Resource):
             FROM files
         """
         files = list(exec_get_all(sql, []))
-        #pics = []
-        #for namepath in files:
-        #    pics.append(send_from_directory(namepath[1], namepath[0], as_attachment=True))
-        #print(pics)
-        #return jsonify(pics)
-        return send_from_directory(files[0][1], files[0][0], as_attachment=True)
+        #print(files)
+        #print(send_from_directory(files[0][1], files[0][0]))
+        #print(send_from_directory(files[1][1], files[1][0]))
+        #file = send_from_directory(files[0][1], files[0][0])
+        return files

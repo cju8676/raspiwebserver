@@ -6,7 +6,7 @@ class ImagePane extends Component {
         super(props)
         this.state = {
             display : false,
-            picture: props.pictures
+            picture: props.picture
         }
     }
 
