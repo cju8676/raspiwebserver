@@ -8,7 +8,8 @@ class Gallery extends Component {
         super(props)
         this.state = {
             currentUser: props.user,
-            pictures: [],
+            pictureLinks: [],
+            linksAndNames: [], //FIXME prob a better way of doing this
             namepath: []
         }
     }
@@ -27,7 +28,8 @@ class Gallery extends Component {
                             const imageURL = URL.createObjectURL(imageBlob);
                             //this.setState({pictures:[imageURL]})})
                             this.setState(prevState => ({
-                                pictures: [...prevState.pictures, imageURL]
+                                pictureLinks: [...prevState.pictureLinks, imageURL],
+                                linksAndNames: [...prevState.linksAndNames, [imageURL, this.state.namepath[i][0]]]
                             }));
                         })
                 }
@@ -45,8 +47,8 @@ class Gallery extends Component {
 
         return (
             <div>
-                {this.state.pictures.map(picture => {
-                    return <ImagePane picture={picture} />
+                {this.state.linksAndNames.map(picture => {
+                    return <ImagePane picture={picture[0]} filename={picture[1]}/>
                 })}
             </div>
         )
