@@ -15,6 +15,7 @@ class LoginScreen extends Component {
     }
 
     handleOutput = (output) => {
+        console.log(output)
         if(output !== false) {
             this.state.newUserChange(output)
         }
@@ -25,6 +26,7 @@ class LoginScreen extends Component {
         fetch(getURL).then(
             response => response.json()
         ).then(jsonOutput => {
+            console.log(jsonOutput)
             this.handleOutput(jsonOutput)
         })
     }

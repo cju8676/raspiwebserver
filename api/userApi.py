@@ -1,18 +1,40 @@
 from flask.helpers import send_from_directory
 from flask_restful import Resource
+from flask_restful import reqparse
 from flask import jsonify
 
 from db_utils import *
 import werkzeug
 
+# If you get an error 0 in Flask, try casting list( ) around exec_..._ call
+
+class CreateUser(Resource):
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('username', type=str)
+        parser.add_argument('password', type=str)
+        parser.add_argument('name', type=str)
+        args = parser.parse_args()
+
+        name = args['username']
+        password = args['password']
+        # TODO password = hash_password(args['password'])
+        name = args['name']
+        sql = """
+            INSERT INTO users (username, password, name)
+            VALUES (%s, %s, %s)
+        """
+        exec_commit(sql, (name, password, name))
 
 class LoginUser(Resource):
     def get(self, username, password):
+
         sql = """
-            SELECT username FROM users
+            SELECT username, name
+            FROM users
             WHERE username = %s and password = %s
         """
-        user = exec_get_one(sql, (username, password))
+        user = list(exec_get_one(sql, (username, password)))
         return user
 
 class GetImage(Resource):

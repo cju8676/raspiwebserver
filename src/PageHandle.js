@@ -8,12 +8,15 @@ class PageHandle extends Component {
         super(props)
         this.state = {
             redirect: "/login",
-            currentUser: null
+            currentUser: null,
+            currentName: null
         }
     }
 
     handleUserChange = (output) => {
-        this.setState({currentUser: output})
+        console.log(output)
+        this.setState({currentUser: output[0]})
+        this.setState({currentName: output[1]})
         this.setState({redirect: "/home"})
     }
 
@@ -22,7 +25,7 @@ class PageHandle extends Component {
             <HashRouter>
                 <Redirect to={this.state.redirect}/>
                 <Route path="/login" component={(props) => <LoginScreen newUser={this.state.currentUser} onChange={this.handleUserChange}/>} />
-                <Route path="/home" component={(props) => <HomePage user={this.state.currentUser} />} />
+                <Route path="/home" component={(props) => <HomePage user={this.state.currentUser} name={this.state.currentName}/>} />
             </HashRouter>
         )
     }

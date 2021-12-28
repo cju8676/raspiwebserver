@@ -17,6 +17,14 @@ def connect():
                             host=config['host'],
                             port=config['port'])
 
+def exec_commit(sql, args={}):
+    conn = connect()
+    cur = conn.cursor()
+    result = cur.execute(sql, args)
+    conn.commit()
+    conn.close()
+    return result
+
 # Returns the first entry from the query
 def exec_get_one(sql, args={}):
     conn = connect();

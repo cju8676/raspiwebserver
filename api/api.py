@@ -25,6 +25,7 @@ def getpic(path, filename):
     # print("path : " + path_str + "   and   filename : " + filename_str)
     return send_from_directory(path_str, filename_str)
 
+api.add_resource(CreateUser, '/createUser/')
 api.add_resource(LoginUser, '/login/<string:username>/<string:password>')
 api.add_resource(GetImage, '/getImage/<string:filename>')
 api.add_resource(GetAllImages, '/getAllImages/')
