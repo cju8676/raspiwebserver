@@ -1,6 +1,7 @@
 import psycopg2
 import yaml
 import os
+import hashlib
 
 from datetime import date
 
@@ -41,6 +42,10 @@ def exec_get_all(sql, args={}):
     list_of_tuples = cur.fetchall()
     conn.close()
     return tuples_to_lists(list_of_tuples)
+
+def hash_password(password):
+    code = hashlib.sha256(password.encode("utf8"))
+    return code.hexdigest()
 
 def tuples_to_lists(list_of_tuples):
     list_of_lists = []

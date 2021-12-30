@@ -16,15 +16,14 @@ class CreateUser(Resource):
         parser.add_argument('name', type=str)
         args = parser.parse_args()
 
-        name = args['username']
-        password = args['password']
-        # TODO password = hash_password(args['password'])
+        username = args['username']
+        password = hash_password(args['password'])
         name = args['name']
         sql = """
             INSERT INTO users (username, password, name)
             VALUES (%s, %s, %s)
         """
-        exec_commit(sql, (name, password, name))
+        exec_commit(sql, (username, password, name))
 
 class LoginUser(Resource):
     def get(self, username, password):
@@ -34,7 +33,8 @@ class LoginUser(Resource):
             FROM users
             WHERE username = %s and password = %s
         """
-        user = list(exec_get_one(sql, (username, password)))
+        newPass = hash_password(password)
+        user = list(exec_get_one(sql, (username, newPass)))
         return user
 
 class GetImage(Resource):

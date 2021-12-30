@@ -22,9 +22,32 @@ class CreateNewAccount extends Component {
         }
     }
 
+    createUser = () => {
+        const data = {
+            name: this.state.firstName,
+            username: this.state.username,
+            password: this.state.password
+        }
+        const reqOptions = {
+            method: 'POST',
+            headers: {Accept: 'application/json', 'Content-Type':'application/json'},
+            body: JSON.stringify(data)
+        }
+        fetch('/createUser/', reqOptions)
+            .then(response => response.json())
+            .then(this.fetchData)
+    }
+
     submitForm = () => {
+        this.createUser()
         this.toggle()
-        //fixme - connect POST request
+        //fixme - add popup saying account was successfully created
+    }
+
+    updateProp = (event) => {
+        if (event.target.id === "enteredName") this.setState({firstName : event.target.value})
+        else if (event.target.id === "enteredUsername") this.setState({username : event.target.value})
+        else if (event.target.id === "enteredPassword") this.setState({password : event.target.value})
     }
 
     render() {
@@ -40,20 +63,26 @@ class CreateNewAccount extends Component {
                                 //error={{content: 'Please enter your name', pointing: 'below'}}
                                 /// if 20 error - name too long!! todo
                                 fluid
+                                id='enteredName'
                                 label='Name'
                                 placeholder='Name'
+                                onChange={this.updateProp}
                             />
                             <Form.Input
                                 //error={{content: 'Please enter a username', pointing: 'below'}}
                                 fluid
+                                id='enteredUsername'
                                 label='Username'
                                 placeholder='Username'
+                                onChange={this.updateProp}
                             />
                             <Form.Input
                                 //error={{content: 'Please enter a valid password', pointing: 'below'}}
                                 fluid
+                                id='enteredPassword'
                                 label='Password'
                                 placeholder='Password'
+                                onChange={this.updateProp}
                             />
                         </Form>
                     </Modal.Content>
