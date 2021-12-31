@@ -10,13 +10,17 @@ class LoginScreen extends Component {
         this.state = {
             username: "",
             password: "",
-            newUserChange: props.onChange
+            newUserChange: props.onChange,
+            error: false
         }
     }
 
     handleOutput = (output) => {
         console.log(output)
-        if(output !== false) {
+        if (output === null) {
+            this.setState({error : true})
+        }
+        else if (output !== false) {
             this.state.newUserChange(output)
         }
     }
@@ -32,11 +36,11 @@ class LoginScreen extends Component {
     }
 
     updateUsername = (event) => {
-        this.setState({username: event.target.value})
+        this.setState({ username: event.target.value })
     }
 
     updatePassword = (event) => {
-        this.setState({password: event.target.value})
+        this.setState({ password: event.target.value })
     }
 
     render() {
@@ -49,6 +53,11 @@ class LoginScreen extends Component {
                     <Header as='h2' color='orange' textAlign='center'>
                         Login
                     </Header>
+                    <Message error
+                            hidden={!this.state.error}
+                            header='Invalid Username or Password'
+                            content='Please try again.'
+                        />
                     <Form size='large'>
                         <Segment stacked>
                             <Form.Input fluid icon='user' iconPosition='left' placeholder='Username' onChange={this.updateUsername} />

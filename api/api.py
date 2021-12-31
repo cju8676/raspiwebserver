@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify
 from flask_restful import Resource, Api
 import urllib.parse
 
+import PIL.Image
+
 from db_utils import *
 from userApi import *
 
@@ -21,6 +23,12 @@ def getpic(path, filename):
     # FIXME ADD for RASPI
     # For windows, assume we know everything is in C:/Users/corey/...
     path_str = 'C:/Users/corey/' + path_str
+
+    #todo use this stuff later in the picture info
+    # image = PIL.Image.open("C:/Users/corey/Downloads/IMG_0920.jpg")
+    # print(image.getexif())
+    # print(image.info)
+
 
     # print("path : " + path_str + "   and   filename : " + filename_str)
     return send_from_directory(path_str, filename_str)

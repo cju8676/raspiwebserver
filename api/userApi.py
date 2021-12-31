@@ -34,8 +34,10 @@ class LoginUser(Resource):
             WHERE username = %s and password = %s
         """
         newPass = hash_password(password)
-        user = list(exec_get_one(sql, (username, newPass)))
-        return user
+        user = exec_get_one(sql, (username, newPass))
+        if user is None:
+            return None
+        return list(user)
 
 class GetImage(Resource):
     def get(self, filename):

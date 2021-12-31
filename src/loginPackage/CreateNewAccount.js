@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Button, Modal, Form } from 'semantic-ui-react'
+import { Button, Modal, Form, Message } from 'semantic-ui-react'
 
 class CreateNewAccount extends Component {
 
@@ -9,7 +9,8 @@ class CreateNewAccount extends Component {
             username: "",
             password: "",
             firstName: "",
-            modal: false
+            modal: false,
+            created: false
         }
     }
 
@@ -35,7 +36,9 @@ class CreateNewAccount extends Component {
         }
         fetch('/createUser/', reqOptions)
             .then(response => response.json())
-            .then(this.fetchData)
+            .then(() => {
+                this.setState({created : true})
+            })
     }
 
     submitForm = () => {
@@ -53,6 +56,11 @@ class CreateNewAccount extends Component {
     render() {
         return (
             <div>
+                <Message success
+                    hidden={!this.state.created}
+                    header='Successfully created your account!'
+                    content='You may now log in with your new credentials.'
+                 />
                 <Modal
                     open={this.state.modal}
                     trigger={<Button onClick={this.toggle}>Create New Account</Button>}>
