@@ -18,13 +18,24 @@ def connect():
                             host=config['host'],
                             port=config['port'])
 
+# returns True if it committed without duplicates or errors, False otherwise, and None if it couldn't even connect
 def exec_commit(sql, args={}):
-    conn = connect()
-    cur = conn.cursor()
-    result = cur.execute(sql, args)
-    conn.commit()
-    conn.close()
-    return result
+    try:
+        conn = connect()
+        cur = conn.cursor()
+        try:
+            cur.execute(sql, args)
+            result = True
+        except psycopg2.IntegrityError:
+            conn.rollback()
+            result = False
+        else:
+            conn.commit()
+        conn.close()
+        return result
+    except Exception:
+        print('COMMIT ERROR OCCURED')
+        return None
 
 # Returns the first entry from the query
 def exec_get_one(sql, args={}):

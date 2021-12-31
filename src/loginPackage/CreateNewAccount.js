@@ -10,7 +10,8 @@ class CreateNewAccount extends Component {
             password: "",
             firstName: "",
             modal: false,
-            created: false
+            created: false,
+            takenUser: false
         }
     }
 
@@ -21,6 +22,17 @@ class CreateNewAccount extends Component {
             this.setState({ password: "" })
             this.setState({ firstName: "" })
         }
+    }
+
+    handleResponse = (jsonOutput) => {
+        console.log(jsonOutput)
+        if (jsonOutput === false) {
+            this.setState({takenUser : true});
+        }
+        else {
+            this.setState({created : true});
+            this.toggle();
+        } 
     }
 
     createUser = () => {
@@ -36,15 +48,13 @@ class CreateNewAccount extends Component {
         }
         fetch('/createUser/', reqOptions)
             .then(response => response.json())
-            .then(() => {
-                this.setState({created : true})
+            .then(jsonOutput => {
+                this.handleResponse(jsonOutput)
             })
     }
 
     submitForm = () => {
         this.createUser()
-        this.toggle()
-        //fixme - add popup saying account was successfully created
     }
 
     updateProp = (event) => {
@@ -66,6 +76,11 @@ class CreateNewAccount extends Component {
                     trigger={<Button onClick={this.toggle}>Create New Account</Button>}>
                     <Modal.Header>Create New Account</Modal.Header>
                     <Modal.Content>
+                        <Message error
+                            hidden={!this.state.takenUser}
+                            header='Sorry!'
+                            content='The username input is taken. Try another.'
+                        />
                         <Form>
                             <Form.Input
                                 //error={{content: 'Please enter your name', pointing: 'below'}}

@@ -23,7 +23,8 @@ class CreateUser(Resource):
             INSERT INTO users (username, password, name)
             VALUES (%s, %s, %s)
         """
-        exec_commit(sql, (username, password, name))
+        
+        return exec_commit(sql, (username, password, name))
 
 class LoginUser(Resource):
     def get(self, username, password):
