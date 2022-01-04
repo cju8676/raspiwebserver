@@ -17,7 +17,7 @@ class HomePage extends Component {
     render() {
 
         const panes = [
-            { menuItem: 'Gallery', render: () => <Tab.Pane attached ={false}><Gallery user={this.state.currentUser}/></Tab.Pane> },
+            { menuItem: 'Gallery', render: () => <Tab.Pane attached ={false}><Gallery user={this.state.currentUserName}/></Tab.Pane> },
             { menuItem: 'Favorites', render: () => <Tab.Pane attached ={false}>Favorites coming soon..</Tab.Pane> },
             { menuItem: 'Albums', render: () => <Tab.Pane attached ={false}>albums coming soon..</Tab.Pane> },
         ]

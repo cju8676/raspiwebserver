@@ -36,6 +36,23 @@ def exec_commit(sql, args={}):
     except Exception:
         print('COMMIT ERROR OCCURED')
         return None
+# def exec_commit(sql, args={}):
+#     #try:
+#     conn = connect()
+#     cur = conn.cursor()
+#     #    try:
+#     cur.execute(sql, args)
+#     result = True
+#     #    except psycopg2.IntegrityError:
+#     conn.rollback()
+#     result = False
+#     #    else:
+#     conn.commit()
+#     conn.close()
+#     return result
+#     #except Exception:
+#     #    print('COMMIT ERROR OCCURED')
+#     #    return None
 
 # Returns the first entry from the query
 def exec_get_one(sql, args={}):

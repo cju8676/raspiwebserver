@@ -54,7 +54,7 @@ class GetAllImages(Resource):
     def get(self):
         
         sql = """
-            SELECT name, filepath 
+            SELECT name, filepath, id 
             FROM files
         """
         files = list(exec_get_all(sql, []))
@@ -63,3 +63,21 @@ class GetAllImages(Resource):
         #print(send_from_directory(files[1][1], files[1][0]))
         #file = send_from_directory(files[0][1], files[0][0])
         return files
+
+class AddFavorite(Resource):
+    def post(self, username, id):
+
+        sql = """
+            INSERT INTO favorites (username, id)
+            VALUES (%s, %s)
+        """
+        return exec_commit(sql, (username, id))
+
+class DeleteFavorite(Resource):
+    def post(self, username, id):
+    
+        sql = """
+            DELETE FROM favorites
+            WHERE username = %s AND id = %s
+        """
+        return exec_commit(sql, (username, id))

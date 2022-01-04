@@ -37,6 +37,8 @@ api.add_resource(CreateUser, '/createUser/')
 api.add_resource(LoginUser, '/login/<string:username>/<string:password>')
 api.add_resource(GetImage, '/getImage/<string:filename>')
 api.add_resource(GetAllImages, '/getAllImages/')
+api.add_resource(AddFavorite, '/addFav/<string:username>/<string:id>')
+api.add_resource(DeleteFavorite, '/removeFav/<string:username>/<string:id>')
 
 if __name__ == '__main__':
     print("Starting Flask backend")

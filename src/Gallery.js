@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { Card } from 'semantic-ui-react'
 
 import ImagePane from './ImagePane'
 
@@ -8,34 +9,32 @@ class Gallery extends Component {
         super(props)
         this.state = {
             currentUser: props.user,
-            pictureLinks: [],
-            linksAndNames: [], //FIXME prob a better way of doing this
-            namepath: []
+            link_name_id: [],
+            name_path_id: [],
         }
     }
 
     fetchPictures = () => {
         fetch('/getAllImages/').then(response => response.json())
             .then(JSONresponse => {
-                this.setState({ namepath: JSONresponse })
+                this.setState({ name_path_id: JSONresponse })
                 console.log(this.state)
-                for (let i = 0; i < this.state.namepath.length; i++) {
+                for (let i = 0; i < this.state.name_path_id.length; i++) {
                     //FIXME for some reason it doesn't like encoding / so i do it manually
-                    var path = (this.state.namepath[i][1]).replace('/', '%2F');
-                    fetch('/files/' + encodeURIComponent(path) + '/' + encodeURIComponent(this.state.namepath[i][0]))
+                    var path = (this.state.name_path_id[i][1]).replace('/', '%2F');
+                    //fixme could change this to just the id to simplify
+                    fetch('/files/' + encodeURIComponent(path) + '/' + encodeURIComponent(this.state.name_path_id[i][0]))
                         .then(response => response.blob())
                         .then(imageBlob => {
                             const imageURL = URL.createObjectURL(imageBlob);
                             //this.setState({pictures:[imageURL]})})
                             this.setState(prevState => ({
-                                pictureLinks: [...prevState.pictureLinks, imageURL],
-                                linksAndNames: [...prevState.linksAndNames, [imageURL, this.state.namepath[i][0]]]
+                                link_name_id: 
+                                [...prevState.link_name_id, [imageURL, this.state.name_path_id[i][0], this.state.name_path_id[i][2]]]
                             }));
                         })
                 }
-                console.log(this.state)
             })
-
     }
 
     componentDidMount() {
@@ -47,9 +46,12 @@ class Gallery extends Component {
 
         return (
             <div>
-                {this.state.linksAndNames.map(picture => {
-                    return <ImagePane picture={picture[0]} filename={picture[1]}/>
-                })}
+                {console.log(this.state)}
+                <Card.Group itemsPerRow={4}>
+                    {this.state.link_name_id.map(picture => {
+                        return <ImagePane picture={picture[0]} filename={picture[1]} id={picture[2]} user={this.state.currentUser}/>
+                    })}
+                </Card.Group>
             </div>
         )
     }
