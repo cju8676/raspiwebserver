@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
-import { Card, Search, Divider, Header, Button } from 'semantic-ui-react'
+import { Card } from 'semantic-ui-react'
 
 import ImagePane from './ImagePane'
 
 
-class Gallery extends Component {
+class FavoritesGallery extends Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -15,7 +15,7 @@ class Gallery extends Component {
     }
 
     fetchPictures = () => {
-        fetch('/getAllImages/').then(response => response.json())
+        fetch('/getFavorites/' + this.state.currentUser ).then(response => response.json())
             .then(JSONresponse => {
                 this.setState({ name_path_id: JSONresponse })
                 console.log(this.state)
@@ -46,23 +46,15 @@ class Gallery extends Component {
 
         return (
             <div>
-                <div>
-                    <Header as='h3' size='small '>
-                        <Button color='orange' size='large' floated='right'>Upload</Button>
-                        <Search />
-                    </Header>
-                </div>
-                    <Divider />
-                <div>
-                    <Card.Group itemsPerRow={4}>
-                        {this.state.link_name_id.map(picture => {
-                            return <ImagePane picture={picture[0]} filename={picture[1]} id={picture[2]} user={this.state.currentUser}/>
-                        })}
-                    </Card.Group>
-                </div>
+                {console.log(this.state)}
+                <Card.Group itemsPerRow={4}>
+                    {this.state.link_name_id.map(picture => {
+                        return <ImagePane picture={picture[0]} filename={picture[1]} id={picture[2]} user={this.state.currentUser} favorited='true'/>
+                    })}
+                </Card.Group>
             </div>
         )
     }
 }
 
-export default Gallery;
+export default FavoritesGallery;

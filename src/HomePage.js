@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import { Header, Tab } from 'semantic-ui-react'
 
 import Gallery from './Gallery'
+import FavoritesGallery from './FavoritesGallery'
+import Albums from './Albums'
 
 
 
@@ -18,8 +20,8 @@ class HomePage extends Component {
 
         const panes = [
             { menuItem: 'Gallery', render: () => <Tab.Pane attached ={false}><Gallery user={this.state.currentUserName}/></Tab.Pane> },
-            { menuItem: 'Favorites', render: () => <Tab.Pane attached ={false}>Favorites coming soon..</Tab.Pane> },
-            { menuItem: 'Albums', render: () => <Tab.Pane attached ={false}>albums coming soon..</Tab.Pane> },
+            { menuItem: 'Favorites', render: () => <Tab.Pane attached ={false}><FavoritesGallery user={this.state.currentUserName}/></Tab.Pane> },
+            { menuItem: 'Albums', render: () => <Tab.Pane attached ={false}><Albums user={this.state.currentUserName}/></Tab.Pane> },
         ]
 
         return (

@@ -81,3 +81,13 @@ class DeleteFavorite(Resource):
             WHERE username = %s AND id = %s
         """
         return exec_commit(sql, (username, id))
+
+class GetFavorites(Resource):
+    def get(self, username):
+        sql = """
+            SELECT f.name, f.filepath, f.id
+            FROM files f, favorites s
+            WHERE s.username = %s
+            AND f.id = s.id;
+        """
+        return list(exec_get_all(sql, [username]))
