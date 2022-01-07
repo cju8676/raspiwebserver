@@ -8,9 +8,10 @@ class Gallery extends Component {
     constructor(props) {
         super(props)
         this.state = {
+            albums: [],
             currentUser: props.user,
             link_name_id: [],
-            name_path_id: [],
+            name_path_id: []
         }
     }
 
@@ -37,8 +38,16 @@ class Gallery extends Component {
             })
     }
 
+    fetchAlbums = () => {
+        fetch('/getAlbums/' + this.props.user).then(response => response.json())
+            .then(JSONresponse => {
+                this.setState({albums : JSONresponse})
+            })
+    }
+
     componentDidMount() {
         //FIXME if photos are already loaded then switching tabs shouldn't reset this
+        this.fetchAlbums();
         this.fetchPictures();
     }
 

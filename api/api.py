@@ -40,6 +40,8 @@ api.add_resource(GetAllImages, '/getAllImages/')
 api.add_resource(AddFavorite, '/addFav/<string:username>/<string:id>')
 api.add_resource(DeleteFavorite, '/removeFav/<string:username>/<string:id>')
 api.add_resource(GetFavorites, '/getFavorites/<string:username>')
+api.add_resource(CreateAlbum, '/createAlbum/<string:username>/<string:album_name>')
+api.add_resource(GetAllAlbums, '/getAlbums/<string:username>')
 
 if __name__ == '__main__':
     print("Starting Flask backend")

@@ -36,6 +36,8 @@ def exec_commit(sql, args={}):
     except Exception:
         print('COMMIT ERROR OCCURED')
         return None
+        
+#used to test errors, not reliable in doing POST requests 
 # def exec_commit(sql, args={}):
 #     #try:
 #     conn = connect()
@@ -53,6 +55,7 @@ def exec_commit(sql, args={}):
 #     #except Exception:
 #     #    print('COMMIT ERROR OCCURED')
 #     #    return None
+
 
 # Returns the first entry from the query
 def exec_get_one(sql, args={}):

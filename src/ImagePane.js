@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Button, Icon, Card, Image, Modal, Divider } from 'semantic-ui-react'
+import { Button, Icon, Card, Image, Modal, Divider, Dropdown } from 'semantic-ui-react'
 
 class ImagePane extends Component {
     constructor(props) {
@@ -10,7 +10,8 @@ class ImagePane extends Component {
             picture: props.picture,
             favorited: props.favorited,
             id : props.id,
-            infoModal: false
+            infoModal: false,
+            albums : props.albums
         }
     }
 
@@ -43,6 +44,13 @@ class ImagePane extends Component {
     }
 
     toggleInfoModal = () => {this.setState({infoModal : !this.state.infoModal})}
+
+    getOptions = () => {
+        const options = [
+            {key: 'test', text: 'Test', value: 'test'}
+        ]
+        return options
+    }
 
     // todo exif information
     // name
@@ -77,7 +85,19 @@ class ImagePane extends Component {
                     {this.state.favorited && <Icon name='favorite' color='yellow' />}
                     Favorite
                     </Button>
-                <Button><Icon name='add'/>Add to Album</Button>
+                {/* <Button>
+                    <Icon name='add'/>Add to Album
+                    
+                </Button> */}
+                <Dropdown
+                    text='Add to Album'
+                    icon='add'
+                    floating
+                    labeled
+                    button
+                    className='icon'
+                    options={this.getOptions()}>
+                </Dropdown>
                 <Modal
                     open={this.state.infoModal}
                     trigger={<Button onClick={this.toggleInfoModal}><Icon name='info' /></Button>}>

@@ -91,3 +91,29 @@ class GetFavorites(Resource):
             AND f.id = s.id;
         """
         return list(exec_get_all(sql, [username]))
+
+class CreateAlbum(Resource):
+    def post(self, username, album_name):
+        # parser = reqparse.RequestParser()
+        # parser.add_argument('username', type=str)
+        # parser.add_argument('album_name', type=str)
+        # args = parser.parse_args()
+
+        # username = args['username']
+        # album_name = args['album_name']
+
+        print(username, "         ", album_name)
+        sql = """
+            INSERT INTO albums (username, album_name)
+            VALUES (%s, %s)
+        """ 
+        return exec_commit(sql, (username, album_name))
+
+class GetAllAlbums(Resource):
+    def get(self, username):
+        sql = """
+            SELECT album_name
+            FROM albums
+            WHERE username = %s;
+        """
+        return list(exec_get_all(sql, [username]))
