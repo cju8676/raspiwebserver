@@ -104,8 +104,8 @@ class Albums extends Component {
 
                     </Card>
                     {this.state.albums.map(album => {
-                        return <Card><Card.Content>{album}</Card.Content></Card>
-                    })}
+                        return <Card href={('#album/').concat(album)}><Card.Content>{album}</Card.Content></Card>
+                    })}''
                 </Card.Group>
             </div>
         )

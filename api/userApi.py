@@ -114,6 +114,38 @@ class GetAllAlbums(Resource):
         sql = """
             SELECT album_name
             FROM albums
-            WHERE username = %s;
+            WHERE username = %s
+            AND id = -1;
         """
         return list(exec_get_all(sql, [username]))
+
+class AddToAlbum(Resource):
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('username', type=str)
+        parser.add_argument('album_name', type=str)
+        parser.add_argument('id', type=str)
+        args = parser.parse_args()
+
+        username = args['username']
+        album_name = args['album_name']
+        id = args['id']
+        
+        sql = """
+            INSERT INTO albums (username, album_name, id)
+            VALUES (%s, %s, %s)
+        """
+        return exec_commit(sql, (username, album_name, id))
+
+class GetAlbumPhotos(Resource):
+    def get(self, username, album_name):
+        
+        sql = """
+            SELECT f.name, f.filepath, f.id 
+            FROM files f, albums a
+            WHERE f.id = a.id
+            AND a.username = %s
+            AND a.album_name = %s;
+        """
+        files = list(exec_get_all(sql, [username, album_name]))
+        return files

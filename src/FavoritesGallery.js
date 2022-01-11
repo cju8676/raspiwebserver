@@ -11,6 +11,7 @@ class FavoritesGallery extends Component {
             currentUser: props.user,
             link_name_id: [],
             name_path_id: [],
+            albums : []
         }
     }
 
@@ -37,8 +38,16 @@ class FavoritesGallery extends Component {
             })
     }
 
+    fetchAlbums = () => {
+        fetch('/getAlbums/' + this.props.user).then(response => response.json())
+            .then(JSONresponse => {
+                this.setState({albums : JSONresponse})
+            })
+    }
+
     componentDidMount() {
         //FIXME if photos are already loaded then switching tabs shouldn't reset this
+        this.fetchAlbums();
         this.fetchPictures();
     }
 
@@ -49,7 +58,13 @@ class FavoritesGallery extends Component {
                 {console.log(this.state)}
                 <Card.Group itemsPerRow={4}>
                     {this.state.link_name_id.map(picture => {
-                        return <ImagePane picture={picture[0]} filename={picture[1]} id={picture[2]} user={this.state.currentUser} favorited='true'/>
+                        return <ImagePane 
+                        picture={picture[0]} 
+                        filename={picture[1]} 
+                        id={picture[2]} 
+                        user={this.state.currentUser} 
+                        favorited='true'
+                        albums={this.state.albums}/>
                     })}
                 </Card.Group>
             </div>

@@ -1,25 +1,24 @@
-import React, { Component } from 'react'
-import { Card, Search, Divider, Header, Button } from 'semantic-ui-react'
+import React, {Component} from 'react'
+import {Header, Button, Card, Divider } from 'semantic-ui-react'
+import ImagePane from './ImagePane';
 
-import ImagePane from './ImagePane'
-
-
-class Gallery extends Component {
+class AlbumPage extends Component {
     constructor(props) {
-        super(props)
+        super(props);
         this.state = {
-            albums: [],
-            currentUser: props.user,
             link_name_id: [],
             name_path_id: []
         }
     }
 
-    fetchPictures = () => {
-        fetch('/getAllImages/').then(response => response.json())
+    fetchAlbumPhotos = () => {
+        //fixme if these are already previously fetched by gallery then we would just want to
+        // get those instead to be more efficient
+        // todo to do this we would change every /files/ instance to just the id, fetch
+        // id's from db first then use those id's to fetch /files/ 
+        fetch('/getAlbumPhotos/'+ this.props.user + '/' + this.props.match.params.album).then(response => response.json())
             .then(JSONresponse => {
-                this.setState({ name_path_id: JSONresponse })
-                console.log(this.state)
+                this.setState({name_path_id : JSONresponse})
                 for (let i = 0; i < this.state.name_path_id.length; i++) {
                     //FIXME for some reason it doesn't like encoding / so i do it manually
                     var path = (this.state.name_path_id[i][1]).replace('/', '%2F');
@@ -38,29 +37,18 @@ class Gallery extends Component {
             })
     }
 
-    fetchAlbums = () => {
-        fetch('/getAlbums/' + this.props.user).then(response => response.json())
-            .then(JSONresponse => {
-                this.setState({albums : JSONresponse})
-            })
-    }
-
     componentDidMount() {
-        //FIXME if photos are already loaded then switching tabs shouldn't reset this
-        this.fetchAlbums();
-        this.fetchPictures();
+        this.fetchAlbumPhotos();
     }
 
-    render() {
 
+    render () {
         return (
             <div>
-                <div>
-                    <Header as='h3' size='small '>
-                        <Button color='orange' size='large' floated='right'>Upload</Button>
-                        <Search />
-                    </Header>
-                </div>
+                <Header>
+                    <Button color='orange' size='large' href='#home'>Back</Button>
+                    {this.props.match.params.album}
+                </Header>
                 <Divider />
                 <div>
                     <Card.Group itemsPerRow={4}>
@@ -69,8 +57,9 @@ class Gallery extends Component {
                             picture={picture[0]} 
                             filename={picture[1]} 
                             id={picture[2]} 
-                            user={this.state.currentUser}
-                            albums={this.state.albums}/>
+                            user={this.props.currentUser}
+                            albums={[]}
+                            />
                         })}
                     </Card.Group>
                 </div>
@@ -79,4 +68,4 @@ class Gallery extends Component {
     }
 }
 
-export default Gallery;
+export default AlbumPage;

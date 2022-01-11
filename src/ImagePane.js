@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Button, Icon, Card, Image, Modal, Divider, Dropdown } from 'semantic-ui-react'
+import { Button, Icon, Card, Image, Modal, Divider, Dropdown, Confirm } from 'semantic-ui-react'
 
 class ImagePane extends Component {
     constructor(props) {
@@ -11,7 +11,7 @@ class ImagePane extends Component {
             favorited: props.favorited,
             id : props.id,
             infoModal: false,
-            albums : props.albums
+            albums : props.albums,
         }
     }
 
@@ -35,7 +35,7 @@ class ImagePane extends Component {
         }
         else {
             this.setState({favorited : true})
-            //fixme post user and picture id
+            // post user and picture id
             const getUrl = '/addFav/' + this.props.user + '/' + this.state.id
             fetch(getUrl, reqOptions)
                 .then(response => response.json())
@@ -46,10 +46,32 @@ class ImagePane extends Component {
     toggleInfoModal = () => {this.setState({infoModal : !this.state.infoModal})}
 
     getOptions = () => {
-        const options = [
-            {key: 'test', text: 'Test', value: 'test'}
-        ]
-        return options
+        if (this.state.albums.length === 0) return [];
+        else {
+            const op = this.state.albums.map(album => {
+                return {key: album, text: album, value: album}
+            })
+            return op
+        }
+    }
+
+    selectAlbum = (e, data) => {
+        console.log(data.value);
+        const postData = {
+            username : this.props.user,
+            album_name : data.value,
+            id : this.state.id
+        }
+        const reqOptions = {
+            method : 'POST',
+            headers : {Accept: 'application/json', 'Content-Type':'application/json'},
+            body : JSON.stringify(postData)
+        }
+        fetch('/addPicToAlbum/', reqOptions)
+            .then(response => response.json())
+            .then(jsonOutput => {
+                //TODO handle response - success or failed to add to album
+            })
     }
 
     // todo exif information
@@ -96,7 +118,8 @@ class ImagePane extends Component {
                     labeled
                     button
                     className='icon'
-                    options={this.getOptions()}>
+                    options={this.getOptions()}
+                    onChange={this.selectAlbum}>
                 </Dropdown>
                 <Modal
                     open={this.state.infoModal}
