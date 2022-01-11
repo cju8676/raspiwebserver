@@ -1,14 +1,33 @@
 import React, {Component} from 'react'
-import {Header, Button, Card, Divider } from 'semantic-ui-react'
+import {Header, Button, Card, Divider, Confirm } from 'semantic-ui-react'
 import ImagePane from './ImagePane';
+import {withRouter} from 'react-router-dom'
 
 class AlbumPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
             link_name_id: [],
-            name_path_id: []
+            name_path_id: [],
+            open: false
         }
+    }
+
+    open = () => this.setState({open : true})
+
+    close = () => this.setState({open : false})
+
+    deleteAlbum = () => {
+        this.close();
+        const reqOptions = {
+            method: 'POST',
+            headers: {Accept:'application/json', 'Content-Type':'application/json'},
+        }
+        fetch('/delAlbum/' + this.props.user + '/' + this.props.match.params.album, reqOptions)
+            .then(response => response.json())
+            .then(JSONresponse => 
+                JSONresponse ? this.props.history.push('/home') : console.log("not del"))
+        
     }
 
     fetchAlbumPhotos = () => {
@@ -48,6 +67,12 @@ class AlbumPage extends Component {
                 <Header>
                     <Button color='orange' size='large' href='#home'>Back</Button>
                     {this.props.match.params.album}
+                    <Button color='red' size='large' floated='right' onClick={this.open}>Delete</Button>
+                    <Confirm
+                        open={this.state.open}
+                        onCancel={this.close}
+                        onConfirm={this.deleteAlbum}
+                        />
                 </Header>
                 <Divider />
                 <div>

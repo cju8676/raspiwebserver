@@ -33,6 +33,15 @@ def getpic(path, filename):
     # print("path : " + path_str + "   and   filename : " + filename_str)
     return send_from_directory(path_str, filename_str)
 
+@app.route('/info/<path>/<filename>', methods=['GET'])
+def getinfo(path, filename):
+    path_str = 'C:/Users/corey/' + urllib.parse.unquote(path) + '/' + urllib.parse.unquote(filename)
+    print("path: ", path_str)
+    image = PIL.Image.open(path_str)
+    #print(image.size)
+    print(image.getexif())
+    return ""
+
 api.add_resource(CreateUser, '/createUser/')
 api.add_resource(LoginUser, '/login/<string:username>/<string:password>')
 api.add_resource(GetImage, '/getImage/<string:filename>')
@@ -44,6 +53,7 @@ api.add_resource(CreateAlbum, '/createAlbum/<string:username>/<string:album_name
 api.add_resource(GetAllAlbums, '/getAlbums/<string:username>')
 api.add_resource(AddToAlbum, '/addPicToAlbum/')
 api.add_resource(GetAlbumPhotos, '/getAlbumPhotos/<string:username>/<string:album_name>')
+api.add_resource(DeleteAlbum, '/delAlbum/<string:username>/<string:album_name>')
 
 if __name__ == '__main__':
     print("Starting Flask backend")

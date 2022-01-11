@@ -149,3 +149,11 @@ class GetAlbumPhotos(Resource):
         """
         files = list(exec_get_all(sql, [username, album_name]))
         return files
+
+class DeleteAlbum(Resource):
+    def post(self, username, album_name):
+        sql = """
+            DELETE FROM albums
+            WHERE username = %s AND album_name = %s;
+        """
+        return exec_commit(sql, (username, album_name))

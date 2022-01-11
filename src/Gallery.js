@@ -34,6 +34,12 @@ class Gallery extends Component {
                                 [...prevState.link_name_id, [imageURL, this.state.name_path_id[i][0], this.state.name_path_id[i][2]]]
                             }));
                         })
+                    
+                    fetch('/info/' + encodeURIComponent(path) + '/' + encodeURIComponent(this.state.name_path_id[i][0]))
+                        .then(response => response.text())
+                        .then(output => {
+                            this.setState({})
+                        })
                 }
             })
     }

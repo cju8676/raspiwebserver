@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Card, Icon, Button, Modal, Input } from 'semantic-ui-react'
+import { Card, Icon, Button, Modal, Input, Message } from 'semantic-ui-react'
 
 //import ImagePane from './ImagePane'
 
@@ -10,7 +10,8 @@ class Albums extends Component {
             username: props.user,
             album_name: "",
             albums : [],
-            modal: false
+            modal: false,
+            duplicate: false
         }
     }
 
@@ -25,11 +26,15 @@ class Albums extends Component {
 
     handleResponse = (jsonOutput) => {
         if (jsonOutput === false) {
-            //todo album name already exists
+            //album name already exists
+            this.setState({duplicate : true})
+            console.log("false album already exists");
         }
         else {
             // created pop up
             this.toggle();
+            this.componentDidMount();
+            console.log("album nmame does note exist yet we are good");
         }
     }
 
@@ -83,6 +88,11 @@ class Albums extends Component {
                                 Create New Album
                             </Modal.Header>
                             <Modal.Content>
+                                <Message error
+                                    hidden={!this.state.duplicate}
+                                    header='Album with that name already exists.'
+                                    content='Please try again.'
+                                    />
                                 <Input
                                     fluid
                                     id='enteredAlbumName'
@@ -105,7 +115,7 @@ class Albums extends Component {
                     </Card>
                     {this.state.albums.map(album => {
                         return <Card href={('#album/').concat(album)}><Card.Content>{album}</Card.Content></Card>
-                    })}''
+                    })}
                 </Card.Group>
             </div>
         )
