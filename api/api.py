@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from flask_restful import Resource, Api
 import urllib.parse
 
-import PIL.Image
+from PIL import Image, ExifTags
 
 from db_utils import *
 from userApi import *
@@ -36,11 +36,18 @@ def getpic(path, filename):
 @app.route('/info/<path>/<filename>', methods=['GET'])
 def getinfo(path, filename):
     path_str = 'C:/Users/corey/' + urllib.parse.unquote(path) + '/' + urllib.parse.unquote(filename)
-    print("path: ", path_str)
-    image = PIL.Image.open(path_str)
+    #print("path: ", path_str)
+    image = Image.open(path_str)
     #print(image.size)
-    print(image.getexif())
-    return ""
+    exifdata = dict(image.getexif())
+    for key, val in exifdata.items():
+        if key in ExifTags.TAGS:
+            print(ExifTags.TAGS[key], ":", val)
+    if len(exifdata) == 0:
+        print("nothing")
+    else:
+        print(exifdata)
+    return jsonify([image.size[0], image.size[1]])
 
 api.add_resource(CreateUser, '/createUser/')
 api.add_resource(LoginUser, '/login/<string:username>/<string:password>')

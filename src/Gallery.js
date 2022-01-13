@@ -10,8 +10,10 @@ class Gallery extends Component {
         this.state = {
             albums: [],
             currentUser: props.user,
-            link_name_id: [],
-            name_path_id: []
+            link_name_id_info: [],
+            name_path_id: [],
+            id_info: {},
+            id_path: {}
         }
     }
 
@@ -24,21 +26,22 @@ class Gallery extends Component {
                     //FIXME for some reason it doesn't like encoding / so i do it manually
                     var path = (this.state.name_path_id[i][1]).replace('/', '%2F');
                     //fixme could change this to just the id to simplify
+                    this.setState(prevState => ({
+                        ...prevState,
+                        id_path: {
+                            ...prevState.id_path,
+                            [this.state.name_path_id[i][2]]:[path]
+                        }
+                    }))
+
                     fetch('/files/' + encodeURIComponent(path) + '/' + encodeURIComponent(this.state.name_path_id[i][0]))
                         .then(response => response.blob())
                         .then(imageBlob => {
                             const imageURL = URL.createObjectURL(imageBlob);
-                            //this.setState({pictures:[imageURL]})})
                             this.setState(prevState => ({
-                                link_name_id: 
-                                [...prevState.link_name_id, [imageURL, this.state.name_path_id[i][0], this.state.name_path_id[i][2]]]
+                                link_name_id_info:
+                                    [...prevState.link_name_id_info, [imageURL, this.state.name_path_id[i][0], this.state.name_path_id[i][2], this.state.id_path[this.state.name_path_id[i][2]]]]
                             }));
-                        })
-                    
-                    fetch('/info/' + encodeURIComponent(path) + '/' + encodeURIComponent(this.state.name_path_id[i][0]))
-                        .then(response => response.text())
-                        .then(output => {
-                            this.setState({})
                         })
                 }
             })
@@ -47,7 +50,7 @@ class Gallery extends Component {
     fetchAlbums = () => {
         fetch('/getAlbums/' + this.props.user).then(response => response.json())
             .then(JSONresponse => {
-                this.setState({albums : JSONresponse})
+                this.setState({ albums: JSONresponse })
             })
     }
 
@@ -70,13 +73,14 @@ class Gallery extends Component {
                 <Divider />
                 <div>
                     <Card.Group itemsPerRow={4}>
-                        {this.state.link_name_id.map(picture => {
-                            return <ImagePane 
-                            picture={picture[0]} 
-                            filename={picture[1]} 
-                            id={picture[2]} 
-                            user={this.state.currentUser}
-                            albums={this.state.albums}/>
+                        {this.state.link_name_id_info.map(picture => {
+                            return <ImagePane
+                                picture={picture[0]}
+                                filename={picture[1]}
+                                id={picture[2]}
+                                user={this.state.currentUser}
+                                albums={this.state.albums}
+                                path={picture[3]}/>
                         })}
                     </Card.Group>
                 </div>
