@@ -23,31 +23,24 @@ def getpic(path, filename):
     # FIXME ADD for RASPI
     # For windows, assume we know everything is in C:/Users/corey/...
     path_str = 'C:/Users/corey/' + path_str
-
-    #todo use this stuff later in the picture info
-    # image = PIL.Image.open("C:/Users/corey/Downloads/IMG_0920.jpg")
-    # print(image.getexif())
     # print(image.info)
-
-
-    # print("path : " + path_str + "   and   filename : " + filename_str)
     return send_from_directory(path_str, filename_str)
 
 @app.route('/info/<path>/<filename>', methods=['GET'])
 def getinfo(path, filename):
     path_str = 'C:/Users/corey/' + urllib.parse.unquote(path) + '/' + urllib.parse.unquote(filename)
-    #print("path: ", path_str)
     image = Image.open(path_str)
-    #print(image.size)
     exifdata = dict(image.getexif())
-    for key, val in exifdata.items():
-        if key in ExifTags.TAGS:
-            print(ExifTags.TAGS[key], ":", val)
+    # for key, val in exifdata.items():
+    #     if key in ExifTags.TAGS:
+    #         print(key, " : ", ExifTags.TAGS[key], ":", val)
+    #TODO get Shot and ISO info added to this
     if len(exifdata) == 0:
-        print("nothing")
+        # len wid
+        return jsonify([image.size[0], image.size[1]])
     else:
-        print(exifdata)
-    return jsonify([image.size[0], image.size[1]])
+        # len wid make model datetime
+        return jsonify([image.size[0], image.size[1], exifdata[271], exifdata[272], exifdata[306]])
 
 api.add_resource(CreateUser, '/createUser/')
 api.add_resource(LoginUser, '/login/<string:username>/<string:password>')
