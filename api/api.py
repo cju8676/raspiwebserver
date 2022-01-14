@@ -35,12 +35,20 @@ def getinfo(path, filename):
     #     if key in ExifTags.TAGS:
     #         print(key, " : ", ExifTags.TAGS[key], ":", val)
     #TODO get Shot and ISO info added to this
+    sql = """
+            SELECT name, color
+            FROM tags
+            WHERE id = -1;
+        """
+    avail_tags = list(exec_get_all(sql, []))
+
+
     if len(exifdata) == 0:
-        # len wid
-        return jsonify([image.size[0], image.size[1]])
+        # len wid --- --- --- tags
+        return jsonify([image.size[0], image.size[1], "---", "---", "---", avail_tags])
     else:
-        # len wid make model datetime
-        return jsonify([image.size[0], image.size[1], exifdata[271], exifdata[272], exifdata[306]])
+        # len wid make model datetime tags
+        return jsonify([image.size[0], image.size[1], exifdata[271], exifdata[272], exifdata[306], avail_tags])
 
 api.add_resource(CreateUser, '/createUser/')
 api.add_resource(LoginUser, '/login/<string:username>/<string:password>')
@@ -54,6 +62,8 @@ api.add_resource(GetAllAlbums, '/getAlbums/<string:username>')
 api.add_resource(AddToAlbum, '/addPicToAlbum/')
 api.add_resource(GetAlbumPhotos, '/getAlbumPhotos/<string:username>/<string:album_name>')
 api.add_resource(DeleteAlbum, '/delAlbum/<string:username>/<string:album_name>')
+api.add_resource(GetTags, '/getTags/<string:id>')
+api.add_resource(CreateTag, '/createTag/')
 
 if __name__ == '__main__':
     print("Starting Flask backend")

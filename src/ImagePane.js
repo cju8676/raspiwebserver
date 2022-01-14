@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Button, Icon, Card, Image, Modal, Divider, Dropdown, Input, Label, Segment } from 'semantic-ui-react'
+import { Button, Icon, Card, Image, Modal, Divider, Dropdown, Input, Label, Segment, Form } from 'semantic-ui-react'
 
 class ImagePane extends Component {
     constructor(props) {
@@ -12,16 +12,22 @@ class ImagePane extends Component {
             id: props.id,
             infoModal: false,
             albums: props.albums,
-            // [len, wid, make, modal, datetime]
+            // [len, wid, make, modal, datetime, tags]
             info: [],
 
-            // name : color
-            tags: {},
+            // [[name, color], ...]
+            tags: [],
+            myTags: [],
             tagModal: false,
 
             // name : imageURL
-            people : {},
+            people: {},
             peopleModal: false
+        }
+
+        this.newTag = {
+            name : "",
+            color : ""
         }
     }
 
@@ -65,13 +71,8 @@ class ImagePane extends Component {
                 //         [id]: output
                 //     }
                 // }))
-                this.setState({info : output})
-                
-                if (this.state.info.length === 2) this.setState(prevState => ({
-                    info:
-                    [...prevState.info, "---", "---", "---"]
-                }))
-                console.log(this.state.info)
+                this.setState({ info: output });
+                this.setState({ tags: this.state.info[5] });
             })
     }
 
@@ -107,42 +108,89 @@ class ImagePane extends Component {
     }
 
     toggleTag = () => {
-        this.setState({tagModal : !this.state.tagModal})
+        this.setState({ tagModal: !this.state.tagModal })
     }
 
     togglePeople = () => {
-        this.setState({peopleModal : !this.state.peopleModal})
+        this.setState({ peopleModal: !this.state.peopleModal })
+    }
+
+    myTags = () => {
+        fetch('/getTags/' + this.state.id).then(response => response.json())
+            .then(jsonOutput => {
+                if (jsonOutput.length !== 0)
+                    this.setState({ myTags: jsonOutput})
+            })
+    }
+
+    createTag = () => {
+        const data = {
+            name : this.newTag.name,
+            color : this.newTag.color
+        }
+        const reqOptions = {
+            method: 'POST',
+            headers: {Accept:'application/json', 'Content-Type':'application/json'},
+            body: JSON.stringify(data)
+        }
+        fetch('/createTag/', reqOptions)
+            .then(response => response.json())
+            .then(
+                // confirm tag has been created
+            )
+    }
+
+    update = (event) => {
+        if (event.target.id === 'enteredName') {
+            this.newTag.name = event.target.value;
+        }
+    }
+
+    handleDrop = (e, data) => {
+        if (data.id === 'enteredColor') {
+            this.newTag.color = data.value;
+        }
     }
 
     getTags = () => {
         const options = [
-            {label:{color:'red'}, text: 'Red', value: 'red'},
-            {label:{color:'orange'}, text: 'Orange', value: 'orange'},
-            {label:{color:'yellow'}, text: 'Yellow', value: 'yellow'},
-            {label:{color:'olive'}, text: 'Olive', value: 'olive'},
-            {label:{color:'green'}, text: 'Green', value: 'green'},
-            {label:{color:'teal'}, text: 'Teal', value: 'teal'},
-            {label:{color:'blue'}, text: 'Blue', value: 'blue'},
-            {label:{color:'violet'}, text: 'Violet', value: 'violet'},
-            {label:{color:'purple'}, text: 'Purple', value: 'purple'},
-            {label:{color:'pink'}, text: 'Pink', value: 'pink'},
-            {label:{color:'brown'}, text: 'Brown', value: 'brown'},
-            {label:{color:'grey'}, text: 'Grey', value: 'grey'},
-            {label:{color:'black'}, text: 'Black', value: 'black'},
+            { label: { color: 'red' }, text: 'Red', value: 'red' },
+            { label: { color: 'orange' }, text: 'Orange', value: 'orange' },
+            { label: { color: 'yellow' }, text: 'Yellow', value: 'yellow' },
+            { label: { color: 'olive' }, text: 'Olive', value: 'olive' },
+            { label: { color: 'green' }, text: 'Green', value: 'green' },
+            { label: { color: 'teal' }, text: 'Teal', value: 'teal' },
+            { label: { color: 'blue' }, text: 'Blue', value: 'blue' },
+            { label: { color: 'violet' }, text: 'Violet', value: 'violet' },
+            { label: { color: 'purple' }, text: 'Purple', value: 'purple' },
+            { label: { color: 'pink' }, text: 'Pink', value: 'pink' },
+            { label: { color: 'brown' }, text: 'Brown', value: 'brown' },
+            { label: { color: 'grey' }, text: 'Grey', value: 'grey' },
+            { label: { color: 'black' }, text: 'Black', value: 'black' },
         ]
         return (
             <Label.Group>
-                <Label color='red'>Hello</Label>
-                <Label>World</Label>
-                <Label icon='add' onClick={this.toggleTag}/>
+                {this.state.myTags.map(tag => {
+                    return (<Label color={tag[1]}>{tag[0]}</Label>)
+                })}
+                <Label>
+                    <Dropdown icon='add'>
+                        <Dropdown.Menu>
+                            {this.state.tags.map(tag => {
+                                return (<Dropdown.Item text={tag[0]} label={{ color: tag[1] }} />)
+                            })}
+                            <Dropdown.Item text='New Tag' onClick={this.toggleTag} />
+                        </Dropdown.Menu>
+                    </Dropdown>
+                </Label>
                 {this.state.tagModal && (
-                <Segment>
-                    <h4>Create Tag</h4>
-                    <Input placeholder='Name'/>
-                    <Dropdown placeholder='Color' search selection options={options} />
-                    <Button color='black' onClick={this.toggleTag}>Cancel</Button>
-                    <Button positive/*onClick={this.submitForm}*/>Submit</Button>
-                </Segment>)}
+                    <Segment>
+                        <h4>Create Tag</h4>
+                        <Input type='text' id='enteredName' placeholder='Name' onChange={this.update}/>
+                        <Dropdown placeholder='Color' search selection options={options} id='enteredColor' onChange={this.handleDrop}/>
+                        <Button color='black' onClick={this.toggleTag}>Cancel</Button>
+                        <Button positive onClick={this.createTag}>Submit</Button>
+                    </Segment>)}
             </Label.Group>
         )
     }
@@ -150,37 +198,50 @@ class ImagePane extends Component {
     getPeople = () => {
         //fixme have this dumb thing only once
         const options = [
-            {label:{color:'red'}, text: 'Red', value: 'red'},
-            {label:{color:'orange'}, text: 'Orange', value: 'orange'},
-            {label:{color:'yellow'}, text: 'Yellow', value: 'yellow'},
-            {label:{color:'olive'}, text: 'Olive', value: 'olive'},
-            {label:{color:'green'}, text: 'Green', value: 'green'},
-            {label:{color:'teal'}, text: 'Teal', value: 'teal'},
-            {label:{color:'blue'}, text: 'Blue', value: 'blue'},
-            {label:{color:'violet'}, text: 'Violet', value: 'violet'},
-            {label:{color:'purple'}, text: 'Purple', value: 'purple'},
-            {label:{color:'pink'}, text: 'Pink', value: 'pink'},
-            {label:{color:'brown'}, text: 'Brown', value: 'brown'},
-            {label:{color:'grey'}, text: 'Grey', value: 'grey'},
-            {label:{color:'black'}, text: 'Black', value: 'black'},
+            { label: { color: 'red' }, text: 'Red', value: 'red' },
+            { label: { color: 'orange' }, text: 'Orange', value: 'orange' },
+            { label: { color: 'yellow' }, text: 'Yellow', value: 'yellow' },
+            { label: { color: 'olive' }, text: 'Olive', value: 'olive' },
+            { label: { color: 'green' }, text: 'Green', value: 'green' },
+            { label: { color: 'teal' }, text: 'Teal', value: 'teal' },
+            { label: { color: 'blue' }, text: 'Blue', value: 'blue' },
+            { label: { color: 'violet' }, text: 'Violet', value: 'violet' },
+            { label: { color: 'purple' }, text: 'Purple', value: 'purple' },
+            { label: { color: 'pink' }, text: 'Pink', value: 'pink' },
+            { label: { color: 'brown' }, text: 'Brown', value: 'brown' },
+            { label: { color: 'grey' }, text: 'Grey', value: 'grey' },
+            { label: { color: 'black' }, text: 'Black', value: 'black' },
         ]
+        //todo delete
+        const people = {
+            "Juice": "blue",
+        }
         return (
             <Label.Group>
-                <Label picture>
+                <Label picture color='blue'>
                     Juice
                     {/*FIXME MAKE SURE IMAGE IS SQUARE WHEN CREATING PERSON*/}
                     <img src={this.state.picture} alt='Profile pic' />
                 </Label>
-                <Label icon='add' onClick={this.togglePeople}/>
+                <Label>
+                    <Dropdown icon='add'>
+                        <Dropdown.Menu>
+                            {Object.keys(people).map((key, idx) => {
+                                return (<Dropdown.Item text={key} label={{ color: people[key] }} />)
+                            })}
+                            <Dropdown.Item text='Create New Person' onClick={this.togglePeople} />
+                        </Dropdown.Menu>
+                    </Dropdown>
+                </Label>
                 {this.state.peopleModal && (
-                <Segment>
-                    <h4>Create New Person</h4>
-                    <Input placeholder='Name'/>
-                    <Dropdown placeholder='Tag Color' search selection options={options} />
-                    <Button>Upload Profile Pic</Button>
-                    <Button color='black' onClick={this.togglePeople}>Cancel</Button>
-                    <Button positive/*onClick={this.submitForm}*/>Submit</Button>
-                </Segment>)}
+                    <Segment>
+                        <h4>Create New Person</h4>
+                        <Input placeholder='Name' />
+                        <Dropdown placeholder='Tag Color' search selection options={options} />
+                        <Button>Upload Profile Pic</Button>
+                        <Button color='black' onClick={this.togglePeople}>Cancel</Button>
+                        <Button positive/*onClick={this.submitForm}*/>Submit</Button>
+                    </Segment>)}
             </Label.Group>
         )
     }
@@ -188,6 +249,7 @@ class ImagePane extends Component {
     componentDidMount() {
         //fixme only query this info if we open the modal, otherwise we'd be loading double time for every photo
         this.fetchInfo();
+        this.myTags();
     }
 
     render() {
@@ -238,7 +300,6 @@ class ImagePane extends Component {
                             {this.state.info[4]}
                             <Divider />
                             ID: {this.state.id}
-
                         </Modal.Content>
                         <Modal.Actions>
                             <Button color='black' onClick={this.toggleInfoModal}>Close</Button>

@@ -157,3 +157,28 @@ class DeleteAlbum(Resource):
             WHERE username = %s AND album_name = %s;
         """
         return exec_commit(sql, (username, album_name))
+
+class GetTags(Resource):
+    def get(self, id):
+        sql = """
+            SELECT name, color
+            FROM tags
+            WHERE id = %s;
+        """
+        return list(exec_get_all(sql, [id]))
+
+class CreateTag(Resource):
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('name', type=str)
+        parser.add_argument('color', type=str)
+        args = parser.parse_args()
+
+        name = args['name']
+        color = args['color']
+
+        sql = """
+            INSERT into tags (name, color)
+            VALUES (%s, %s)
+        """
+        return exec_commit(sql, (name, color))
