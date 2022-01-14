@@ -64,6 +64,7 @@ api.add_resource(GetAlbumPhotos, '/getAlbumPhotos/<string:username>/<string:albu
 api.add_resource(DeleteAlbum, '/delAlbum/<string:username>/<string:album_name>')
 api.add_resource(GetTags, '/getTags/<string:id>')
 api.add_resource(CreateTag, '/createTag/')
+api.add_resource(AddTag, '/addTag/<string:id>')
 
 if __name__ == '__main__':
     print("Starting Flask backend")

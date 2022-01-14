@@ -123,6 +123,48 @@ class ImagePane extends Component {
             })
     }
 
+    updateTagsDropdown = () => {
+        this.toggleTag();
+        this.setState(prevState => ({
+            tags:
+                [...prevState.tags, [this.newTag.name, this.newTag.color]]
+        }));
+        //this.getTags();
+        this.newTag.name = "";
+        this.newTag.color = "";
+        this.componentDidMount();
+    }
+
+    updateTagsList = () => {
+        console.log(this.newTag.name, this.newTag.color);
+        this.setState(prevState => ({
+            myTags:
+                [...prevState.myTags, [this.newTag.name, this.newTag.color]]
+        }));
+        //this.myTags();
+        this.newTag.name = "";
+        this.newTag.color = "";
+        this.componentDidMount();
+    }
+
+    addTag = () => {
+        const data = {
+            name : this.newTag.name,
+            color : this.newTag.color
+        }
+        const reqOptions = {
+            method: 'POST',
+            headers: {Accept:'application/json', 'Content-Type':'application/json'},
+            body: JSON.stringify(data)
+        }
+        fetch('/addTag/' + this.state.id, reqOptions)
+            .then(response => response.json())
+            .then(
+                // confirm tag has been created
+                this.updateTagsList()
+            )
+    }
+
     createTag = () => {
         const data = {
             name : this.newTag.name,
@@ -137,6 +179,7 @@ class ImagePane extends Component {
             .then(response => response.json())
             .then(
                 // confirm tag has been created
+                this.updateTagsDropdown()
             )
     }
 
@@ -150,6 +193,16 @@ class ImagePane extends Component {
         if (data.id === 'enteredColor') {
             this.newTag.color = data.value;
         }
+    }
+
+    selectTag = (e, data) => {
+        this.newTag.name = data.text;
+        this.newTag.color = data.label.color;
+        this.addTag();
+    }
+
+    handleDelete = (tag) => {
+        console.log("deleting : " + tag);
     }
 
     getTags = () => {
@@ -171,13 +224,17 @@ class ImagePane extends Component {
         return (
             <Label.Group>
                 {this.state.myTags.map(tag => {
-                    return (<Label color={tag[1]}>{tag[0]}</Label>)
+                    return (
+                        <Label color={tag[1]} onMouseEnter={() => {}}>
+                            {tag[0]}
+                            <Icon name='delete'/>
+                        </Label>)
                 })}
                 <Label>
                     <Dropdown icon='add'>
                         <Dropdown.Menu>
                             {this.state.tags.map(tag => {
-                                return (<Dropdown.Item text={tag[0]} label={{ color: tag[1] }} />)
+                                return (<Dropdown.Item text={tag[0]} label={{ color: tag[1] }} onClick={this.selectTag} />)
                             })}
                             <Dropdown.Item text='New Tag' onClick={this.toggleTag} />
                         </Dropdown.Menu>

@@ -182,3 +182,19 @@ class CreateTag(Resource):
             VALUES (%s, %s)
         """
         return exec_commit(sql, (name, color))
+
+class AddTag(Resource):
+    def post(self, id):
+        parser = reqparse.RequestParser()
+        parser.add_argument('name', type=str)
+        parser.add_argument('color', type=str)
+        args = parser.parse_args()
+
+        name = args['name']
+        color = args['color']
+
+        sql = """
+            INSERT into tags (name, color, id)
+            VALUES (%s, %s, %s)
+        """
+        return exec_commit(sql, (name, color, id))
