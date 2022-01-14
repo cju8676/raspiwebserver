@@ -198,3 +198,17 @@ class AddTag(Resource):
             VALUES (%s, %s, %s)
         """
         return exec_commit(sql, (name, color, id))
+
+class DeleteAccount(Resource):
+    def post(self, username):
+        sql = """
+            DELETE from albums
+            WHERE username = %s;
+
+            DELETE from favorites
+            WHERE username = %s;
+
+            DELETE from users
+            WHERE username = %s;
+        """
+        return exec_commit(sql, (username, username, username))

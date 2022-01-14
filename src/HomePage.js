@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Header, Tab } from 'semantic-ui-react'
+import { Header, Tab, Icon, Button, Container  } from 'semantic-ui-react'
 
 import Gallery from './Gallery'
 import FavoritesGallery from './FavoritesGallery'
@@ -27,9 +27,15 @@ class HomePage extends Component {
         return (
             <div>
                 <Header as='h2'>
+                    <div>
                     Welcome, {this.state.currentName}.
-                    <Tab menu={{color:'orange',tabular:false, attached:false, inverted:true}} panes={panes} />
+                    <Button href={('#settings/').concat(this.props.user)} floated='right' size='large '>
+                        <Icon name='setting'/>
+                        Settings
+                    </Button>
+                    </div>
                 </Header>
+                <Tab menu={{color:'orange',tabular:false, attached:false, inverted:true}} panes={panes} />
             </div>
         )
     }

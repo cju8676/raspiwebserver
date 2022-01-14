@@ -65,6 +65,7 @@ api.add_resource(DeleteAlbum, '/delAlbum/<string:username>/<string:album_name>')
 api.add_resource(GetTags, '/getTags/<string:id>')
 api.add_resource(CreateTag, '/createTag/')
 api.add_resource(AddTag, '/addTag/<string:id>')
+api.add_resource(DeleteAccount, '/delAcc/<string:username>')
 
 if __name__ == '__main__':
     print("Starting Flask backend")
