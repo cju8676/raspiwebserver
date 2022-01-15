@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Button, Icon, Card, Image, Modal, Divider, Dropdown, Input, Label, Segment } from 'semantic-ui-react'
+import ImageTags from './ImageTags'
 
 class ImagePane extends Component {
     constructor(props) {
@@ -12,22 +13,12 @@ class ImagePane extends Component {
             id: props.id,
             infoModal: false,
             albums: props.albums,
-            // [len, wid, make, modal, datetime, tags]
+            // [len, wid, make, modal, datetime, [tags]]
             info: [],
-
-            // [[name, color], ...]
-            tags: [],
-            myTags: [],
-            tagModal: false,
 
             // name : imageURL
             people: {},
             peopleModal: false
-        }
-
-        this.newTag = {
-            name : "",
-            color : ""
         }
 
         this.options = [
@@ -88,7 +79,6 @@ class ImagePane extends Component {
                 //     }
                 // }))
                 this.setState({ info: output });
-                this.setState({ tags: this.state.info[5] });
             })
     }
 
@@ -123,134 +113,8 @@ class ImagePane extends Component {
             })
     }
 
-    toggleTag = () => {
-        this.setState({ tagModal: !this.state.tagModal })
-    }
-
     togglePeople = () => {
         this.setState({ peopleModal: !this.state.peopleModal })
-    }
-
-    myTags = () => {
-        fetch('/getTags/' + this.state.id).then(response => response.json())
-            .then(jsonOutput => {
-                if (jsonOutput.length !== 0)
-                    this.setState({ myTags: jsonOutput})
-            })
-    }
-
-    updateTagsDropdown = () => {
-        this.toggleTag();
-        this.setState(prevState => ({
-            tags:
-                [...prevState.tags, [this.newTag.name, this.newTag.color]]
-        }));
-        //this.getTags();
-        this.newTag.name = "";
-        this.newTag.color = "";
-        this.componentDidMount();
-    }
-
-    updateTagsList = () => {
-        console.log(this.newTag.name, this.newTag.color);
-        this.setState(prevState => ({
-            myTags:
-                [...prevState.myTags, [this.newTag.name, this.newTag.color]]
-        }));
-        //this.myTags();
-        this.newTag.name = "";
-        this.newTag.color = "";
-        this.componentDidMount();
-    }
-
-    addTag = () => {
-        const data = {
-            name : this.newTag.name,
-            color : this.newTag.color
-        }
-        const reqOptions = {
-            method: 'POST',
-            headers: {Accept:'application/json', 'Content-Type':'application/json'},
-            body: JSON.stringify(data)
-        }
-        fetch('/addTag/' + this.state.id, reqOptions)
-            .then(response => response.json())
-            .then(
-                // confirm tag has been created
-                this.updateTagsList()
-            )
-    }
-
-    createTag = () => {
-        const data = {
-            name : this.newTag.name,
-            color : this.newTag.color
-        }
-        const reqOptions = {
-            method: 'POST',
-            headers: {Accept:'application/json', 'Content-Type':'application/json'},
-            body: JSON.stringify(data)
-        }
-        fetch('/createTag/', reqOptions)
-            .then(response => response.json())
-            .then(
-                // confirm tag has been created
-                this.updateTagsDropdown()
-            )
-    }
-
-    update = (event) => {
-        if (event.target.id === 'enteredName') {
-            this.newTag.name = event.target.value;
-        }
-    }
-
-    handleDrop = (e, data) => {
-        if (data.id === 'enteredColor') {
-            this.newTag.color = data.value;
-        }
-    }
-
-    selectTag = (e, data) => {
-        this.newTag.name = data.text;
-        this.newTag.color = data.label.color;
-        this.addTag();
-    }
-
-    handleDelete = (tag) => {
-        console.log("deleting : " + tag);
-    }
-
-    getTags = () => {
-        return (
-            <Label.Group>
-                {this.state.myTags.map(tag => {
-                    return (
-                        <Label color={tag[1]} onMouseEnter={() => {}}>
-                            {tag[0]}
-                            <Icon name='delete'/>
-                        </Label>)
-                })}
-                <Label>
-                    <Dropdown icon='add'>
-                        <Dropdown.Menu>
-                            {this.state.tags.map(tag => {
-                                return (<Dropdown.Item text={tag[0]} label={{ color: tag[1] }} onClick={this.selectTag} />)
-                            })}
-                            <Dropdown.Item text='New Tag' onClick={this.toggleTag} />
-                        </Dropdown.Menu>
-                    </Dropdown>
-                </Label>
-                {this.state.tagModal && (
-                    <Segment>
-                        <h4>Create Tag</h4>
-                        <Input type='text' id='enteredName' placeholder='Name' onChange={this.update}/>
-                        <Dropdown placeholder='Color' search selection options={this.options} id='enteredColor' onChange={this.handleDrop}/>
-                        <Button color='black' onClick={this.toggleTag}>Cancel</Button>
-                        <Button positive onClick={this.createTag}>Submit</Button>
-                    </Segment>)}
-            </Label.Group>
-        )
     }
 
     getPeople = () => {
@@ -290,8 +154,9 @@ class ImagePane extends Component {
 
     componentDidMount() {
         //fixme only query this info if we open the modal, otherwise we'd be loading double time for every photo
+        // to do this just make a separate info component and attach it to image pane like we did
+        // for tags and people
         this.fetchInfo();
-        this.myTags();
     }
 
     render() {
@@ -311,10 +176,7 @@ class ImagePane extends Component {
                     </Button>
                     <Dropdown
                         text='Add to Album'
-                        icon='add'
-                        floating
-                        labeled
-                        button
+                        icon='add' floating labeled button
                         className='icon'
                         options={this.getOptions()}
                         onChange={this.selectAlbum}>
@@ -326,8 +188,7 @@ class ImagePane extends Component {
                         <Modal.Content>
                             <h3>{this.state.name}</h3>
                             <Divider />
-                            <h2>Tags</h2>
-                            {this.getTags()}
+                            <ImageTags tags={this.state.info[5]} id={this.state.id}/>
                             <Divider />
                             <h2>People</h2>
                             {this.getPeople()}
