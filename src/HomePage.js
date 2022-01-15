@@ -12,7 +12,8 @@ class HomePage extends Component {
         super(props)
         this.state = {
             currentUserName: props.user,
-            currentName: props.name
+            currentName: props.name,
+            logout : props.onChange
         }
     }
 
@@ -29,9 +30,14 @@ class HomePage extends Component {
                 <Header as='h2'>
                     <div>
                     Welcome, {this.state.currentName}.
-                    <Button href={('#settings/').concat(this.props.user)} floated='right' size='large '>
+                    
+                    <Button href='#settings' floated='right' size='large'>
                         <Icon name='setting'/>
                         Settings
+                    </Button>
+                    <Button onClick={this.state.logout} floated='right' size='large'>
+                        <Icon name='sign out'/>
+                        Logout
                     </Button>
                     </div>
                 </Header>

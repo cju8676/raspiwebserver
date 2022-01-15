@@ -212,3 +212,37 @@ class DeleteAccount(Resource):
             WHERE username = %s;
         """
         return exec_commit(sql, (username, username, username))
+
+class UpdateName(Resource):
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('username', type=str)
+        parser.add_argument('new_name', type=str)
+        args = parser.parse_args()
+        username = args['username']
+        new_name = args['new_name']
+        
+        sql = """
+            UPDATE users
+            SET name = %s
+            WHERE username = %s;
+        """
+        return exec_commit(sql, (new_name, username))
+
+class UpdateUsername(Resource):
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('username', type=str)
+        parser.add_argument('new_username', type=str)
+        args = parser.parse_args()
+
+        username = args['username']
+        new_username = args['new_username']
+        sql = """
+            UPDATE users
+            SET username = %s
+            WHERE username = %s;
+        """
+        return exec_commit(sql, (new_username, username))
+
+# class UpdatePassword(Resource):
