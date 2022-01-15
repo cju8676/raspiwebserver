@@ -5,15 +5,15 @@ class ImageTags extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            id : props.id,
-            tags : props.tags,
-            myTags : [],
-            tagModal : false
+            id: props.id,
+            tags: [],
+            myTags: [],
+            tagModal: false
         }
 
         this.newTag = {
-            name : "",
-            color : ""
+            name: "",
+            color: ""
         }
 
         this.options = [
@@ -37,7 +37,15 @@ class ImageTags extends Component {
         fetch('/getTags/' + this.state.id).then(response => response.json())
             .then(jsonOutput => {
                 if (jsonOutput.length !== 0)
-                    this.setState({ myTags: jsonOutput})
+                    this.setState({ myTags: jsonOutput })
+            })
+    }
+
+    availTags = () => {
+        fetch('/getAvailTags/' + this.state.id).then(response => response.json())
+            .then(jsonOutput => {
+                console.log(jsonOutput)
+                this.setState({ tags: jsonOutput })
             })
     }
 
@@ -47,7 +55,6 @@ class ImageTags extends Component {
             tags:
                 [...prevState.tags, [this.newTag.name, this.newTag.color]]
         }));
-        //this.getTags();
         this.newTag.name = "";
         this.newTag.color = "";
         this.componentDidMount();
@@ -59,12 +66,12 @@ class ImageTags extends Component {
 
     createTag = () => {
         const data = {
-            name : this.newTag.name,
-            color : this.newTag.color
+            name: this.newTag.name,
+            color: this.newTag.color
         }
         const reqOptions = {
             method: 'POST',
-            headers: {Accept:'application/json', 'Content-Type':'application/json'},
+            headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         }
         fetch('/createTag/', reqOptions)
@@ -88,13 +95,16 @@ class ImageTags extends Component {
     }
 
     addTag = () => {
+        // changed in db, this should never hit bc should never show up in avail tags
+        // if (JSON.stringify(this.state.myTags) != -1)
+        //     return false;
         const data = {
-            name : this.newTag.name,
-            color : this.newTag.color
+            name: this.newTag.name,
+            color: this.newTag.color
         }
         const reqOptions = {
             method: 'POST',
-            headers: {Accept:'application/json', 'Content-Type':'application/json'},
+            headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         }
         fetch('/addTag/' + this.state.id, reqOptions)
@@ -124,43 +134,59 @@ class ImageTags extends Component {
 
     handleDelete = (tag) => {
         console.log("deleting : " + tag);
+        const data = {
+            name: tag[0],
+            color: tag[1]
+        }
+        const reqOptions = {
+            method: 'POST',
+            headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        }
+        fetch('/delTag/' + this.state.id, reqOptions)
+            .then(response => response.json())
+            .then(
+                // confirm tag has been created
+                this.updateTagsList()
+            )
     }
 
     componentDidMount() {
+        this.availTags();
         this.myTags();
     }
 
-    render () {
+    render() {
         return (
             <div>
                 <h2>Tags</h2>
                 <Label.Group>
-                {this.state.myTags.map(tag => {
-                    return (
-                        <Label color={tag[1]} onMouseEnter={() => {}}>
-                            {tag[0]}
-                            <Icon name='delete'/>
-                        </Label>)
-                })}
-                <Label>
-                    <Dropdown icon='add'>
-                        <Dropdown.Menu>
-                            {this.state.tags.map(tag => {
-                                return (<Dropdown.Item text={tag[0]} label={{ color: tag[1] }} onClick={this.selectTag} />)
-                            })}
-                            <Dropdown.Item text='New Tag' onClick={this.toggleTag} />
-                        </Dropdown.Menu>
-                    </Dropdown>
-                </Label>
-                {this.state.tagModal && (
-                    <Segment>
-                        <h4>Create Tag</h4>
-                        <Input type='text' id='enteredName' placeholder='Name' onChange={this.update}/>
-                        <Dropdown placeholder='Color' search selection options={this.options} id='enteredColor' onChange={this.handleDrop}/>
-                        <Button color='black' onClick={this.toggleTag}>Cancel</Button>
-                        <Button positive onClick={this.createTag}>Submit</Button>
-                    </Segment>)}
-            </Label.Group>
+                    {this.state.myTags.map(tag => {
+                        return (
+                            <Label color={tag[1]} >
+                                {tag[0]}
+                                <Icon name='delete' onClick={e => this.handleDelete(tag)}/>
+                            </Label>)
+                    })}
+                    <Label>
+                        <Dropdown icon='add'>
+                            <Dropdown.Menu>
+                                {this.state.tags.map(tag => {
+                                    return (<Dropdown.Item text={tag[0]} label={{ color: tag[1] }} onClick={this.selectTag} />)
+                                })}
+                                <Dropdown.Item text='New Tag' onClick={this.toggleTag} />
+                            </Dropdown.Menu>
+                        </Dropdown>
+                    </Label>
+                    {this.state.tagModal && (
+                        <Segment>
+                            <h4>Create Tag</h4>
+                            <Input type='text' id='enteredName' placeholder='Name' onChange={this.update} />
+                            <Dropdown placeholder='Color' search selection options={this.options} id='enteredColor' onChange={this.handleDrop} />
+                            <Button color='black' onClick={this.toggleTag}>Cancel</Button>
+                            <Button positive onClick={this.createTag}>Submit</Button>
+                        </Segment>)}
+                </Label.Group>
             </div>
         )
     }

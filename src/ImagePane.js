@@ -14,8 +14,8 @@ class ImagePane extends Component {
             id: props.id,
             infoModal: false,
             albums: props.albums,
-            // [len, wid, make, modal, datetime, [tags]]
-            info: [],
+            // [len, wid, make, modal, datetime]
+            info: []
         }
     }
 
@@ -130,7 +130,7 @@ class ImagePane extends Component {
                         <Modal.Content>
                             <h3>{this.state.name}</h3>
                             <Divider />
-                            <ImageTags tags={this.state.info[5]} id={this.state.id}/>
+                            <ImageTags id={this.state.id}/>
                             <Divider />
                             <PeopleTags picture={this.state.picture} id={this.state.id}/>
                             <Divider />

@@ -37,22 +37,16 @@ def getinfo(path, filename):
     #     if key in ExifTags.TAGS:
     #         print(key, " : ", ExifTags.TAGS[key], ":", val)
     #TODO get Shot and ISO info added to this
-    sql = """
-            SELECT name, color
-            FROM tags
-            WHERE id = -1;
-        """
-    avail_tags = list(exec_get_all(sql, []))
 
     if len(exifdata) == 0:
         # len wid --- --- --- tags
-        return jsonify([image.size[0], image.size[1], "---", "---", "---", avail_tags])
+        return jsonify([image.size[0], image.size[1], "---", "---", "---"])
     else:
         #print(datetime.strptime(exifdata[306], '%Y:%m:%d %H:%M:%S').strftime("%B %d, %Y -- %I:%M:%S %p"))
         formatted = datetime.strptime(exifdata[306], '%Y:%m:%d %H:%M:%S').strftime("%B %d, %Y -- %I:%M:%S %p")
 
         # len wid make model datetime tags
-        return jsonify([image.size[0], image.size[1], exifdata[271], exifdata[272], formatted, avail_tags])
+        return jsonify([image.size[0], image.size[1], exifdata[271], exifdata[272], formatted])
 
 api.add_resource(CreateUser, '/createUser/')
 api.add_resource(LoginUser, '/login/<string:username>/<string:password>')
@@ -66,9 +60,11 @@ api.add_resource(GetAllAlbums, '/getAlbums/<string:username>')
 api.add_resource(AddToAlbum, '/addPicToAlbum/')
 api.add_resource(GetAlbumPhotos, '/getAlbumPhotos/<string:username>/<string:album_name>')
 api.add_resource(DeleteAlbum, '/delAlbum/<string:username>/<string:album_name>')
-api.add_resource(GetTags, '/getTags/<string:id>')
+api.add_resource(GetMyTags, '/getTags/<string:id>')
+api.add_resource(GetAvailTags, '/getAvailTags/<string:id>')
 api.add_resource(CreateTag, '/createTag/')
 api.add_resource(AddTag, '/addTag/<string:id>')
+api.add_resource(DeleteTag, '/delTag/<string:id>')
 api.add_resource(DeleteAccount, '/delAcc/<string:username>')
 api.add_resource(UpdateName, '/updateName/')
 api.add_resource(UpdateUsername, '/updateUsername/')

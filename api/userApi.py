@@ -158,7 +158,7 @@ class DeleteAlbum(Resource):
         """
         return exec_commit(sql, (username, album_name))
 
-class GetTags(Resource):
+class GetMyTags(Resource):
     def get(self, id):
         sql = """
             SELECT name, color
@@ -166,6 +166,22 @@ class GetTags(Resource):
             WHERE id = %s;
         """
         return list(exec_get_all(sql, [id]))
+
+class GetAvailTags(Resource):
+    def get(self, id):
+        sql = """
+            SELECT name, color
+            FROM tags
+            WHERE id = -1
+            AND name NOT IN
+                (
+                    SELECT name
+                    FROM tags
+                    WHERE id = %s
+                )
+        """
+        avail_tags = list(exec_get_all(sql, [id]))
+        return avail_tags
 
 class CreateTag(Resource):
     def post(self):
@@ -199,6 +215,25 @@ class AddTag(Resource):
         """
         return exec_commit(sql, (name, color, id))
 
+class DeleteTag(Resource):
+    def post(self, id):
+        parser = reqparse.RequestParser()
+        parser.add_argument('name', type=str)
+        parser.add_argument('color', type=str)
+        args = parser.parse_args()
+
+        name = args['name']
+        color = args['color']
+
+        sql = """
+            DELETE FROM tags
+            WHERE id = %s
+            AND name = %s
+            AND color = %s
+        """
+        return exec_commit(sql, (id, name, color))
+
+
 class DeleteAccount(Resource):
     def post(self, username):
         sql = """
@@ -221,7 +256,7 @@ class UpdateName(Resource):
         args = parser.parse_args()
         username = args['username']
         new_name = args['new_name']
-        
+
         sql = """
             UPDATE users
             SET name = %s
