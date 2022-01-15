@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
-import { Button, Icon, Card, Image, Modal, Divider, Dropdown, Input, Label, Segment } from 'semantic-ui-react'
+import { Button, Icon, Card, Image, Modal, Divider, Dropdown } from 'semantic-ui-react'
 import ImageTags from './ImageTags'
+import PeopleTags from './PeopleTags'
 
 class ImagePane extends Component {
     constructor(props) {
@@ -15,27 +16,7 @@ class ImagePane extends Component {
             albums: props.albums,
             // [len, wid, make, modal, datetime, [tags]]
             info: [],
-
-            // name : imageURL
-            people: {},
-            peopleModal: false
         }
-
-        this.options = [
-            { label: { color: 'red' }, text: 'Red', value: 'red' },
-            { label: { color: 'orange' }, text: 'Orange', value: 'orange' },
-            { label: { color: 'yellow' }, text: 'Yellow', value: 'yellow' },
-            { label: { color: 'olive' }, text: 'Olive', value: 'olive' },
-            { label: { color: 'green' }, text: 'Green', value: 'green' },
-            { label: { color: 'teal' }, text: 'Teal', value: 'teal' },
-            { label: { color: 'blue' }, text: 'Blue', value: 'blue' },
-            { label: { color: 'violet' }, text: 'Violet', value: 'violet' },
-            { label: { color: 'purple' }, text: 'Purple', value: 'purple' },
-            { label: { color: 'pink' }, text: 'Pink', value: 'pink' },
-            { label: { color: 'brown' }, text: 'Brown', value: 'brown' },
-            { label: { color: 'grey' }, text: 'Grey', value: 'grey' },
-            { label: { color: 'black' }, text: 'Black', value: 'black' },
-        ]
     }
 
     favorite = () => {
@@ -113,45 +94,6 @@ class ImagePane extends Component {
             })
     }
 
-    togglePeople = () => {
-        this.setState({ peopleModal: !this.state.peopleModal })
-    }
-
-    getPeople = () => {
-        //todo delete
-        const people = {
-            "Juice": "blue",
-        }
-        return (
-            <Label.Group>
-                <Label picture color='blue'>
-                    Juice
-                    {/*FIXME MAKE SURE IMAGE IS SQUARE WHEN CREATING PERSON*/}
-                    <img src={this.state.picture} alt='Profile pic' />
-                </Label>
-                <Label>
-                    <Dropdown icon='add'>
-                        <Dropdown.Menu>
-                            {Object.keys(people).map((key, idx) => {
-                                return (<Dropdown.Item text={key} label={{ color: people[key] }} />)
-                            })}
-                            <Dropdown.Item text='Create New Person' onClick={this.togglePeople} />
-                        </Dropdown.Menu>
-                    </Dropdown>
-                </Label>
-                {this.state.peopleModal && (
-                    <Segment>
-                        <h4>Create New Person</h4>
-                        <Input placeholder='Name' />
-                        <Dropdown placeholder='Tag Color' search selection options={this.options} />
-                        <Button>Upload Profile Pic</Button>
-                        <Button color='black' onClick={this.togglePeople}>Cancel</Button>
-                        <Button positive/*onClick={this.submitForm}*/>Submit</Button>
-                    </Segment>)}
-            </Label.Group>
-        )
-    }
-
     componentDidMount() {
         //fixme only query this info if we open the modal, otherwise we'd be loading double time for every photo
         // to do this just make a separate info component and attach it to image pane like we did
@@ -190,8 +132,7 @@ class ImagePane extends Component {
                             <Divider />
                             <ImageTags tags={this.state.info[5]} id={this.state.id}/>
                             <Divider />
-                            <h2>People</h2>
-                            {this.getPeople()}
+                            <PeopleTags picture={this.state.picture} id={this.state.id}/>
                             <Divider />
                             <h2>Dimensions</h2>
                             {this.state.info[0]} x {this.state.info[1]}

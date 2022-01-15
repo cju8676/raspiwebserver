@@ -1,6 +1,5 @@
-import { getDefaultNormalizer } from '@testing-library/react';
 import React, { Component } from 'react'
-import { Button, Icon, Card, Image, Modal, Divider, Dropdown, Input, Label, Segment } from 'semantic-ui-react'
+import { Button, Icon, Dropdown, Input, Label, Segment } from 'semantic-ui-react'
 
 class ImageTags extends Component {
     constructor(props) {
