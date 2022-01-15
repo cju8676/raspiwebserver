@@ -4,6 +4,8 @@ import urllib.parse
 
 from PIL import Image, ExifTags
 
+from datetime import datetime
+
 from db_utils import *
 from userApi import *
 
@@ -42,13 +44,15 @@ def getinfo(path, filename):
         """
     avail_tags = list(exec_get_all(sql, []))
 
-
     if len(exifdata) == 0:
         # len wid --- --- --- tags
         return jsonify([image.size[0], image.size[1], "---", "---", "---", avail_tags])
     else:
+        #print(datetime.strptime(exifdata[306], '%Y:%m:%d %H:%M:%S').strftime("%B %d, %Y -- %I:%M:%S %p"))
+        formatted = datetime.strptime(exifdata[306], '%Y:%m:%d %H:%M:%S').strftime("%B %d, %Y -- %I:%M:%S %p")
+
         # len wid make model datetime tags
-        return jsonify([image.size[0], image.size[1], exifdata[271], exifdata[272], exifdata[306], avail_tags])
+        return jsonify([image.size[0], image.size[1], exifdata[271], exifdata[272], formatted, avail_tags])
 
 api.add_resource(CreateUser, '/createUser/')
 api.add_resource(LoginUser, '/login/<string:username>/<string:password>')
