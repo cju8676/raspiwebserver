@@ -16,10 +16,7 @@ class PageHandle extends Component {
     }
 
     handleUserChange = (output) => {
-        console.log(output)
-        this.setState({currentUser: output[0]})
-        this.setState({currentName: output[1]})
-        this.setState({redirect: "/home"})
+        this.setState({currentUser: output[0], currentName: output[1], redirect: "/home"})
     }
 
     handleLogout = () => {

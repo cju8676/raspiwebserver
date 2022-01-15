@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
-import { Header, Button, Icon, Divider, Confirm, Container, Segment, Input } from 'semantic-ui-react'
-import ImagePane from './ImagePane';
-import { withRouter } from 'react-router-dom'
+import { Header, Button, Divider, Confirm, Container, Segment, Input } from 'semantic-ui-react'
+//import { withRouter } from 'react-router-dom'
 
 class SettingsPage extends Component {
     constructor(props) {
@@ -36,71 +35,57 @@ class SettingsPage extends Component {
     }
 
     handleUpdate = (e) => {
-        if (e ==='name') {
-            console.log('NAME')
-            this.state.name = this.updateInfo;
+        if (e ==='Name') {
+            this.setState({name : this.updateInfo});
             this.updateInfo= "";
             this.toggleName();
             this.componentDidMount();
         }
-        else if (e === 'user') {
-            console.log('USER')
-            this.state.user = this.updateInfo;
+        else if (e === 'Username') {
+            this.setState({user : this.updateInfo});
             this.updateInfo= "";
             this.toggleuserName();
             this.componentDidMount();
         }
     }
 
-    updateName = () => {
+    /* Update name or username in DB */
+    updateNameInfo = () => {
         const data = {
             username: this.props.user,
             new_name: this.updateInfo
         }
-        console.log(data)
         const reqOptions = {
             method: 'POST',
             headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         }
-        fetch('/updateName/', reqOptions).then(response => response.json)
+        var nameOrUser = "";
+        if (this.state.nameModal) nameOrUser = 'Name'
+        else nameOrUser = 'Username';
+        console.log(nameOrUser)
+        fetch('/update' + nameOrUser + '/', reqOptions).then(response => response.json)
             .then(
                 // todo handle success pop up
-                this.handleUpdate('name')
-            )
-    }
-
-    updateUsername = () => {
-        //FIXME COMBINE WITH OTHER UPDATE
-        const data = {
-            username: this.props.user,
-            new_username: this.updateInfo
-        }
-        const reqOptions = {
-            method: 'POST',
-            headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        }
-        fetch('/updateUsername/', reqOptions).then(response => response.json)
-            .then(
-                // todo handle success pop up
-                this.handleUpdate('user')
+                this.handleUpdate(nameOrUser)
             )
     }
 
     toggleName = () => {
         this.setState({nameModal : !this.state.nameModal})
+        if (this.state.nameModal === false && this.state.usernameModal === true)
+            this.setState({usernameModal : !this.state.usernameModal})
     }
 
     toggleuserName = () => {
         this.setState({usernameModal : !this.state.usernameModal})
+        if (this.state.nameModal === true && this.state.usernameModal === false)
+            this.setState({nameModal : !this.state.nameModal})
     }
 
     update = (event) => {
-        //fixme if i do it this way i cant edit 2 at the same time
-        console.log(event)
         if (event.target.id === 'enteredName') {
-            this.updateInfo= event.target.value;
+            this.updateInfo = event.target.value;
         }
     }
 
@@ -123,7 +108,7 @@ class SettingsPage extends Component {
                         <h4>Edit Name</h4>
                         <Input type='text' id='enteredName' placeholder='Name' onChange={this.update}/>
                         <Button color='black' onClick={this.toggleName}>Cancel</Button>
-                        <Button positive onClick={this.updateName}>Confirm</Button>
+                        <Button positive onClick={this.updateNameInfo}>Confirm</Button>
                     </Segment>)}
                     <h2>Username</h2>
                     {this.state.user} <Button basic compact icon='edit' color='black' onClick={this.toggleuserName}/>
@@ -132,7 +117,7 @@ class SettingsPage extends Component {
                         <h4>Edit Username</h4>
                         <Input type='text' id='enteredName' placeholder='Name' onChange={this.update}/>
                         <Button color='black' onClick={this.toggleuserName}>Cancel</Button>
-                        <Button positive onClick={this.updateUsername}>Confirm</Button>
+                        <Button positive onClick={this.updateNameInfo}>Confirm</Button>
                     </Segment>)}
                     <Divider />
                     <Button onClick={this.state.logout}>Logout</Button>
@@ -147,7 +132,6 @@ class SettingsPage extends Component {
                         onConfirm={this.deleteAcc}
                     />
                 </Container>
-
             </div>
         )
     }

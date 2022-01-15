@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import {Header, Button, Card, Divider, Confirm } from 'semantic-ui-react'
 import ImagePane from './ImagePane';
-import {withRouter} from 'react-router-dom'
+//import {withRouter} from 'react-router-dom'
 
 class AlbumPage extends Component {
     constructor(props) {
@@ -46,7 +46,6 @@ class AlbumPage extends Component {
                         .then(response => response.blob())
                         .then(imageBlob => {
                             const imageURL = URL.createObjectURL(imageBlob);
-                            //this.setState({pictures:[imageURL]})})
                             this.setState(prevState => ({
                                 link_name_id: 
                                 [...prevState.link_name_id, [imageURL, this.state.name_path_id[i][0], this.state.name_path_id[i][2]]]

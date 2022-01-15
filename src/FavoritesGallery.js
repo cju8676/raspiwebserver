@@ -9,9 +9,10 @@ class FavoritesGallery extends Component {
         super(props)
         this.state = {
             currentUser: props.user,
-            link_name_id: [],
+            link_name_id_info: [],
             name_path_id: [],
-            albums : []
+            albums : [],
+            id_path: {}
         }
     }
 
@@ -24,14 +25,20 @@ class FavoritesGallery extends Component {
                     //FIXME for some reason it doesn't like encoding / so i do it manually
                     var path = (this.state.name_path_id[i][1]).replace('/', '%2F');
                     //fixme could change this to just the id to simplify
+                    this.setState(prevState => ({
+                        ...prevState,
+                        id_path: {
+                            ...prevState.id_path,
+                            [this.state.name_path_id[i][2]]:[path]
+                        }
+                    }))
                     fetch('/files/' + encodeURIComponent(path) + '/' + encodeURIComponent(this.state.name_path_id[i][0]))
                         .then(response => response.blob())
                         .then(imageBlob => {
                             const imageURL = URL.createObjectURL(imageBlob);
-                            //this.setState({pictures:[imageURL]})})
                             this.setState(prevState => ({
-                                link_name_id: 
-                                [...prevState.link_name_id, [imageURL, this.state.name_path_id[i][0], this.state.name_path_id[i][2]]]
+                                link_name_id_info:
+                                    [...prevState.link_name_id_info, [imageURL, this.state.name_path_id[i][0], this.state.name_path_id[i][2], this.state.id_path[this.state.name_path_id[i][2]]]]
                             }));
                         })
                 }
@@ -57,14 +64,15 @@ class FavoritesGallery extends Component {
             <div>
                 {console.log(this.state)}
                 <Card.Group itemsPerRow={4}>
-                    {this.state.link_name_id.map(picture => {
+                    {this.state.link_name_id_info.map(picture => {
                         return <ImagePane 
                         picture={picture[0]} 
                         filename={picture[1]} 
                         id={picture[2]} 
                         user={this.state.currentUser} 
                         favorited='true'
-                        albums={this.state.albums}/>
+                        albums={this.state.albums}
+                        path={picture[3]}/>
                     })}
                 </Card.Group>
             </div>
