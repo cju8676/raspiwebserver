@@ -80,7 +80,9 @@ class Gallery extends Component {
                                 id={picture[2]}
                                 user={this.state.currentUser}
                                 albums={this.state.albums}
-                                path={picture[3]}/>
+                                path={picture[3]}
+                                inAlbum={false}
+                                />
                         })}
                     </Card.Group>
                 </div>

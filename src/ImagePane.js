@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Button, Icon, Card, Image, Modal, Divider, Dropdown } from 'semantic-ui-react'
+import { Button, Icon, Card, Image, Modal, Divider, Dropdown, Confirm } from 'semantic-ui-react'
 import ImageTags from './ImageTags'
 import PeopleTags from './PeopleTags'
 
@@ -15,9 +15,15 @@ class ImagePane extends Component {
             infoModal: false,
             albums: props.albums,
             // [len, wid, make, modal, datetime]
-            info: []
+            info: [],
+
+            open : false,
+            refresh : props.refresh
         }
     }
+    open = () => this.setState({open : true})
+
+    close = () => this.setState({open : false})
 
     favorite = () => {
         const data = {
@@ -94,6 +100,31 @@ class ImagePane extends Component {
             })
     }
 
+    handleRemove = () => {
+        this.close();
+        this.state.refresh();
+    }
+
+    removeFromAlbum = () => {
+        const postData = {
+            username: this.props.user,
+            album_name: this.props.inAlbum,
+            id: this.state.id
+        }
+        console.log(postData)
+        const reqOptions = {
+            method: 'POST',
+            headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+            body: JSON.stringify(postData)
+        }
+        fetch('/removeFromAlbum/', reqOptions)
+            .then(response => response.json())
+            .then(jsonOutput => {
+                //TODO handle response - success or failed to remove from album
+                this.handleRemove()
+            })
+    }
+
     componentDidMount() {
         //fixme only query this info if we open the modal, otherwise we'd be loading double time for every photo
         // to do this just make a separate info component and attach it to image pane like we did
@@ -116,13 +147,22 @@ class ImagePane extends Component {
                         {this.state.favorited && <Icon name='favorite' color='yellow' />}
                         Favorite
                     </Button>
-                    <Dropdown
+                    {!this.props.inAlbum && <Dropdown
                         text='Add to Album'
                         icon='add' floating labeled button
                         className='icon'
                         options={this.getOptions()}
                         onChange={this.selectAlbum}>
-                    </Dropdown>
+                    </Dropdown>}
+                    {this.props.inAlbum && <Button color='red' onClick={this.open}>
+                        Remove
+                    </Button>}
+                    <Confirm 
+                        open={this.state.open}
+                        onCancel={this.close}
+                        onConfirm={this.removeFromAlbum}
+                        content='This will remove this file from the album'
+                        />
                     <Modal
                         open={this.state.infoModal}
                         trigger={<Button onClick={this.toggleInfoModal}><Icon name='info' /></Button>}>

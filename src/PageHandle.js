@@ -23,13 +23,17 @@ class PageHandle extends Component {
         this.setState({currentUser: null, currentName: null, redirect: "/login"})
     }
 
+    handleRefresh = (album) => {
+        this.setState({redirect: "/album/" + album})
+    }
+
     render() {
         return ( 
             <HashRouter>
                 <Redirect to={this.state.redirect}/>
                 <Route path="/login" component={(props) => <LoginScreen newUser={this.state.currentUser} onChange={this.handleUserChange}/>} />
                 <Route path="/home" component={(props) => <HomePage user={this.state.currentUser} name={this.state.currentName} onChange={this.handleLogout}/>}/>
-                <Route path="/album/:album" component={(props) => <AlbumPage {...props} user={this.state.currentUser}/>}/>
+                <Route path="/album/:album" component={(props) => <AlbumPage {...props} user={this.state.currentUser} onChange={this.handleRefresh}/>}/>
                 <Route path="/settings" component={(props) => <SettingsPage {...props} onChange={this.handleLogout} name={this.state.currentName} user={this.state.currentUser}/>}/>
             </HashRouter>
         )
