@@ -50,3 +50,9 @@ h1 {
   cursor: pointer;
   border-radius: 5px;
 }
+
+.rightButton {
+  position: relative;
+  z-index: 99;
+  float: right;
+}

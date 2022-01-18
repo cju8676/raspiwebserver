@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
-import { Card, Search, Divider, Header, Button } from 'semantic-ui-react'
+import { Card, Search, Divider, Header, Button, Modal } from 'semantic-ui-react'
 
 import ImagePane from './ImagePane'
+import UploadFileModal from './UploadFileModal'
 
 
 class Gallery extends Component {
@@ -13,7 +14,9 @@ class Gallery extends Component {
             link_name_id_info: [],
             name_path_id: [],
             id_info: {},
-            id_path: {}
+            id_path: {},
+            uploadFile : false,
+            refresh : props.onRefresh
         }
     }
 
@@ -66,7 +69,7 @@ class Gallery extends Component {
             <div>
                 <div>
                     <Header as='h3' size='small '>
-                        <Button color='orange' size='large' floated='right'>Upload</Button>
+                        <UploadFileModal onRefresh={this.state.refresh}/>
                         <Search />
                     </Header>
                 </div>

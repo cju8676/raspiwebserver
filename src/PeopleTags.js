@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { Button, Dropdown, Input, Label, Segment } from 'semantic-ui-react'
+import { Button, Dropdown, Input, Label, Segment, Form, Container } from 'semantic-ui-react'
+import Cropper from 'react-easy-crop'
 
 class PeopleTags extends Component {
     constructor(props) {
@@ -7,9 +8,11 @@ class PeopleTags extends Component {
         this.state = {
             id: props.id,
             people: props.people,
-            peopleModal: false
+            peopleModal: false,
             // // name : imageURL
             // people: {},
+            file: null,
+            cropper : false
         }
 
         this.newPerson = {
@@ -33,10 +36,47 @@ class PeopleTags extends Component {
             { label: { color: 'grey' }, text: 'Grey', value: 'grey' },
             { label: { color: 'black' }, text: 'Black', value: 'black' },
         ]
+
+        this.crop = {x : 0, y: 0}
+        this.zoom = 1
+
+        this.handleUploadImage = this.handleUploadImage.bind(this);
     }
 
     togglePeople = () => {
         this.setState({ peopleModal: !this.state.peopleModal })
+        this.setState({ cropper : false})
+    }
+
+    handleUploadImage = (e) => {
+        e.preventDefault();
+        const data = new FormData();
+        data.append("file", this.uploadInput.files[0]);
+        // data.append('filename', this.fileName.value);
+        fetch('/upload', {
+            method: 'POST',
+            body: data
+        }).then((response) => {
+            response.blob().then((imageBlob) => {
+                console.log(imageBlob)
+                this.setState({ imageURL: URL.createObjectURL(imageBlob) });
+            });
+          });
+          
+        this.setState({ cropper : true });
+    }
+
+    setCrop = (x, y) => {
+        this.crop.x = x;
+        this.crop.y = y;
+    }
+
+    setZoom = (x) => {
+        this.zoom = x;
+    }
+
+    onCropComplete = (area, pixels) => {
+        console.log(area, pixels)
     }
 
     render() {
@@ -67,9 +107,42 @@ class PeopleTags extends Component {
                             <h4>Create New Person</h4>
                             <Input placeholder='Name' />
                             <Dropdown placeholder='Tag Color' search selection options={this.options} />
-                            <Button>Upload Profile Pic</Button>
+                            {/* <Button method='post' action="/upload" enctype="multipart/form-data">Upload Profile Pic</Button> */}
                             <Button color='black' onClick={this.togglePeople}>Cancel</Button>
-                            <Button positive/*onClick={this.submitForm}*/>Submit</Button>
+                            <Button positive >Submit</Button>
+                            {/* <form onSubmit={this.handleUploadImage}>
+                                <div>
+                                    <Button>
+                                    <input ref={(ref) => { this.uploadInput = ref; }} type="file" />
+                                    </Button>
+                                </div>
+                                <div>
+                                    <input ref={(ref) => { this.fileName = ref; }} type="text" placeholder="Enter the desired name of file" />
+                                </div>
+                                <br />
+                                <div>
+                                    <button>Upload</button>
+                                </div>
+                                <img src={this.state.imageURL} alt="img" />
+                            </form> */}
+                            <Form onSubmit={this.handleUploadImage}>
+                                <Container>
+                                    <input ref={(ref) => { this.uploadInput = ref; }} type="file" />
+                                    {/* <input ref={(ref) => { this.fileName = ref; }} type="text" placeholder="Enter the desired name of file" /> */}
+                                    <Button positive>Submit</Button>
+                                    {this.state.cropper && 
+                                        <Cropper 
+                                            image={this.state.imageURL}
+                                            crop={this.crop}
+                                            zoom={this.zoom}
+                                            aspect={4 / 4}
+                                            onCropChange={this.setCrop}
+                                            onCropComplete={this.onCropComplete}
+                                            onZoomChange={this.setZoom}/>}
+                                </Container>
+                            </Form>
+
+
                         </Segment>)}
                 </Label.Group>
             </div>

@@ -1,6 +1,7 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, redirect, url_for
 from flask_restful import Resource, Api
 import urllib.parse
+from werkzeug.utils import secure_filename
 
 from PIL import Image, ExifTags
 
@@ -9,7 +10,11 @@ from datetime import datetime
 from db_utils import *
 from userApi import *
 
+UPLOAD_FOLDER='C:/Users/corey/Pictures/dbtest'
+ALLOWED_EXTENSIONS = {'jpg', 'jpeg'}
+
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 api = Api(app)
 
 @app.route("/")
@@ -33,9 +38,9 @@ def getinfo(path, filename):
     path_str = 'C:/Users/corey/' + urllib.parse.unquote(path) + '/' + urllib.parse.unquote(filename)
     image = Image.open(path_str)
     exifdata = dict(image.getexif())
-    # for key, val in exifdata.items():
-    #     if key in ExifTags.TAGS:
-    #         print(key, " : ", ExifTags.TAGS[key], ":", val)
+    for key, val in exifdata.items():
+        if key in ExifTags.TAGS:
+            print(key, " : ", ExifTags.TAGS[key], ":", val)
     #TODO get Shot and ISO info added to this
 
     if len(exifdata) == 0:
@@ -47,6 +52,45 @@ def getinfo(path, filename):
 
         # len wid make model datetime tags
         return jsonify([image.size[0], image.size[1], exifdata[271], exifdata[272], formatted])
+
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/upload', methods=['POST'])
+def fileUploadProfPic():
+    target=os.path.join(UPLOAD_FOLDER, datetime.today().strftime("%m-%d-%Y"))
+    if not os.path.isdir(target):
+        os.mkdir(target)
+    file = request.files['file'] 
+    filename = secure_filename(file.filename)
+    destination="/".join([target, filename])
+    print(target)
+    print(filename)
+    file.save(destination)
+    return send_from_directory(target, filename, as_attachment=True)
+
+#FIXME combine with prof pic upload
+@app.route('/uploadPic', methods=['POST'])
+def fileUpload():
+    target=os.path.join(UPLOAD_FOLDER, datetime.today().strftime("%m-%d-%Y"))
+    if not os.path.isdir(target):
+        os.mkdir(target)
+    file = request.files['file'] 
+    filename = secure_filename(file.filename)
+    destination="/".join([target, filename])
+    print(target)
+    print(filename)
+    file.save(destination)
+
+    sql = """
+        INSERT INTO files (name, filepath)
+        VALUES (%s, %s)
+    """
+    return str(exec_commit(sql, (filename, target.replace('C:/Users/corey/', ""))))
+
+    
+
 
 api.add_resource(CreateUser, '/createUser/')
 api.add_resource(LoginUser, '/login/<string:username>/<string:password>')
