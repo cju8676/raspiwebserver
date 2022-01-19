@@ -85,6 +85,7 @@ class Gallery extends Component {
                                 albums={this.state.albums}
                                 path={picture[3]}
                                 inAlbum={false}
+                                refresh={this.state.refresh}
                                 />
                         })}
                     </Card.Group>

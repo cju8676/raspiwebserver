@@ -18,12 +18,17 @@ class ImagePane extends Component {
             info: [],
 
             open : false,
+            openDel : false,
             refresh : props.refresh
         }
     }
     open = () => this.setState({open : true})
 
+    openDel = () => this.setState({openDel : true})
+
     close = () => this.setState({open : false})
+
+    closeDel = () => this.setState({openDel : false})
 
     favorite = () => {
         const data = {
@@ -101,7 +106,8 @@ class ImagePane extends Component {
     }
 
     handleRemove = () => {
-        this.close();
+        this.props.inAlbum && this.close();
+        !this.props.inAlbum && this.closeDel();
         this.state.refresh();
     }
 
@@ -121,6 +127,19 @@ class ImagePane extends Component {
             .then(response => response.json())
             .then(jsonOutput => {
                 //TODO handle response - success or failed to remove from album
+                this.handleRemove()
+            })
+    }
+
+    delete = () => {
+        const reqOptions = {
+            method : 'POST',
+            headers : { Accept: 'application/json', 'Content-Type' : 'application/json'}
+        }
+        fetch('/deleteImage/' + this.state.id, reqOptions)
+            .then(response => response.json())
+            .then(jsonOutput => {
+                //todo provide pop up that says it was deleted
                 this.handleRemove()
             })
     }
@@ -189,6 +208,14 @@ class ImagePane extends Component {
                             <Button color='black' onClick={this.toggleInfoModal}>Close</Button>
                         </Modal.Actions>
                     </Modal>
+                    <Button negative icon='trash' onClick={this.openDel}></Button>
+                    <Confirm 
+                        open={this.state.openDel}
+                        onCancel={this.closeDel}
+                        onConfirm={this.delete}
+                        header='Delete File?'
+                        content='This will delete this file for EVERYONE! Are you sure you want to proceed?'
+                    />
                 </Card.Content>
             </Card>
         )

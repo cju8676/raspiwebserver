@@ -302,3 +302,20 @@ class UpdateUsername(Resource):
         return exec_commit(sql, (new_username, username))
 
 # class UpdatePassword(Resource):
+
+class DeleteImage(Resource):
+    def post(self, id):
+        sql = """
+            DELETE from albums
+            WHERE id = %s;
+
+            DELETE from favorites
+            WHERE id = %s;
+
+            DELETE from tags
+            WHERE id = %s;
+
+            DELETE from files
+            WHERE id = %s;
+        """
+        return exec_commit(sql, (id, id, id, id))
