@@ -38,9 +38,9 @@ def getinfo(path, filename):
     path_str = 'C:/Users/corey/' + urllib.parse.unquote(path) + '/' + urllib.parse.unquote(filename)
     image = Image.open(path_str)
     exifdata = dict(image.getexif())
-    for key, val in exifdata.items():
-        if key in ExifTags.TAGS:
-            print(key, " : ", ExifTags.TAGS[key], ":", val)
+    # for key, val in exifdata.items():
+    #     if key in ExifTags.TAGS:
+    #         print(key, " : ", ExifTags.TAGS[key], ":", val)
     #TODO get Shot and ISO info added to this
 
     if len(exifdata) == 0:
@@ -65,8 +65,8 @@ def fileUploadProfPic():
     file = request.files['file'] 
     filename = secure_filename(file.filename)
     destination="/".join([target, filename])
-    print(target)
-    print(filename)
+    # print(target)
+    # print(filename)
     file.save(destination)
     return send_from_directory(target, filename, as_attachment=True)
 
@@ -82,15 +82,24 @@ def fileUpload():
     print(target)
     print(filename)
     file.save(destination)
-
+    # Save file to db
     sql = """
         INSERT INTO files (name, filepath)
         VALUES (%s, %s)
     """
-    return str(exec_commit(sql, (filename, target.replace('C:/Users/corey/', ""))))
-
-    
-
+    exec_commit(sql, (filename, target.replace('C:/Users/corey/', "")))
+    # Get created tags at idx -2 and transfer them to our new file's id and delete them from -2 idx
+    sql_tags = """
+        UPDATE tags
+        SET id = (
+            SELECT id
+            FROM files
+            WHERE name = %s
+            AND filepath = %s
+        )
+        WHERE id = -2;
+    """
+    return str(exec_commit(sql_tags, (filename, target.replace('C:/Users/corey/', ""))))
 
 api.add_resource(CreateUser, '/createUser/')
 api.add_resource(LoginUser, '/login/<string:username>/<string:password>')

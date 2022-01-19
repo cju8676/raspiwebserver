@@ -190,19 +190,27 @@ class GetMyTags(Resource):
 
 class GetAvailTags(Resource):
     def get(self, id):
-        sql = """
-            SELECT name, color
-            FROM tags
-            WHERE id = -1
-            AND name NOT IN
-                (
-                    SELECT name
-                    FROM tags
-                    WHERE id = %s
-                )
-        """
-        avail_tags = list(exec_get_all(sql, [id]))
-        return avail_tags
+        if not id:
+            sql = """
+                SELECT name, color
+                FROM tags
+                WHERE id = -1
+            """
+            return list(exec_get_all(sql,()))
+        else:    
+            sql = """
+                SELECT name, color
+                FROM tags
+                WHERE id = -1
+                AND name NOT IN
+                    (
+                        SELECT name
+                        FROM tags
+                        WHERE id = %s
+                    )
+            """
+            avail_tags = list(exec_get_all(sql, [id]))
+            return avail_tags
 
 class CreateTag(Resource):
     def post(self):
