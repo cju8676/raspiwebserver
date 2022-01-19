@@ -33,8 +33,8 @@ def getpic(path, filename):
     # print(image.info)
     return send_from_directory(path_str, filename_str)
 
-@app.route('/info/<path>/<filename>', methods=['GET'])
-def getinfo(path, filename):
+@app.route('/info/<path>/<filename>/<username>', methods=['GET'])
+def getinfo(path, filename, username):
     path_str = 'C:/Users/corey/' + urllib.parse.unquote(path) + '/' + urllib.parse.unquote(filename)
     image = Image.open(path_str)
     exifdata = dict(image.getexif())
@@ -42,16 +42,31 @@ def getinfo(path, filename):
     #     if key in ExifTags.TAGS:
     #         print(key, " : ", ExifTags.TAGS[key], ":", val)
     #TODO get Shot and ISO info added to this
+    
+    # check if img is already faved
+    sql = """
+        SELECT COUNT(1)
+        FROM favorites
+        WHERE username = %s
+        AND id IN (
+            SELECT id
+            FROM files
+            WHERE name = %s
+            AND filepath = %s
+        )
+    """
+    is_favorited = exec_get_one(sql, (username, urllib.parse.unquote(filename), urllib.parse.unquote(path)))[0]
+
 
     if len(exifdata) == 0:
         # len wid --- --- --- tags
-        return jsonify([image.size[0], image.size[1], "---", "---", "---"])
+        return jsonify([image.size[0], image.size[1], "---", "---", "---", is_favorited])
     else:
         #print(datetime.strptime(exifdata[306], '%Y:%m:%d %H:%M:%S').strftime("%B %d, %Y -- %I:%M:%S %p"))
         formatted = datetime.strptime(exifdata[306], '%Y:%m:%d %H:%M:%S').strftime("%B %d, %Y -- %I:%M:%S %p")
 
         # len wid make model datetime tags
-        return jsonify([image.size[0], image.size[1], exifdata[271], exifdata[272], formatted])
+        return jsonify([image.size[0], image.size[1], exifdata[271], exifdata[272], formatted, is_favorited])
 
 def allowed_file(filename):
     return '.' in filename and \

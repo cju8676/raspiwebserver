@@ -59,7 +59,7 @@ class ImagePane extends Component {
     }
 
     fetchInfo = () => {
-        fetch('/info/' + encodeURIComponent(this.props.path) + '/' + encodeURIComponent(this.state.name))
+        fetch('/info/' + encodeURIComponent(this.props.path) + '/' + encodeURIComponent(this.state.name) + '/' + this.props.user)
             .then(response => response.json())
             .then(output => {
                 // var id = this.state.id;
@@ -71,6 +71,8 @@ class ImagePane extends Component {
                 //     }
                 // }))
                 this.setState({ info: output });
+                console.log(output[5], this.state.id)
+                this.setState({ favorited : Boolean(output[5])})
             })
     }
 
