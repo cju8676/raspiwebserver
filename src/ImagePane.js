@@ -76,7 +76,10 @@ class ImagePane extends Component {
             })
     }
 
-    toggleInfoModal = () => { this.setState({ infoModal: !this.state.infoModal }) }
+    toggleInfoModal = () => { 
+        this.fetchInfo();
+        this.setState({ infoModal: !this.state.infoModal }) 
+    }
 
     getOptions = () => {
         if (this.state.albums.length === 0) return [];
@@ -147,10 +150,8 @@ class ImagePane extends Component {
     }
 
     componentDidMount() {
-        //fixme only query this info if we open the modal, otherwise we'd be loading double time for every photo
-        // to do this just make a separate info component and attach it to image pane like we did
-        // for tags and people
-        this.fetchInfo();
+        // todo split info into its own component
+        {this.state.infoModal && this.fetchInfo();}
     }
 
     render() {
@@ -161,7 +162,7 @@ class ImagePane extends Component {
                 <Image src={this.state.picture} alt="pic" />
                 <Card.Content>
                     <a href={this.state.picture} download={this.state.name}>
-                        {/*this.state.display &&*/ <Button type="submit"><Icon name='download' />Save</Button>}
+                        <Button type="submit"><Icon name='download' />Save</Button>
                     </a>
                     <Button onClick={this.favorite}>
                         {!this.state.favorited && <Icon name='favorite' />}

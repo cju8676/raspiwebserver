@@ -36,10 +36,10 @@ class ImageTags extends Component {
     myTags = () => {
         fetch('/getTags/' + this.state.id).then(response => response.json())
             .then(jsonOutput => {
-                if (jsonOutput.length !== 0)
+                if (jsonOutput.length !== 0) 
                     this.setState({ myTags: jsonOutput })
             })
-    }
+        }
 
     availTags = () => {
         fetch('/getAvailTags/' + this.state.id).then(response => response.json())
@@ -133,7 +133,6 @@ class ImageTags extends Component {
     }
 
     handleDelete = (tag) => {
-        console.log("deleting : " + tag);
         const data = {
             name: tag[0],
             color: tag[1]
