@@ -8,6 +8,7 @@ class ImageTags extends Component {
             id: props.id,
             tags: [],
             myTags: [],
+            myTagsComps: [],
             tagModal: false
         }
 
@@ -36,8 +37,23 @@ class ImageTags extends Component {
     myTags = () => {
         fetch('/getTags/' + this.state.id).then(response => response.json())
             .then(jsonOutput => {
-                if (jsonOutput.length !== 0) 
+                if (jsonOutput.length !== 0) {
                     this.setState({ myTags: jsonOutput })
+                    // this.setState({ myTagsComps: [] })
+                    // for(var i = 0 ; i < jsonOutput.length ; i++) {
+                    //     this.setState(prevState => ({
+                    //         myTagsComps:
+                    //         [...prevState.myTagsComps, 
+                    //         <Label color={jsonOutput[i][1]}>
+                    //             {jsonOutput[i][0]}
+                    //             <Icon name='delete' 
+                    //             onClick={() => this.handleDelete(jsonOutput[i])}
+                    //             />
+                    //         </Label>
+                    //         ]
+                    //     }))
+                    // }
+                }
             })
         }
 
@@ -147,6 +163,7 @@ class ImageTags extends Component {
             .then(
                 // confirm tag has been created
                 this.updateTagsList()
+                //this.componentDidMount
             )
     }
 
@@ -167,6 +184,7 @@ class ImageTags extends Component {
                                 <Icon name='delete' onClick={e => this.handleDelete(tag)}/>
                             </Label>)
                     })}
+                    {/* {this.state.myTagsComps} */}
                     <Label>
                         <Dropdown icon='add'>
                             <Dropdown.Menu>
