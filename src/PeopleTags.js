@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Button, Dropdown, Input, Label, Segment, Form, Container } from 'semantic-ui-react'
+import { Button, Dropdown, Input, Label, Segment, Form, Container, Icon } from 'semantic-ui-react'
 import Cropper from 'react-easy-crop'
 
 class PeopleTags extends Component {
@@ -7,18 +7,19 @@ class PeopleTags extends Component {
         super(props);
         this.state = {
             id: props.id,
-            people: props.people,
+            people: [],
             peopleModal: false,
             // // name : imageURL
             // people: {},
             file: null,
-            cropper : false
+            cropper : false,
+            myPeople : []
         }
 
         this.newPerson = {
             name: "",
             color: "",
-            pic: ""
+            //pic: ""
         }
 
         this.options = [
@@ -79,24 +80,152 @@ class PeopleTags extends Component {
         console.log(area, pixels)
     }
 
-    render() {
-        const people = {
-            "Juice": "blue",
+    createPerson = () => {
+        const data = {
+            name: this.newPerson.name,
+            color: this.newPerson.color
         }
+        const reqOptions = {
+            method: 'POST',
+            headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        }
+        fetch('/createPerson/', reqOptions)
+            .then(response => response.json())
+            .then(
+                // confirm person has been created
+                this.updatePeopleDropdown()
+            )
+    }
+
+    updatePeopleDropdown = () => {
+        this.togglePeople();
+        this.setState(prevState => ({
+            people:
+                [...prevState.people, [this.newPerson.name, this.newPerson.color]]
+        }));
+        this.newPerson.name = "";
+        this.newPerson.color = "";
+        this.componentDidMount();
+    }
+
+    togglePeople = () => {
+        this.setState({ peopleModal: !this.state.peopleModal })
+    }
+
+    myPeople = () => {
+        fetch('/getPeople/' + this.state.id).then(response => response.json())
+            .then(jsonOutput => {
+                if (jsonOutput.length !== 0) {
+                    this.setState({ myPeople: jsonOutput })
+                }
+            })
+        }
+
+    availPeople = () => {
+        fetch('/getAvailPeople/' + this.state.id).then(response => response.json())
+            .then(jsonOutput => {
+                this.setState({ people: jsonOutput })
+            })
+    }
+
+    handleDelete = (person) => {
+        const data = {
+            name: person[0],
+            color: person[1]
+        }
+        const reqOptions = {
+            method: 'POST',
+            headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        }
+        fetch('/delPerson/' + this.state.id, reqOptions)
+            .then(response => response.json())
+            .then(
+                // confirm tag has been created
+                this.updatePeopleList()
+                //this.componentDidMount
+            )
+    }
+
+    addPerson = () => {
+        const data = {
+            name: this.newPerson.name,
+            color: this.newPerson.color
+        }
+        const reqOptions = {
+            method: 'POST',
+            headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        }
+        fetch('/addPerson/' + this.state.id, reqOptions)
+            .then(response => response.json())
+            .then(
+                // confirm tag has been created
+                this.updatePeopleList()
+            )
+    }
+
+    updatePeopleList = () => {
+        console.log(this.newPerson.name, this.newPerson.color);
+        this.setState(prevState => ({
+            myPeople:
+                [...prevState.myPeople, [this.newPerson.name, this.newPerson.color]]
+        }));
+        this.newPerson.name = "";
+        this.newPerson.color = "";
+        this.componentDidMount();
+    }
+
+    selectPerson = (e, data) => {
+        this.newPerson.name = data.text;
+        this.newPerson.color = data.label.color;
+        this.addPerson();
+    }
+
+    update = (event) => {
+        if (event.target.id === 'enteredName') {
+            this.newPerson.name = event.target.value;
+        }
+    }
+
+    handleDrop = (e, data) => {
+        if (data.id === 'enteredColor') {
+            this.newPerson.color = data.value;
+        }
+    }
+
+    componentDidMount() {
+        this.availPeople();
+        this.myPeople();
+    }
+
+    render() {
         return (
             <div>
                 <h2>People</h2>
                 <Label.Group>
-                    <Label picture color='blue'>
-                        Juice
+                    {this.state.myPeople.map(person => {
+                        return (
+                            <Label color={person[1]}>
+                                {person[0]}
+                                <Icon name='delete' onClick={e => this.handleDelete(person)} />
+                            </Label>
+                        )
+                    })}
+                    {/* <Label picture color='blue'>
+                        Juice */}
                         {/*FIXME MAKE SURE IMAGE IS SQUARE WHEN CREATING PERSON*/}
-                        <img src={this.props.picture} alt='Profile pic' />
-                    </Label>
+                        {/* <img src={this.props.picture} alt='Profile pic' /> */}
+                    {/* </Label> */}
                     <Label>
                         <Dropdown icon='add'>
                             <Dropdown.Menu>
-                                {Object.keys(people).map((key, idx) => {
+                                {/* {Object.keys(people).map((key, idx) => {
                                     return (<Dropdown.Item text={key} label={{ color: people[key] }} />)
+                                })} */}
+                                {this.state.people.map(person => {
+                                    return (<Dropdown.Item text={person[0]} label={{color : person[1] }} onClick={this.selectPerson} />)
                                 })}
                                 <Dropdown.Item text='Create New Person' onClick={this.togglePeople} />
                             </Dropdown.Menu>
@@ -105,11 +234,11 @@ class PeopleTags extends Component {
                     {this.state.peopleModal && (
                         <Segment>
                             <h4>Create New Person</h4>
-                            <Input placeholder='Name' />
-                            <Dropdown placeholder='Tag Color' search selection options={this.options} />
+                            <Input placeholder='Name' id='enteredName' onChange={this.update}/>
+                            <Dropdown placeholder='Color' search selection options={this.options} id='enteredColor' onChange={this.handleDrop}/>
                             {/* <Button method='post' action="/upload" enctype="multipart/form-data">Upload Profile Pic</Button> */}
                             <Button color='black' onClick={this.togglePeople}>Cancel</Button>
-                            <Button positive >Submit</Button>
+                            <Button positive onClick={this.createPerson}>Submit</Button>
                             {/* <form onSubmit={this.handleUploadImage}>
                                 <div>
                                     <Button>
@@ -125,11 +254,11 @@ class PeopleTags extends Component {
                                 </div>
                                 <img src={this.state.imageURL} alt="img" />
                             </form> */}
-                            <Form onSubmit={this.handleUploadImage}>
+                            {/* <Form onSubmit={this.handleUploadImage}>
                                 <Container>
-                                    <input ref={(ref) => { this.uploadInput = ref; }} type="file" />
+                                    <input ref={(ref) => { this.uploadInput = ref; }} type="file" /> */}
                                     {/* <input ref={(ref) => { this.fileName = ref; }} type="text" placeholder="Enter the desired name of file" /> */}
-                                    <Button positive>Submit</Button>
+                                    {/* <Button positive>Submit</Button>
                                     {this.state.cropper && 
                                         <Cropper 
                                             image={this.state.imageURL}
@@ -140,7 +269,7 @@ class PeopleTags extends Component {
                                             onCropComplete={this.onCropComplete}
                                             onZoomChange={this.setZoom}/>}
                                 </Container>
-                            </Form>
+                            </Form> */}
 
 
                         </Segment>)}

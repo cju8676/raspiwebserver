@@ -184,7 +184,18 @@ class GetMyTags(Resource):
         sql = """
             SELECT name, color
             FROM tags
-            WHERE id = %s;
+            WHERE id = %s
+            AND people = 0
+        """
+        return list(exec_get_all(sql, [id]))
+
+class GetMyPeople(Resource):
+    def get(self, id):
+        sql = """
+            SELECT name, color
+            FROM tags
+            WHERE id = %s
+            AND people = 1
         """
         return list(exec_get_all(sql, [id]))
 
@@ -195,6 +206,7 @@ class GetAvailTags(Resource):
                 SELECT name, color
                 FROM tags
                 WHERE id = -1
+                AND people = 0
             """
             return list(exec_get_all(sql,()))
         else:    
@@ -202,6 +214,7 @@ class GetAvailTags(Resource):
                 SELECT name, color
                 FROM tags
                 WHERE id = -1
+                AND people = 0
                 AND name NOT IN
                     (
                         SELECT name
@@ -211,6 +224,33 @@ class GetAvailTags(Resource):
             """
             avail_tags = list(exec_get_all(sql, [id]))
             return avail_tags
+
+class GetAvailPeople(Resource):
+    def get(self, id):
+        if not id:
+            sql = """
+                SELECT name, color
+                FROM tags
+                WHERE id = -1
+                AND people = 1
+            """
+            return list(exec_get_all(sql,()))
+        else:    
+            sql = """
+                SELECT name, color
+                FROM tags
+                WHERE id = -1
+                AND people = 1
+                AND name NOT IN
+                    (
+                        SELECT name
+                        FROM tags
+                        WHERE id = %s
+                    )
+            """
+            avail_tags = list(exec_get_all(sql, [id]))
+            return avail_tags
+
 
 class CreateTag(Resource):
     def post(self):
@@ -227,6 +267,23 @@ class CreateTag(Resource):
             VALUES (%s, %s)
         """
         return exec_commit(sql, (name, color))
+
+class CreatePerson(Resource):
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('name', type=str)
+        parser.add_argument('color', type=str)
+        args = parser.parse_args()
+
+        name = args['name']
+        color = args['color']
+
+        sql = """
+            INSERT into tags (name, color, people)
+            VALUES (%s, %s, %s)
+        """
+        return exec_commit(sql, (name, color, 1))
+
 
 class AddTag(Resource):
     def post(self, id):
@@ -261,6 +318,41 @@ class DeleteTag(Resource):
             AND color = %s
         """
         return exec_commit(sql, (id, name, color))
+
+class AddPerson(Resource):
+    def post(self, id):
+        parser = reqparse.RequestParser()
+        parser.add_argument('name', type=str)
+        parser.add_argument('color', type=str)
+        args = parser.parse_args()
+
+        name = args['name']
+        color = args['color']
+
+        sql = """
+            INSERT into tags (name, color, id, people)
+            VALUES (%s, %s, %s, %s)
+        """
+        return exec_commit(sql, (name, color, id, 1))
+
+class DeletePerson(Resource):
+    def post(self, id):
+        parser = reqparse.RequestParser()
+        parser.add_argument('name', type=str)
+        parser.add_argument('color', type=str)
+        args = parser.parse_args()
+
+        name = args['name']
+        color = args['color']
+
+        sql = """
+            DELETE FROM tags
+            WHERE id = %s
+            AND name = %s
+            AND color = %s
+            AND people = %s
+        """
+        return exec_commit(sql, (id, name, color, 1))
 
 
 class DeleteAccount(Resource):
