@@ -8,7 +8,9 @@ from PIL import Image, ExifTags
 from datetime import datetime
 
 from db_utils import *
-from userApi import *
+from user_api import *
+from album_api import *
+from imagepane_api import *
 
 UPLOAD_FOLDER='C:/Users/corey/Pictures/dbtest'
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg'}
