@@ -11,16 +11,24 @@ class CreateNewAccount extends Component {
             firstName: "",
             modal: false,
             created: false,
-            takenUser: false
+            takenUser: false,
+            nameBlank: false,
+            userBlank: false,
+            passBlank: false
         }
     }
 
     toggle = () => {
         this.setState({ modal: !this.state.modal });
         if (this.state.modal === false) {
-            this.setState({ username: "" })
-            this.setState({ password: "" })
-            this.setState({ firstName: "" })
+            this.setState({
+                 username: "",
+                 password: "",
+                 firstName: "",
+                 userBlank: false,
+                 passBlank: false,
+                 nameBlank: false
+         })
         }
     }
 
@@ -36,6 +44,12 @@ class CreateNewAccount extends Component {
     }
 
     createUser = () => {
+        if (this.state.firstName === "" || this.state.username === "" || this.state.password === "") {
+            if (this.state.firstName === "") this.setState({nameBlank : true})
+            if (this.state.username === "") this.setState({userBlank : true})
+            if (this.state.password === "") this.setState({passBlank : true})
+            return;
+        }
         const data = {
             name: this.state.firstName,
             username: this.state.username,
@@ -58,9 +72,24 @@ class CreateNewAccount extends Component {
     }
 
     updateProp = (event) => {
-        if (event.target.id === "enteredName") this.setState({firstName : event.target.value})
-        else if (event.target.id === "enteredUsername") this.setState({username : event.target.value})
-        else if (event.target.id === "enteredPassword") this.setState({password : event.target.value})
+        if (event.target.id === "enteredName") {
+            this.setState({
+                firstName : event.target.value,
+                nameBlank : false
+            })
+        }    
+        else if (event.target.id === "enteredUsername") {
+            this.setState({
+                username : event.target.value,
+                userBlank : false
+            })
+        }
+        else if (event.target.id === "enteredPassword") {
+            this.setState({
+                password : event.target.value,
+                passBlank : false
+            })
+        }
     }
 
     render() {
@@ -83,6 +112,7 @@ class CreateNewAccount extends Component {
                         />
                         <Form>
                             <Form.Input
+                                error={this.state.nameBlank}
                                 //error={{content: 'Please enter your name', pointing: 'below'}}
                                 /// if 20 error - name too long!! todo
                                 fluid
@@ -92,6 +122,7 @@ class CreateNewAccount extends Component {
                                 onChange={this.updateProp}
                             />
                             <Form.Input
+                                error={this.state.userBlank}
                                 //error={{content: 'Please enter a username', pointing: 'below'}}
                                 fluid
                                 id='enteredUsername'
@@ -100,6 +131,7 @@ class CreateNewAccount extends Component {
                                 onChange={this.updateProp}
                             />
                             <Form.Input
+                                error={this.state.passBlank}
                                 //error={{content: 'Please enter a valid password', pointing: 'below'}}
                                 fluid
                                 id='enteredPassword'

@@ -11,7 +11,9 @@ class LoginScreen extends Component {
             username: "",
             password: "",
             newUserChange: props.onChange,
-            error: false
+            error: false,
+            userBlank: false,
+            passBlank: false
         }
     }
 
@@ -26,6 +28,14 @@ class LoginScreen extends Component {
     }
 
     tryLogin = () => {
+        if (this.state.username === "") {
+            this.setState({userBlank: true})
+            return;
+        }
+        if (this.state.password === "") {
+            this.setState({passBlank : true})
+            return;
+        }
         const getURL = '/login/' + this.state.username + '/' + this.state.password
         fetch(getURL).then(
             response => response.json()
@@ -36,11 +46,17 @@ class LoginScreen extends Component {
     }
 
     updateUsername = (event) => {
-        this.setState({ username: event.target.value })
+        this.setState({
+             username: event.target.value,
+             userBlank: false
+             })
     }
 
     updatePassword = (event) => {
-        this.setState({ password: event.target.value })
+        this.setState({ 
+            password: event.target.value,
+            passBlank : false
+        })
     }
 
     render() {
@@ -60,8 +76,8 @@ class LoginScreen extends Component {
                         />
                     <Form size='large'>
                         <Segment stacked>
-                            <Form.Input fluid icon='user' iconPosition='left' placeholder='Username' onChange={this.updateUsername} />
-                            <Form.Input fluid icon='lock' iconPosition='left' placeholder='Password' type='password' onChange={this.updatePassword} />
+                            <Form.Input fluid icon='user' iconPosition='left' placeholder='Username' onChange={this.updateUsername} error={this.state.userBlank}/>
+                            <Form.Input fluid icon='lock' iconPosition='left' placeholder='Password' type='password' onChange={this.updatePassword} error={this.state.passBlank}/>
                             <Button color='orange' fluid size='large' onClick={this.tryLogin}>Login</Button>
                         </Segment>
                     </Form>

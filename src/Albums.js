@@ -11,7 +11,8 @@ class Albums extends Component {
             album_name: "",
             albums : [],
             modal: false,
-            duplicate: false
+            duplicate: false,
+            nameBlank : false
         }
     }
 
@@ -39,6 +40,10 @@ class Albums extends Component {
     }
 
     createAlbum = () => {
+        if (this.state.album_name === "") {
+            this.setState({nameBlank : true})
+            return;
+        }
         const data = {
             username : this.state.username,
             album_name : this.state.album_name
@@ -57,7 +62,11 @@ class Albums extends Component {
 
     updateProp = (event) => {
         // eventually can add more info to this whole thing
-        if (event.target.id === "enteredAlbumName") this.setState({album_name : event.target.value})
+        if (event.target.id === "enteredAlbumName") 
+            this.setState({
+                album_name : event.target.value,
+                nameBlank: false
+            })
     }
 
     fetchAlbums = () => {
@@ -94,6 +103,7 @@ class Albums extends Component {
                                     content='Please try again.'
                                     />
                                 <Input
+                                    error={this.state.nameBlank}
                                     fluid
                                     id='enteredAlbumName'
                                     placeholder='Album Name'

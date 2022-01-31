@@ -9,7 +9,9 @@ class ImageTags extends Component {
             tags: [],
             myTags: [],
             myTagsComps: [],
-            tagModal: false
+            tagModal: false,
+            nameBlank: false,
+            colorBlank: false
         }
 
         this.newTag = {
@@ -73,14 +75,28 @@ class ImageTags extends Component {
         }));
         this.newTag.name = "";
         this.newTag.color = "";
+        this.setState({
+            nameBlank: false,
+            colorBlank : false
+        })
         this.componentDidMount();
     }
 
     toggleTag = () => {
-        this.setState({ tagModal: !this.state.tagModal })
+        this.newTag = {name : "", color : ""}
+        this.setState({
+             tagModal: !this.state.tagModal,
+             nameBlank: false,
+             colorBlank : false
+            })
     }
 
     createTag = () => {
+        if (this.newTag.name === "" || this.newTag.color === "") {
+            if (this.newTag.name === "") this.setState({nameBlank : true})
+            if (this.newTag.color === "") this.setState({colorBlank : true})
+            return;
+        }
         const data = {
             name: this.newTag.name,
             color: this.newTag.color
@@ -101,12 +117,14 @@ class ImageTags extends Component {
     update = (event) => {
         if (event.target.id === 'enteredName') {
             this.newTag.name = event.target.value;
+            this.setState({nameBlank : false})
         }
     }
 
     handleDrop = (e, data) => {
         if (data.id === 'enteredColor') {
             this.newTag.color = data.value;
+            this.setState({colorBlank : false})
         }
     }
 
@@ -198,8 +216,8 @@ class ImageTags extends Component {
                     {this.state.tagModal && (
                         <Segment>
                             <h4>Create Tag</h4>
-                            <Input type='text' id='enteredName' placeholder='Name' onChange={this.update} />
-                            <Dropdown placeholder='Color' search selection options={this.options} id='enteredColor' onChange={this.handleDrop} />
+                            <Input type='text' id='enteredName' placeholder='Name' onChange={this.update} error={this.state.nameBlank}/>
+                            <Dropdown placeholder='Color' search selection options={this.options} id='enteredColor' onChange={this.handleDrop} error={this.state.colorBlank}/>
                             <Button color='black' onClick={this.toggleTag}>Cancel</Button>
                             <Button positive onClick={this.createTag}>Submit</Button>
                         </Segment>)}

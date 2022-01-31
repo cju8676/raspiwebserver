@@ -11,7 +11,9 @@ class SettingsPage extends Component {
             user : props.user,
             logout: props.onChange,
             nameModal: false,
-            usernameModal : false
+            usernameModal : false,
+            nameBlank: false,
+            userBlank : false
         }
 
         this.updateInfo= "";
@@ -51,6 +53,14 @@ class SettingsPage extends Component {
 
     /* Update name or username in DB */
     updateNameInfo = () => {
+        if (this.state.nameModal && this.updateInfo === "") {
+            this.setState({nameBlank: true})
+            return;
+        }
+        else if (this.state.usernameModal && this.updateInfo === "") {
+            this.setState({userBlank : true})
+            return;
+        }
         const data = {
             username: this.props.user,
             new_name: this.updateInfo
@@ -86,6 +96,10 @@ class SettingsPage extends Component {
     update = (event) => {
         if (event.target.id === 'enteredName') {
             this.updateInfo = event.target.value;
+            this.setState({
+                nameBlank: false,
+                userBlank : false
+            })
         }
     }
 
@@ -106,7 +120,7 @@ class SettingsPage extends Component {
                     {this.state.nameModal && (
                     <Segment>
                         <h4>Edit Name</h4>
-                        <Input type='text' id='enteredName' placeholder='Name' onChange={this.update}/>
+                        <Input type='text' id='enteredName' placeholder='Name' onChange={this.update} error={this.state.nameBlank}/>
                         <Button color='black' onClick={this.toggleName}>Cancel</Button>
                         <Button positive onClick={this.updateNameInfo}>Confirm</Button>
                     </Segment>)}
@@ -115,7 +129,7 @@ class SettingsPage extends Component {
                     {this.state.usernameModal && (
                     <Segment>
                         <h4>Edit Username</h4>
-                        <Input type='text' id='enteredName' placeholder='Name' onChange={this.update}/>
+                        <Input type='text' id='enteredName' placeholder='Name' onChange={this.update} error={this.state.userBlank}/>
                         <Button color='black' onClick={this.toggleuserName}>Cancel</Button>
                         <Button positive onClick={this.updateNameInfo}>Confirm</Button>
                     </Segment>)}

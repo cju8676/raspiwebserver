@@ -13,7 +13,9 @@ class PeopleTags extends Component {
             // people: {},
             file: null,
             cropper : false,
-            myPeople : []
+            myPeople : [],
+            nameBlank : false,
+            colorBlank : false
         }
 
         this.newPerson = {
@@ -81,6 +83,11 @@ class PeopleTags extends Component {
     }
 
     createPerson = () => {
+        if (this.newPerson.name === "" || this.newPerson.color === "") {
+            if (this.newPerson.name === "") this.setState({nameBlank : true})
+            if (this.newPerson.color === "") this.setState({colorBlank : true})
+            return;
+        }
         const data = {
             name: this.newPerson.name,
             color: this.newPerson.color
@@ -110,7 +117,12 @@ class PeopleTags extends Component {
     }
 
     togglePeople = () => {
-        this.setState({ peopleModal: !this.state.peopleModal })
+        this.newPerson = {name : "", color : ""}
+        this.setState({ 
+            peopleModal: !this.state.peopleModal,
+            nameBlank : false,
+            colorBlank : false
+        })
     }
 
     myPeople = () => {
@@ -186,12 +198,14 @@ class PeopleTags extends Component {
     update = (event) => {
         if (event.target.id === 'enteredName') {
             this.newPerson.name = event.target.value;
+            this.setState({nameBlank: false})
         }
     }
 
     handleDrop = (e, data) => {
         if (data.id === 'enteredColor') {
             this.newPerson.color = data.value;
+            this.setState({colorBlank: false})
         }
     }
 
@@ -234,8 +248,8 @@ class PeopleTags extends Component {
                     {this.state.peopleModal && (
                         <Segment>
                             <h4>Create New Person</h4>
-                            <Input placeholder='Name' id='enteredName' onChange={this.update}/>
-                            <Dropdown placeholder='Color' search selection options={this.options} id='enteredColor' onChange={this.handleDrop}/>
+                            <Input placeholder='Name' id='enteredName' onChange={this.update} error={this.state.nameBlank}/>
+                            <Dropdown placeholder='Color' search selection options={this.options} id='enteredColor' onChange={this.handleDrop} error={this.state.colorBlank}/>
                             {/* <Button method='post' action="/upload" enctype="multipart/form-data">Upload Profile Pic</Button> */}
                             <Button color='black' onClick={this.togglePeople}>Cancel</Button>
                             <Button positive onClick={this.createPerson}>Submit</Button>
