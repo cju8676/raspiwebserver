@@ -144,6 +144,7 @@ api.add_resource(DeletePerson, '/delPerson/<string:id>')
 api.add_resource(DeleteAccount, '/delAcc/<string:username>')
 api.add_resource(UpdateName, '/updateName/')
 api.add_resource(UpdateUsername, '/updateUsername/')
+api.add_resource(UpdatePassword, '/updatePass/')
 api.add_resource(DeleteImage, '/deleteImage/<string:id>')
 
 if __name__ == '__main__':

@@ -12,8 +12,10 @@ class SettingsPage extends Component {
             logout: props.onChange,
             nameModal: false,
             usernameModal : false,
+            passModal: false,
             nameBlank: false,
-            userBlank : false
+            userBlank : false,
+            passBlank: false
         }
 
         this.updateInfo= "";
@@ -49,6 +51,12 @@ class SettingsPage extends Component {
             this.toggleuserName();
             this.componentDidMount();
         }
+        else if (e === 'Pass') {
+            //this.setState({})
+            this.updateInfo = "";
+            this.togglePass();
+            this.componentDidMount();
+        }
     }
 
     /* Update name or username in DB */
@@ -59,6 +67,10 @@ class SettingsPage extends Component {
         }
         else if (this.state.usernameModal && this.updateInfo === "") {
             this.setState({userBlank : true})
+            return;
+        }
+        else if (this.state.passModal && this.updateInfo === "") {
+            this.setState({passBlank : true})
             return;
         }
         const data = {
@@ -72,7 +84,8 @@ class SettingsPage extends Component {
         }
         var nameOrUser = "";
         if (this.state.nameModal) nameOrUser = 'Name'
-        else nameOrUser = 'Username';
+        else if (this.state.usernameModal) nameOrUser = 'Username';
+        else nameOrUser = 'Pass'
         console.log(nameOrUser)
         fetch('/update' + nameOrUser + '/', reqOptions).then(response => response.json)
             .then(
@@ -82,15 +95,42 @@ class SettingsPage extends Component {
     }
 
     toggleName = () => {
-        this.setState({nameModal : !this.state.nameModal})
-        if (this.state.nameModal === false && this.state.usernameModal === true)
-            this.setState({usernameModal : !this.state.usernameModal})
+        // if off
+        if (!this.state.nameModal) {
+            // toggle name visibility, toggle everything else off
+            this.setState({
+                nameModal : true,
+                usernameModal : false,
+                passModal : false
+            })
+        }
+        else this.setState({nameModal : false})
     }
 
     toggleuserName = () => {
-        this.setState({usernameModal : !this.state.usernameModal})
-        if (this.state.nameModal === true && this.state.usernameModal === false)
-            this.setState({nameModal : !this.state.nameModal})
+        // if off
+        if (!this.state.usernameModal) {
+            // toggle user visibility, toggle everything else off
+            this.setState({
+                usernameModal : true,
+                nameModal : false,
+                passModal : false
+            })
+        }
+        else this.setState({usernameModal : false})
+    }
+
+    togglePass = () => {
+        // if off
+        if (!this.state.passModal) {
+            // toggle pass visibility, toggle everything else off
+            this.setState({
+                passModal : true,
+                nameModal : false,
+                usernameModal : false
+            })
+        }
+        else this.setState({passModal : false})
     }
 
     update = (event) => {
@@ -131,6 +171,15 @@ class SettingsPage extends Component {
                         <h4>Edit Username</h4>
                         <Input type='text' id='enteredName' placeholder='Name' onChange={this.update} error={this.state.userBlank}/>
                         <Button color='black' onClick={this.toggleuserName}>Cancel</Button>
+                        <Button positive onClick={this.updateNameInfo}>Confirm</Button>
+                    </Segment>)}
+                    <h2>Password</h2>
+                    <Button basic compact icon='edit' color='black' onClick={this.togglePass}/>
+                    {this.state.passModal && (
+                    <Segment>
+                        <h4>Edit Password</h4>
+                        <Input type='text' id='enteredName' placeholder='Password' onChange={this.update} error={this.state.passBlank}/>
+                        <Button color='black' onClick={this.togglePass}>Cancel</Button>
                         <Button positive onClick={this.updateNameInfo}>Confirm</Button>
                     </Segment>)}
                     <Divider />

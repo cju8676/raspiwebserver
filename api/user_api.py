@@ -89,7 +89,21 @@ class UpdateUsername(Resource):
         """
         return exec_commit(sql, (new_username, username))
 
-# class UpdatePassword(Resource):
+class UpdatePassword(Resource):
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('username', type=str)
+        parser.add_argument('new_name', type=str)
+        args = parser.parse_args()
+
+        username = args['username']
+        new_pass = hash_password(args['new_name'])
+        sql = """
+            UPDATE users
+            SET password = %s
+            WHERE username = %s;
+        """
+        return exec_commit(sql, (new_pass, username))
 
 class DeleteImage(Resource):
     def post(self, id):
