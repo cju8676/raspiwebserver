@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Header, Button, Divider, Confirm, Container, Segment, Input } from 'semantic-ui-react'
+import EditForm from "./EditForm"
 //import { withRouter } from 'react-router-dom'
 
 class SettingsPage extends Component {
@@ -61,6 +62,7 @@ class SettingsPage extends Component {
 
     /* Update name or username in DB */
     updateNameInfo = () => {
+        console.log(this.updateInfo)
         if (this.state.nameModal && this.updateInfo === "") {
             this.setState({nameBlank: true})
             return;
@@ -82,15 +84,14 @@ class SettingsPage extends Component {
             headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         }
-        var nameOrUser = "";
-        if (this.state.nameModal) nameOrUser = 'Name'
-        else if (this.state.usernameModal) nameOrUser = 'Username';
-        else nameOrUser = 'Pass'
-        console.log(nameOrUser)
-        fetch('/update' + nameOrUser + '/', reqOptions).then(response => response.json)
+        let update;
+        if (this.state.nameModal) update = 'Name'
+        else if (this.state.usernameModal) update = 'Username';
+        else update = 'Pass'
+        fetch('/update' + update + '/', reqOptions).then(response => response.json)
             .then(
                 // todo handle success pop up
-                this.handleUpdate(nameOrUser)
+                this.handleUpdate(update)
             )
     }
 
@@ -134,11 +135,12 @@ class SettingsPage extends Component {
     }
 
     update = (event) => {
-        if (event.target.id === 'enteredName') {
-            this.updateInfo = event.target.value;
-            this.setState({
-                nameBlank: false,
-                userBlank : false
+        this.updateInfo = event.target.value;
+        if (event.target.value !== "") {
+            this.setState ({
+                nameBlank : false,
+                userBlank : false,
+                passBlank : false
             })
         }
     }
@@ -158,30 +160,39 @@ class SettingsPage extends Component {
                     <h2>Name</h2>
                     {this.state.name} <Button basic compact icon='edit' color='black' onClick={this.toggleName}/>
                     {this.state.nameModal && (
-                    <Segment>
-                        <h4>Edit Name</h4>
-                        <Input type='text' id='enteredName' placeholder='Name' onChange={this.update} error={this.state.nameBlank}/>
-                        <Button color='black' onClick={this.toggleName}>Cancel</Button>
-                        <Button positive onClick={this.updateNameInfo}>Confirm</Button>
-                    </Segment>)}
+                    <EditForm
+                        name="Name"
+                        visible= {this.state.nameModal}
+                        toggle={this.toggleName}
+                        update={this.updateNameInfo}
+                        error={this.state.nameBlank}
+                        onChange={this.update}
+                     />)}
                     <h2>Username</h2>
                     {this.state.user} <Button basic compact icon='edit' color='black' onClick={this.toggleuserName}/>
                     {this.state.usernameModal && (
-                    <Segment>
-                        <h4>Edit Username</h4>
-                        <Input type='text' id='enteredName' placeholder='Name' onChange={this.update} error={this.state.userBlank}/>
-                        <Button color='black' onClick={this.toggleuserName}>Cancel</Button>
-                        <Button positive onClick={this.updateNameInfo}>Confirm</Button>
-                    </Segment>)}
+                    <EditForm 
+                        name="Username" 
+                        visible={this.state.usernameModal}
+                        toggle={this.toggleuserName}
+                        update={this.updateNameInfo}
+                        error={this.state.userBlank}
+                        onChange={this.update}
+                    />
+                    )}
                     <h2>Password</h2>
                     <Button basic compact icon='edit' color='black' onClick={this.togglePass}/>
                     {this.state.passModal && (
-                    <Segment>
-                        <h4>Edit Password</h4>
-                        <Input type='text' id='enteredName' placeholder='Password' onChange={this.update} error={this.state.passBlank}/>
-                        <Button color='black' onClick={this.togglePass}>Cancel</Button>
-                        <Button positive onClick={this.updateNameInfo}>Confirm</Button>
-                    </Segment>)}
+                        <EditForm 
+                        name="Password" 
+                        visible={this.state.passModal}
+                        toggle={this.togglePass}
+                        update={this.updateNameInfo}
+                        error={this.state.passBlank}
+                        onChange={this.update}
+
+                        />
+                    )}
                     <Divider />
                     <Button onClick={this.state.logout}>Logout</Button>
                     <Button color='red' size='large' onClick={this.open}>Delete Account</Button>
