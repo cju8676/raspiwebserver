@@ -21,9 +21,9 @@ class HomePage extends Component {
     render() {
 
         const panes = [
-            { menuItem: 'Gallery', render: () => <Tab.Pane attached ={false}><Gallery user={this.state.currentUserName} onRefresh={this.state.refresh}/></Tab.Pane> },
-            { menuItem: 'Favorites', render: () => <Tab.Pane attached ={false}><FavoritesGallery user={this.state.currentUserName}/></Tab.Pane> },
-            { menuItem: 'Albums', render: () => <Tab.Pane attached ={false}><Albums user={this.state.currentUserName}/></Tab.Pane> },
+            { menuItem: 'Gallery', /*pane:*/render: () => <Tab.Pane attached ={false}><Gallery user={this.state.currentUserName} onRefresh={this.state.refresh}/></Tab.Pane> },
+            { menuItem: 'Favorites', /*pane:*/render: () => <Tab.Pane attached ={false}><FavoritesGallery user={this.state.currentUserName}/></Tab.Pane> },
+            { menuItem: 'Albums', /*pane:*/render: () => <Tab.Pane attached ={false}><Albums user={this.state.currentUserName}/></Tab.Pane> },
         ]
 
         return (
@@ -42,7 +42,7 @@ class HomePage extends Component {
                     </Button>
                     </div>
                 </Header>
-                <Tab menu={{color:'orange',tabular:false, attached:false, inverted:true}} panes={panes} />
+                <Tab menu={{color:'orange',tabular:false, attached:false, inverted:true}} panes={panes} /*renderActiveOnly={false}*//>
             </div>
         )
     }

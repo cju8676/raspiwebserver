@@ -7,6 +7,7 @@ class AlbumPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            albName: props.match.params.album,
             link_name_id_info: [],
             name_path_id: [],
             open: false,
@@ -73,7 +74,7 @@ class AlbumPage extends Component {
             <div>
                 <Header>
                     <Button color='orange' size='large' href='#home'>Back</Button>
-                    {this.props.match.params.album}
+                    {this.state.albName}
                     <Button color='red' size='large' floated='right' onClick={this.open}>Delete</Button>
                     <Confirm
                         open={this.state.open}

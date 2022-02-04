@@ -16,7 +16,7 @@ class Gallery extends Component {
             id_info: {},
             id_path: {},
             uploadFile : false,
-            refresh : props.onRefresh
+            refresh : props.onRefresh,
         }
     }
 
