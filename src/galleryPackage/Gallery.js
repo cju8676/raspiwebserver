@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-import { Card, Search, Divider, Header, Button, Modal } from 'semantic-ui-react'
+import { Card, Search, Divider, Header } from 'semantic-ui-react'
 
-import ImagePane from './ImagePane'
+import ImagePane from '../imagePackage/ImagePane'
 import UploadFileModal from './UploadFileModal'
 
 

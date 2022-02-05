@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import {Header, Button, Card, Divider, Confirm } from 'semantic-ui-react'
-import ImagePane from './ImagePane';
+import ImagePane from './imagePackage/ImagePane';
 //import {withRouter} from 'react-router-dom'
 
 class AlbumPage extends Component {

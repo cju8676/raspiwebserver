@@ -151,7 +151,7 @@ class ImagePane extends Component {
 
     componentDidMount() {
         // todo split info into its own component
-        {this.state.infoModal && this.fetchInfo();}
+        this.state.infoModal && this.fetchInfo();
     }
 
     render() {

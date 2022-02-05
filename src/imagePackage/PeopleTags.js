@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import { Button, Dropdown, Input, Label, Segment, Form, Container, Icon } from 'semantic-ui-react'
-import Cropper from 'react-easy-crop'
+import { Button, Dropdown, Input, Label, Segment, Icon } from 'semantic-ui-react'
+//import Cropper from 'react-easy-crop'
 
 class PeopleTags extends Component {
     constructor(props) {

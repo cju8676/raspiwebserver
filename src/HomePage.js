@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Header, Tab, Icon, Button } from 'semantic-ui-react'
 
-import Gallery from './Gallery'
+import Gallery from './galleryPackage/Gallery'
 import FavoritesGallery from './FavoritesGallery'
 import Albums from './Albums'
 

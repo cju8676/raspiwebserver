@@ -3,7 +3,7 @@ import {Route, HashRouter, Redirect} from 'react-router-dom'
 import LoginScreen from './loginPackage/LoginScreen'
 import HomePage from './HomePage'
 import AlbumPage from './AlbumPage'
-import SettingsPage from './SettingsPage'
+import SettingsPage from './settingPackage/SettingsPage'
 
 class PageHandle extends Component {
     constructor(props) {

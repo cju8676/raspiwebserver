@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Card } from 'semantic-ui-react'
 
-import ImagePane from './ImagePane'
+import ImagePane from './imagePackage/ImagePane'
 
 
 class FavoritesGallery extends Component {

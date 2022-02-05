@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Header, Button, Divider, Confirm, Container, Segment, Input } from 'semantic-ui-react'
+import { Header, Button, Divider, Confirm, Container } from 'semantic-ui-react'
 import EditForm from "./EditForm"
 //import { withRouter } from 'react-router-dom'
 
