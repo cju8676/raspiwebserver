@@ -83,6 +83,16 @@ class UpdateUsername(Resource):
         username = args['username']
         new_name = args['new_name']
         print(username, "    ", new_name)
+        # check if username we want to change to already exists
+        dup = """
+            SELECT username
+            FROM users 
+            WHERE username = %s;
+        """
+        if (exec_get_one(dup, (new_name,))):
+            print("yes there is duplicate")
+            return False
+
         sql = """
             UPDATE users
             SET username = %s
