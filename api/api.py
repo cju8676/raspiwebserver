@@ -39,11 +39,21 @@ def getpic(path, filename):
 def getinfo(path, filename, username):
     path_str = 'C:/Users/corey/' + urllib.parse.unquote(path) + '/' + urllib.parse.unquote(filename)
     image = Image.open(path_str)
-    exifdata = dict(image.getexif())
-    # for key, val in exifdata.items():
-    #     if key in ExifTags.TAGS:
-    #         print(key, " : ", ExifTags.TAGS[key], ":", val)
-    #TODO get Shot and ISO info added to this
+    exifdata = dict(image._getexif())
+    exif = {}
+    for key, val in exifdata.items():
+        if key in ExifTags.TAGS:
+            #int(key, " : ", ExifTags.TAGS[key], ":", val)
+            name = ExifTags.TAGS.get(key, key)
+            exif[name] = val
+    gps = {}
+    for key in exif['GPSInfo'].keys():
+        name = ExifTags.GPSTAGS.get(key,key)
+        gps[name] = exif['GPSInfo'][key]
+    print(gps)
+    # print(exifdata)
+    # print(exif)
+    # TODO get Shot and ISO info added to this
     
     # check if img is already faved
     sql = """

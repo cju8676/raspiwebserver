@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
-import { Button, Icon, Card, Image, Modal, Divider, Dropdown, Confirm } from 'semantic-ui-react'
+import { Button, Icon, Card, Image, Modal, Divider, Dropdown, Confirm, Grid } from 'semantic-ui-react'
 import ImageTags from './ImageTags'
 import PeopleTags from './PeopleTags'
+import MapContainer from '../MapContainer'
 
 class ImagePane extends Component {
     constructor(props) {
@@ -17,18 +18,18 @@ class ImagePane extends Component {
             // [len, wid, make, modal, datetime]
             info: [],
 
-            open : false,
-            openDel : false,
-            refresh : props.refresh
+            open: false,
+            openDel: false,
+            refresh: props.refresh
         }
     }
-    open = () => this.setState({open : true})
+    open = () => this.setState({ open: true })
 
-    openDel = () => this.setState({openDel : true})
+    openDel = () => this.setState({ openDel: true })
 
-    close = () => this.setState({open : false})
+    close = () => this.setState({ open: false })
 
-    closeDel = () => this.setState({openDel : false})
+    closeDel = () => this.setState({ openDel: false })
 
     favorite = () => {
         const data = {
@@ -72,13 +73,13 @@ class ImagePane extends Component {
                 // }))
                 this.setState({ info: output });
                 console.log(output[5], this.state.id)
-                this.setState({ favorited : Boolean(output[5])})
+                this.setState({ favorited: Boolean(output[5]) })
             })
     }
 
-    toggleInfoModal = () => { 
+    toggleInfoModal = () => {
         this.fetchInfo();
-        this.setState({ infoModal: !this.state.infoModal }) 
+        this.setState({ infoModal: !this.state.infoModal })
     }
 
     getOptions = () => {
@@ -138,8 +139,8 @@ class ImagePane extends Component {
 
     delete = () => {
         const reqOptions = {
-            method : 'POST',
-            headers : { Accept: 'application/json', 'Content-Type' : 'application/json'}
+            method: 'POST',
+            headers: { Accept: 'application/json', 'Content-Type': 'application/json' }
         }
         fetch('/deleteImage/' + this.state.id, reqOptions)
             .then(response => response.json())
@@ -148,6 +149,20 @@ class ImagePane extends Component {
                 this.handleRemove()
             })
     }
+
+    // initMap() {
+    //     const myLatLng = { lat: -25.363, lng: 131.044 };
+    //     const map = new google.maps.Map(document.getElementById("map"), {
+    //       zoom: 4,
+    //       center: myLatLng,
+    //     });
+      
+    //     new google.maps.Marker({
+    //       position: myLatLng,
+    //       map,
+    //       title: "Hello World!",
+    //     });
+    //   }
 
     componentDidMount() {
         // todo split info into its own component
@@ -179,40 +194,48 @@ class ImagePane extends Component {
                     {this.props.inAlbum && <Button color='red' onClick={this.open}>
                         Remove
                     </Button>}
-                    <Confirm 
+                    <Confirm
                         open={this.state.open}
                         onCancel={this.close}
                         onConfirm={this.removeFromAlbum}
                         content='This will remove this file from the album'
-                        />
+                    />
                     <Modal
                         open={this.state.infoModal}
                         trigger={<Button onClick={this.toggleInfoModal}><Icon name='info' /></Button>}>
-                        <Modal.Header><Image fluid src={this.state.picture} alt={this.state.name} /></Modal.Header>
                         <Modal.Content>
-                            <h3>{this.state.name}</h3>
-                            <Divider />
-                            <ImageTags id={this.state.id}/>
-                            <Divider />
-                            <PeopleTags picture={this.state.picture} id={this.state.id}/>
-                            <Divider />
-                            <h2>Dimensions</h2>
-                            {this.state.info[0]} x {this.state.info[1]}
-                            <h2>Make</h2>
-                            {this.state.info[2]}
-                            <h2>Model</h2>
-                            {this.state.info[3]}
-                            <h2>Date Taken</h2>
-                            {this.state.info[4]}
-                            <Divider />
-                            ID: {this.state.id}
+                            <Grid columns={2} divided>
+                                <Grid.Column>
+                                    <Image fluid src={this.state.picture} alt={this.state.name} />
+                                    <Divider />
+                                    {/* <MapContainer /> */}
+                                </Grid.Column>
+                                <Grid.Column>
+                                    <h3>{this.state.name}</h3>
+                                    <Divider />
+                                    <ImageTags id={this.state.id} />
+                                    <Divider />
+                                    <PeopleTags picture={this.state.picture} id={this.state.id} />
+                                    <Divider />
+                                    <h2>Dimensions</h2>
+                                    {this.state.info[0]} x {this.state.info[1]}
+                                    <h2>Make</h2>
+                                    {this.state.info[2]}
+                                    <h2>Model</h2>
+                                    {this.state.info[3]}
+                                    <h2>Date Taken</h2>
+                                    {this.state.info[4]}
+                                    <Divider />
+                                    ID: {this.state.id}
+                                </Grid.Column>
+                            </Grid>
                         </Modal.Content>
                         <Modal.Actions>
                             <Button color='black' onClick={this.toggleInfoModal}>Close</Button>
                         </Modal.Actions>
                     </Modal>
                     <Button negative icon='trash' onClick={this.openDel}></Button>
-                    <Confirm 
+                    <Confirm
                         open={this.state.openDel}
                         onCancel={this.closeDel}
                         onConfirm={this.delete}
