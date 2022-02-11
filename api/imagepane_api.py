@@ -5,6 +5,7 @@ from flask import jsonify
 
 from db_utils import *
 import werkzeug
+import json
 
 
 class GetImage(Resource):
@@ -19,17 +20,20 @@ class GetImage(Resource):
 
 class GetAllImages(Resource):
     def get(self):
-        
         sql = """
             SELECT name, filepath, id 
             FROM files
         """
-        files = list(exec_get_all(sql, []))
-        #print(files)
-        #print(send_from_directory(files[0][1], files[0][0]))
-        #print(send_from_directory(files[1][1], files[1][0]))
-        #file = send_from_directory(files[0][1], files[0][0])
-        return files
+        res = exec_get_all(sql, [])
+        files_json = []
+        for l in res:
+            files_json.append(
+                {
+                    "name": l[0],
+                    "path": l[1],
+                    "id": l[2]
+                })
+        return json.dumps(files_json)
 
 class AddFavorite(Resource):
     def post(self, username, id):
@@ -57,7 +61,16 @@ class GetFavorites(Resource):
             WHERE s.username = %s
             AND f.id = s.id;
         """
-        return list(exec_get_all(sql, [username]))
+        res = exec_get_all(sql, [username])
+        files_json = []
+        for l in res:
+            files_json.append(
+                {
+                    "name": l[0],
+                    "path": l[1],
+                    "id": l[2]
+                })
+        return json.dumps(files_json)
 
 class GetMyTags(Resource):
     def get(self, id):

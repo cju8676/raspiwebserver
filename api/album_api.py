@@ -5,19 +5,11 @@ from flask import jsonify
 
 from db_utils import *
 import werkzeug
+import json
 
 
 class CreateAlbum(Resource):
     def post(self, username, album_name):
-        # parser = reqparse.RequestParser()
-        # parser.add_argument('username', type=str)
-        # parser.add_argument('album_name', type=str)
-        # args = parser.parse_args()
-
-        # username = args['username']
-        # album_name = args['album_name']
-
-        print(username, "         ", album_name)
         sql = """
             INSERT INTO albums (username, album_name)
             VALUES (%s, %s)
@@ -62,8 +54,16 @@ class GetAlbumPhotos(Resource):
             AND a.username = %s
             AND a.album_name = %s;
         """
-        files = list(exec_get_all(sql, [username, album_name]))
-        return files
+        res = exec_get_all(sql, [username, album_name])
+        files_json = []
+        for l in res:
+            files_json.append(
+                {
+                    "name": l[0],
+                    "path": l[1],
+                    "id": l[2]
+                })
+        return json.dumps(files_json)
 
 class DeleteAlbum(Resource):
     def post(self, username, album_name):

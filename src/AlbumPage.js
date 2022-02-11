@@ -9,7 +9,7 @@ class AlbumPage extends Component {
         this.state = {
             albName: props.match.params.album,
             link_name_id_info: [],
-            name_path_id: [],
+            files: [],
             open: false,
             id_path: {}
         }
@@ -39,25 +39,33 @@ class AlbumPage extends Component {
         // id's from db first then use those id's to fetch /files/ 
         fetch('/getAlbumPhotos/'+ this.props.user + '/' + this.props.match.params.album).then(response => response.json())
             .then(JSONresponse => {
-                this.setState({name_path_id : JSONresponse})
-                for (let i = 0; i < this.state.name_path_id.length; i++) {
+                this.setState({files : JSON.parse(JSONresponse)})
+                for (let i = 0; i < this.state.files.length; i++) {
                     //FIXME for some reason it doesn't like encoding / so i do it manually
-                    var path = (this.state.name_path_id[i][1]).replace('/', '%2F');
+                    var path = (this.state.files[i].path).replace('/', '%2F');
                     //fixme could change this to just the id to simplify
                     this.setState(prevState => ({
                         ...prevState,
                         id_path: {
                             ...prevState.id_path,
-                            [this.state.name_path_id[i][2]]:[path]
+                            [this.state.files[i].id]:[path]
                         }
                     }))
-                    fetch('/files/' + encodeURIComponent(path) + '/' + encodeURIComponent(this.state.name_path_id[i][0]))
+                    fetch('/files/' + encodeURIComponent(path) + '/' + encodeURIComponent(this.state.files[i].name))
                         .then(response => response.blob())
                         .then(imageBlob => {
                             const imageURL = URL.createObjectURL(imageBlob);
                             this.setState(prevState => ({
-                                link_name_id_info: 
-                                [...prevState.link_name_id_info, [imageURL, this.state.name_path_id[i][0], this.state.name_path_id[i][2], this.state.id_path[this.state.name_path_id[i][2]]]]
+                                ...prevState,
+                                link_name_id_info:
+                                    [...prevState.link_name_id_info, 
+                                        {
+                                            link: imageURL,
+                                            name: this.state.files[i].name, 
+                                            id: this.state.files[i].id, 
+                                            info: this.state.id_path[this.state.files[i].id],
+                                            // info: path
+                                        }]
                             }));
                         })
                 }
@@ -87,12 +95,12 @@ class AlbumPage extends Component {
                     <Card.Group itemsPerRow={4}>
                         {this.state.link_name_id_info.map(picture => {
                             return <ImagePane 
-                            picture={picture[0]} 
-                            filename={picture[1]} 
-                            id={picture[2]} 
+                            picture={picture.link} 
+                            filename={picture.name} 
+                            id={picture.id} 
                             user={this.props.user}
                             albums={[]}
-                            path={picture[3]}
+                            path={picture.info}
                             inAlbum={this.props.match.params.album}
                             refresh={this.props.onChange}
                             />
