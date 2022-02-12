@@ -86,7 +86,7 @@ class HomePage extends Component {
                 picture={picture.link}
                 filename={picture.name}
                 id={picture.id}
-                user={this.state.currentUsername}
+                user={this.props.user}
                 albums={this.state.albums}
                 path={picture.info}
                 inAlbum={false}

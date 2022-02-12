@@ -6,8 +6,7 @@ class EditForm extends Component {
         super(props);
         this.state = {
             blank : false,
-            //todo make more uniform
-            taken : false
+            error : false
         };
         this.updateInfo = "";
     }
@@ -19,11 +18,9 @@ class EditForm extends Component {
             this.props.toggle();
         }
         else {
-            //todo make this more uniform for a false in other areas than just the username form
-            // for username: already taken try again message
             this.setState({
                 blank : true,
-                taken : true
+                error : true
             })
 
         }
@@ -57,7 +54,7 @@ class EditForm extends Component {
         if (event.target.value !== "") {
             this.setState({
                 blank : false,
-                taken : false
+                error : false
             })
         }
     }
@@ -69,7 +66,7 @@ class EditForm extends Component {
                 <Segment>
                     <h4>Edit {this.props.name}</h4>
                     <Input type='text' id={'entered'+this.props.name} placeholder={this.props.name} onChange={this.update} error={this.state.blank} />
-                    {this.state.taken && <Label pointing='left' color='red'>Name already taken!</Label>}
+                    {this.state.error && <Label pointing='left' color='red'>{this.props.errorMsg}</Label>}
                     <Divider />
                     <Button color='black' onClick={this.props.toggle}>Cancel</Button>
                     <Button positive onClick={this.submitUpdate}>Confirm</Button>

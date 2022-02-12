@@ -113,6 +113,7 @@ class SettingsPage extends Component {
                             visible={this.state.usernameModal}
                             toggle={this.toggleuserName}
                             update={this.update}
+                            errorMsg={"Name already taken!"}
                         />
                     )}
                     <h2>Password</h2>
@@ -124,6 +125,7 @@ class SettingsPage extends Component {
                             visible={this.state.passModal}
                             toggle={this.togglePass}
                             update={this.update}
+                            errorMsg={"This is your current password"}
                         />
                     )}
                     <Divider />

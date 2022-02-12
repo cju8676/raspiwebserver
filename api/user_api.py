@@ -82,7 +82,6 @@ class UpdateUsername(Resource):
 
         username = args['username']
         new_name = args['new_name']
-        print(username, "    ", new_name)
         # check if username we want to change to already exists
         dup = """
             SELECT username
@@ -90,7 +89,6 @@ class UpdateUsername(Resource):
             WHERE username = %s;
         """
         if (exec_get_one(dup, (new_name,))):
-            print("yes there is duplicate")
             return False
 
         sql = """
@@ -109,6 +107,17 @@ class UpdatePassword(Resource):
 
         username = args['username']
         new_pass = hash_password(args['new_name'])
+
+        # check if we are changing password to what it already is
+        dup = """
+            SELECT password
+            FROM users
+            WHERE username = %s;
+        """
+        check = exec_get_one(dup, (username, ))
+        if (check and check[0] == new_pass):
+            return False
+
         sql = """
             UPDATE users
             SET password = %s
