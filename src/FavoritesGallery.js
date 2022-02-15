@@ -81,6 +81,7 @@ class FavoritesGallery extends Component {
                         albums={this.state.albums}
                         path={picture.info}/>
                     })}
+                    {/* {this.props.img.map(pane => pane)} */}
                 </Card.Group>
             </div>
         )

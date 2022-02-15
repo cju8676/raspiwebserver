@@ -24,8 +24,10 @@ class HomePage extends Component {
             link_name_id_info: [],
             id_path: {},
 
-            imgPanes: []
-        }
+            imgPanes: [],
+
+            fav_ids: []
+        }  
     }
 
     fetchPictures = () => {
@@ -75,9 +77,29 @@ class HomePage extends Component {
             })
     }
 
+    getFavs = () => {
+        fetch('/getFavIDs/' + this.props.user).then(res => res.json())
+            .then(JSONresponse => {
+                console.log(JSONresponse)
+                this.setState({fav_ids : JSONresponse})
+            })
+    }
+
+    favs(img) {
+        let ret;
+            for (let pane in img) {
+                if (this.state.fav_ids.includes(pane.props.id)) {
+                    console.log(pane.props.id)
+                    ret.push(pane)
+                }
+            }
+        return ret
+    }
+
     componentDidMount() {
         this.fetchAlbums();
         this.fetchPictures();
+        this.getFavs();
     }
 
     render() {
@@ -94,9 +116,11 @@ class HomePage extends Component {
             />
         })
 
-        for(var i = 0; i < img.length ; i++) {
-            console.log(img[i])
-        }
+        // for(var i = 0; i < img.length ; i++) {
+        //     console.log(img[i].props.id)
+        // }
+
+        //const favs = this.favs(img);
 
         const panes = [
             {
@@ -105,7 +129,7 @@ class HomePage extends Component {
             },
             {
                 menuItem: 'Favorites',
-                /*pane:*/render: () => <Tab.Pane attached={false}><FavoritesGallery user={this.state.currentUserName} /></Tab.Pane>
+                /*pane:*/render: () => <Tab.Pane attached={false}><FavoritesGallery user={this.state.currentUserName} /*img={favs}*/ /></Tab.Pane>
             },
             {
                 menuItem: 'Albums',
