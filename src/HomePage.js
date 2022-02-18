@@ -1,10 +1,11 @@
-import React, { Component } from 'react'
+import React, { Component, useContext } from 'react'
 import { Header, Tab, Icon, Button } from 'semantic-ui-react'
 
 import Gallery from './galleryPackage/Gallery'
 import FavoritesGallery from './FavoritesGallery'
 import Albums from './Albums'
 import ImagePane from './imagePackage/ImagePane'
+import { UserContext } from './helper/UserContext'
 
 
 
@@ -93,10 +94,6 @@ class HomePage extends Component {
                 refresh={this.state.refresh}
             />
         })
-
-        for(var i = 0; i < img.length ; i++) {
-            console.log(img[i])
-        }
 
         const panes = [
             {

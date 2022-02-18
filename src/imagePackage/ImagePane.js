@@ -4,6 +4,7 @@ import ImageTags from './ImageTags'
 import PeopleTags from './PeopleTags'
 import MapContainer from '../MapContainer'
 
+
 class ImagePane extends Component {
     constructor(props) {
         super(props)
@@ -20,7 +21,9 @@ class ImagePane extends Component {
 
             open: false,
             openDel: false,
-            refresh: props.refresh
+            refresh: props.refresh,
+
+            loading: true
         }
     }
     open = () => this.setState({ open: true })
@@ -165,11 +168,14 @@ class ImagePane extends Component {
     //   }
 
     componentDidMount() {
+        this.setState({loaded: true})
         // todo split info into its own component
         this.state.infoModal && this.fetchInfo();
     }
 
     render() {
+        if (this.state.loading) return null;
+
         return (
             <Card
                 onMouseEnter={e => this.setState({ display: true })}
