@@ -62,7 +62,6 @@ class ImageTags extends Component {
     availTags = () => {
         fetch('/getAvailTags/' + this.state.id).then(response => response.json())
             .then(jsonOutput => {
-                console.log(jsonOutput)
                 this.setState({ tags: jsonOutput })
             })
     }
@@ -156,7 +155,6 @@ class ImageTags extends Component {
     }
 
     updateTagsList = () => {
-        console.log(this.newTag.name, this.newTag.color);
         this.setState(prevState => ({
             myTags:
                 [...prevState.myTags, [this.newTag.name, this.newTag.color]]

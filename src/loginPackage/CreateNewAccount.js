@@ -33,7 +33,6 @@ class CreateNewAccount extends Component {
     }
 
     handleResponse = (jsonOutput) => {
-        console.log(jsonOutput)
         if (jsonOutput === false) {
             this.setState({takenUser : true});
         }

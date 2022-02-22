@@ -39,8 +39,12 @@ def getpic(path, filename):
 def getinfo(path, filename, username):
     path_str = 'C:/Users/corey/' + urllib.parse.unquote(path) + '/' + urllib.parse.unquote(filename)
     image = Image.open(path_str)
-    exifdata = dict(image._getexif())
-    exif = {}
+    exif = image._getexif()
+    if exif is not None:
+        exifdata = dict(exif)
+    else:
+        exifdata = {}
+    # exif = {}
     
     # for key, val in exifdata.items():
     #     if key in ExifTags.TAGS:

@@ -72,7 +72,6 @@ class ImagePane extends Component {
                 //     }
                 // }))
                 this.setState({ info: output });
-                console.log(output[5], this.state.id)
                 this.setState({ favorited: Boolean(output[5]) })
             })
     }
@@ -92,8 +91,13 @@ class ImagePane extends Component {
         }
     }
 
+    handleAlbumAdd = (output) => {
+        //TODO handle response - success or failed to add to album
+        // quick success pop up
+        console.log(output)
+    }
+
     selectAlbum = (e, data) => {
-        console.log(data.value);
         const postData = {
             username: this.props.user,
             album_name: data.value,
@@ -107,7 +111,7 @@ class ImagePane extends Component {
         fetch('/addPicToAlbum/', reqOptions)
             .then(response => response.json())
             .then(jsonOutput => {
-                //TODO handle response - success or failed to add to album
+                this.handleAlbumAdd(jsonOutput)
             })
     }
 
@@ -156,7 +160,7 @@ class ImagePane extends Component {
     //       zoom: 4,
     //       center: myLatLng,
     //     });
-      
+
     //     new google.maps.Marker({
     //       position: myLatLng,
     //       map,
@@ -171,35 +175,11 @@ class ImagePane extends Component {
 
     render() {
         return (
-            <Card
+            <Card onClick={() => this.toggleInfoModal()}
                 onMouseEnter={e => this.setState({ display: true })}
                 onMouseLeave={e => this.setState({ display: false })}>
                 <Image src={this.state.picture} alt="pic" />
                 <Card.Content>
-                    <a href={this.state.picture} download={this.state.name}>
-                        <Button type="submit"><Icon name='download' />Save</Button>
-                    </a>
-                    <Button onClick={this.favorite}>
-                        {!this.state.favorited && <Icon name='favorite' />}
-                        {this.state.favorited && <Icon name='favorite' color='yellow' />}
-                        Favorite
-                    </Button>
-                    {!this.props.inAlbum && <Dropdown
-                        text='Add to Album'
-                        icon='add' floating labeled button
-                        className='icon'
-                        options={this.getOptions()}
-                        onChange={this.selectAlbum}>
-                    </Dropdown>}
-                    {this.props.inAlbum && <Button color='red' onClick={this.open}>
-                        Remove
-                    </Button>}
-                    <Confirm
-                        open={this.state.open}
-                        onCancel={this.close}
-                        onConfirm={this.removeFromAlbum}
-                        content='This will remove this file from the album'
-                    />
                     <Modal
                         open={this.state.infoModal}
                         trigger={<Button onClick={this.toggleInfoModal}><Icon name='info' /></Button>}>
@@ -207,6 +187,33 @@ class ImagePane extends Component {
                             <Grid columns={2} divided>
                                 <Grid.Column>
                                     <Image fluid src={this.state.picture} alt={this.state.name} />
+                                    <Divider />
+                                    <a href={this.state.picture} download={this.state.name}>
+                                        <Button type="submit"><Icon name='download' />Save</Button>
+                                    </a>
+                                    <Button onClick={this.favorite}>
+                                        {!this.state.favorited && <Icon name='favorite' />}
+                                        {this.state.favorited && <Icon name='favorite' color='yellow' />}
+                                        Favorite
+                                    </Button>
+                                    {!this.props.inAlbum &&
+                                        <Dropdown
+                                            text='Add to Album'
+                                            icon='add' floating labeled button
+                                            className='icon'
+                                            options={this.getOptions()}
+                                            onChange={this.selectAlbum}>
+                                        </Dropdown>}
+                                    {this.props.inAlbum &&
+                                        <Button color='red' onClick={this.open}>
+                                            Remove
+                                        </Button>}
+                                    <Confirm
+                                        open={this.state.open}
+                                        onCancel={this.close}
+                                        onConfirm={this.removeFromAlbum}
+                                        content='This will remove this file from the album'
+                                    />
                                     <Divider />
                                     {/* <MapContainer /> */}
                                 </Grid.Column>

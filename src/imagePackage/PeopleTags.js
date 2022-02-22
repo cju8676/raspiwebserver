@@ -179,7 +179,6 @@ class PeopleTags extends Component {
     }
 
     updatePeopleList = () => {
-        console.log(this.newPerson.name, this.newPerson.color);
         this.setState(prevState => ({
             myPeople:
                 [...prevState.myPeople, [this.newPerson.name, this.newPerson.color]]

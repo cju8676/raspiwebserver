@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Modal, Button, Form, Container, Header, Divider } from 'semantic-ui-react'
+import { Modal, Button, Form, Container, Header, Divider, Image } from 'semantic-ui-react'
 import ImageTags from '../imagePackage/ImageTags';
 import PeopleTags from '../imagePackage/PeopleTags';
 
@@ -8,11 +8,13 @@ class UploadFileModal extends Component {
         super(props);
         this.state = {
             uploadFile: false,
-            refresh: props.onRefresh
+            refresh: props.onRefresh,
+            picture: false
         }
+        // this.picture = false;
     }
 
-    toggleUpload = () => {
+    toggleUpload = () => { 
         this.setState({ uploadFile: !this.state.uploadFile })
     }
 
@@ -49,12 +51,16 @@ class UploadFileModal extends Component {
                             <Container>
                                 <Header>Select File</Header>
                                 <input ref={(ref) => { this.uploadInput = ref; }} type="file" />
+                                <Button as='a' onClick={() => console.log(this.uploadInput.files.length)}>Check</Button>
+                                <Container>
+                                    {this.picture && <Image src={this.uploadInput.files[0]} alt={"picture"} /> }
+                                </Container>
                             </Container>
                             <Container>
                                 <ImageTags id={'-2'}/>
                             </Container>
                             <Container>
-                                <PeopleTags />
+                                <PeopleTags id={'-2'}/>
                             </Container>
                             <Divider />
                             <Button as='a' onClick={this.toggleUpload}>Cancel</Button>

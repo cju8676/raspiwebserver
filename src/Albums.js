@@ -27,15 +27,13 @@ class Albums extends Component {
 
     handleResponse = (jsonOutput) => {
         if (jsonOutput === false) {
-            //album name already exists
+            // album name already exists
             this.setState({duplicate : true})
-            console.log("false album already exists");
         }
         else {
-            // created pop up
+            // album created - toggle off create modal
             this.toggle();
             this.componentDidMount();
-            console.log("album nmame does note exist yet we are good");
         }
     }
 

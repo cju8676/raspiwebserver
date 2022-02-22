@@ -69,7 +69,6 @@ class FavoritesGallery extends Component {
 
         return (
             <div>
-                {console.log(this.state)}
                 <Card.Group itemsPerRow={4}>
                     {this.state.link_name_id_info.map(picture => {
                         return <ImagePane 

@@ -94,9 +94,9 @@ class HomePage extends Component {
             />
         })
 
-        for(var i = 0; i < img.length ; i++) {
-            console.log(img[i])
-        }
+        // for(var i = 0; i < img.length ; i++) {
+        //     console.log(img[i])
+        // }
 
         const panes = [
             {
