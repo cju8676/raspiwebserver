@@ -126,18 +126,13 @@ class UpdatePassword(Resource):
         return exec_commit(sql, (new_pass, username))
 
 class DeleteImage(Resource):
-    def post(self, id):
+    def post(self, id, path, name):
         sql = """
-            DELETE from albums
-            WHERE id = %s;
-
-            DELETE from favorites
-            WHERE id = %s;
-
-            DELETE from tags
-            WHERE id = %s;
+            INSERT INTO backup_files (name, filepath, id)
+            VALUES (%s, %s, %s);
 
             DELETE from files
             WHERE id = %s;
+
         """
-        return exec_commit(sql, (id, id, id, id))
+        return exec_commit(sql, (name, path, id, id,))

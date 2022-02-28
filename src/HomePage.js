@@ -106,7 +106,7 @@ class HomePage extends Component {
             },
             {
                 menuItem: 'Favorites',
-                /*pane:*/render: () => <Tab.Pane attached={false}><FavoritesGallery user={this.state.currentUserName} /></Tab.Pane>
+                /*pane:*/render: () => <Tab.Pane attached={false}><FavoritesGallery user={this.state.currentUserName} onRefresh={this.state.refresh}/></Tab.Pane>
             },
             {
                 menuItem: 'Albums',

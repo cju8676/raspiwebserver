@@ -146,7 +146,7 @@ class ImagePane extends Component {
             method: 'POST',
             headers: { Accept: 'application/json', 'Content-Type': 'application/json' }
         }
-        fetch('/deleteImage/' + this.state.id, reqOptions)
+        fetch('/deleteImage/' + this.state.id + '/' + encodeURIComponent(this.props.path) + '/' + encodeURIComponent(this.state.name), reqOptions)
             .then(response => response.json())
             .then(jsonOutput => {
                 //todo provide pop up that says it was deleted
