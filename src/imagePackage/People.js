@@ -78,7 +78,7 @@ export default function People(props) {
                 // confirm tag has been created
                 setPeople([...people, [name, color]])
                 //else setTags([name, color])
-                setAvailPeople(availPeople.filter(prev => !(prev[0] == name && prev[1] == color)));
+                setAvailPeople(availPeople.filter(prev => !(prev[0] === name && prev[1] === color)));
             })
     }
 

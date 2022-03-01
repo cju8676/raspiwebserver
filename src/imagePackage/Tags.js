@@ -61,7 +61,7 @@ export default function Tags(props) {
                 // confirm tag has been created
                 setTags([...tags, [name, color]])
                 //else setTags([name, color])
-                setAvailTags(availTags.filter(prev => !(prev[0] == name && prev[1] == color)));
+                setAvailTags(availTags.filter(prev => !(prev[0] === name && prev[1] === color)));
             })
     }
 

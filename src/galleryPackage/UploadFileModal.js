@@ -9,13 +9,14 @@ class UploadFileModal extends Component {
         this.state = {
             uploadFile: false,
             refresh: props.onRefresh,
-            picture: false
+            file: null
         }
-        // this.picture = false;
+        this.handleChange = this.handleChange.bind(this)
     }
 
-    toggleUpload = () => { 
+    toggleUpload = () => {
         this.setState({ uploadFile: !this.state.uploadFile })
+        this.setState({ file: null })
     }
 
     handleUploadImage = (e) => {
@@ -39,6 +40,12 @@ class UploadFileModal extends Component {
         this.state.refresh();
     }
 
+    handleChange(event) {
+        this.setState({
+            file: URL.createObjectURL(event.target.files[0])
+        })
+    }
+
     render() {
         return (
             <div>
@@ -48,19 +55,16 @@ class UploadFileModal extends Component {
                     <Modal.Header>New File Upload</Modal.Header>
                     <Modal.Content>
                         <Form onSubmit={this.handleUploadImage}>
+                            <Header>Select File</Header>
+                            <input type="file" onChange={this.handleChange} ref={(ref) => { this.uploadInput = ref; }} />
+                            <Header>Preview:</Header>
+                            <Image size="large" src={this.state.file} />
+                            <Divider />
                             <Container>
-                                <Header>Select File</Header>
-                                <input ref={(ref) => { this.uploadInput = ref; }} type="file" />
-                                <Button as='a' onClick={() => console.log(this.uploadInput.files.length)}>Check</Button>
-                                <Container>
-                                    {this.picture && <Image src={this.uploadInput.files[0]} alt={"picture"} /> }
-                                </Container>
+                                <Tags id={'-2'} />
                             </Container>
                             <Container>
-                                <Tags id={'-2'}/>
-                            </Container>
-                            <Container>
-                                <PeopleTags id={'-2'}/>
+                                <PeopleTags id={'-2'} />
                             </Container>
                             <Divider />
                             <Button as='a' onClick={this.toggleUpload}>Cancel</Button>
