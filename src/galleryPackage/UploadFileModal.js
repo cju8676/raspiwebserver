@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Modal, Button, Form, Container, Header, Divider, Image } from 'semantic-ui-react'
-import ImageTags from '../imagePackage/ImageTags';
+import Tags from '../imagePackage/Tags';
 import PeopleTags from '../imagePackage/PeopleTags';
 
 class UploadFileModal extends Component {
@@ -57,7 +57,7 @@ class UploadFileModal extends Component {
                                 </Container>
                             </Container>
                             <Container>
-                                <ImageTags id={'-2'}/>
+                                <Tags id={'-2'}/>
                             </Container>
                             <Container>
                                 <PeopleTags id={'-2'}/>

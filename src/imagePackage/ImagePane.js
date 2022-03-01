@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import { Button, Icon, Card, Image, Modal, Divider, Dropdown, Confirm, Grid } from 'semantic-ui-react'
-import ImageTags from './ImageTags'
 import PeopleTags from './PeopleTags'
 import MapContainer from '../MapContainer'
+import Tags from './Tags'
 
 class ImagePane extends Component {
     constructor(props) {
@@ -175,9 +175,7 @@ class ImagePane extends Component {
 
     render() {
         return (
-            <Card onClick={() => this.toggleInfoModal()}
-                onMouseEnter={e => this.setState({ display: true })}
-                onMouseLeave={e => this.setState({ display: false })}>
+            <Card>
                 <Image src={this.state.picture} alt="pic" />
                 <Card.Content>
                     <Modal
@@ -220,7 +218,7 @@ class ImagePane extends Component {
                                 <Grid.Column>
                                     <h3>{this.state.name}</h3>
                                     <Divider />
-                                    <ImageTags id={this.state.id} />
+                                    <Tags id={this.state.id} />
                                     <Divider />
                                     <PeopleTags picture={this.state.picture} id={this.state.id} />
                                     <Divider />
