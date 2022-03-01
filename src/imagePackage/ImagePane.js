@@ -3,6 +3,7 @@ import { Button, Icon, Card, Image, Modal, Divider, Dropdown, Confirm, Grid } fr
 import PeopleTags from './PeopleTags'
 import MapContainer from '../MapContainer'
 import Tags from './Tags'
+import People from './People'
 
 class ImagePane extends Component {
     constructor(props) {
@@ -220,7 +221,9 @@ class ImagePane extends Component {
                                     <Divider />
                                     <Tags id={this.state.id} />
                                     <Divider />
-                                    <PeopleTags picture={this.state.picture} id={this.state.id} />
+                                    {/* <PeopleTags picture={this.state.picture} id={this.state.id} /> */}
+                                    {/* <Divider /> */}
+                                    <People id={this.state.id} />
                                     <Divider />
                                     <h2>Dimensions</h2>
                                     {this.state.info[0]} x {this.state.info[1]}

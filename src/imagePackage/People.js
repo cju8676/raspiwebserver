@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import { Label, Icon, Dropdown, Segment, Input, Button } from 'semantic-ui-react';
+import { Label, Icon, Dropdown, Segment, Input, Button } from 'semantic-ui-react'
 
-export default function Tags(props) {
+export default function People(props) {
     const { id } = props;
 
     const options = [
@@ -20,27 +20,44 @@ export default function Tags(props) {
         { label: { color: 'black' }, text: 'Black', value: 'black' },
     ]
 
-    const [tags, setTags] = useState(() => {
-        fetch('/getTags/' + id).then(response => response.json())
+    const [people, setPeople] = useState(() => {
+        fetch('/getPeople/' + id).then(response => response.json())
             .then(jsonOutput => {
-                if (jsonOutput.length !== 0) {
-                    setTags(jsonOutput)
-                }
-                else setTags([]);
+                if (jsonOutput.length !== 0)
+                    setPeople(jsonOutput)
+                else setPeople([])
             })
     })
 
-    const [availTags, setAvailTags] = useState(() => {
-        fetch('/getAvailTags/' + id).then(response => response.json())
+    const [availPeople, setAvailPeople] = useState(() => {
+        fetch('/getAvailPeople/' + id).then(response => response.json())
             .then(jsonOutput => {
-                setAvailTags(jsonOutput)
+                setAvailPeople(jsonOutput)
             })
     })
 
     const [tagModal, setTagModal] = useState(false);
     const [nameBlank, setNameBlank] = useState(false);
     const [colorBlank, setColorBlank] = useState(false);
-    const [newTag, setNewTag] = useState({name: "", color: ""})
+    const [newTag, setNewTag] = useState({name: "", color: ""});
+
+    function delTag(per) {
+        const data = {
+            name: per[0],
+            color: per[1]
+        }
+        const reqOptions = {
+            method: 'POST',
+            headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        }
+        fetch('/delPerson/' + id, reqOptions)
+            .then(response => response.json())
+            .then(() => {
+                setPeople(people.filter(prevTag => prevTag !== per))
+                setAvailPeople([...availPeople, per])
+            })
+    }
 
     function addTag(name, color) {
         // changed in db, this should never hit bc should never show up in avail tags
@@ -55,31 +72,13 @@ export default function Tags(props) {
             headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         }
-        fetch('/addTag/' + id, reqOptions)
+        fetch('/addPerson/' + id, reqOptions)
             .then(response => response.json())
             .then(() => {
                 // confirm tag has been created
-                setTags([...tags, [name, color]])
+                setPeople([...people, [name, color]])
                 //else setTags([name, color])
-                setAvailTags(availTags.filter(prev => !(prev[0] == name && prev[1] == color)));
-            })
-    }
-
-    function delTag(tag) {
-        const data = {
-            name: tag[0],
-            color: tag[1]
-        }
-        const reqOptions = {
-            method: 'POST',
-            headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        }
-        fetch('/delTag/' + id, reqOptions)
-            .then(response => response.json())
-            .then(() => {
-                setTags(tags.filter(prevTag => prevTag !== tag))
-                setAvailTags([...availTags, tag])
+                setAvailPeople(availPeople.filter(prev => !(prev[0] == name && prev[1] == color)));
             })
     }
 
@@ -121,42 +120,37 @@ export default function Tags(props) {
             .then(() => {
                 // confirm tag has been created
                 setTagModal(false);
-                setAvailTags([...availTags, [newTag.name, newTag.color]])
+                setAvailPeople([...availPeople, [newTag.name, newTag.color]])
                 setNewTag({name: "", color: ""})
                 setNameBlank(false)
                 setColorBlank(false)
             })
     }
 
-    // useEffect(() => {
-    //     console.log("rendered again");
-    //     console.log(tags)
-    // }, [tags])
-
     return (
         <div>
-            <h2>Tags</h2>
+            <h2>People</h2>
             <Label.Group>
-                {tags && tags.map(tag => {
+                {people && people.map(per => {
                     return (
-                        <Label color={tag[1]} >
-                            {tag[0]}
-                            <Icon name='delete' onClick={e => delTag(tag)} />
+                        <Label color={per[1]} >
+                            {per[0]}
+                            <Icon name='delete' onClick={e => delTag(per)} />
                         </Label>)
                 })}
                 <Label>
                     <Dropdown icon='add'>
                         <Dropdown.Menu>
-                            {availTags && availTags.map(tag => {
-                                return (<Dropdown.Item text={tag[0]} label={{ color: tag[1] }} onClick={selectTag} />)
+                            {availPeople && availPeople.map(person => {
+                                return (<Dropdown.Item text={person[0]} label={{ color: person[1] }} onClick={selectTag} />)
                             })}
-                            <Dropdown.Item text='New Tag' onClick={() => setTagModal(true)} />
+                            <Dropdown.Item text='Create New Person' onClick={() => setTagModal(true)} />
                         </Dropdown.Menu>
                     </Dropdown>
                 </Label>
                 {tagModal && (
                     <Segment>
-                        <h4>Create Tag</h4>
+                        <h4>Create Person</h4>
                         <Input type='text' id='enteredName' placeholder='Name' onChange={update} error={nameBlank} />
                         <Dropdown placeholder='Color' search selection options={options} id='enteredColor' onChange={handleDrop} error={colorBlank} />
                         <Button color='black' onClick={() => setTagModal(false)}>Cancel</Button>
