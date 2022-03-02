@@ -44,19 +44,30 @@ def getinfo(path, filename, username):
         exifdata = dict(exif)
     else:
         exifdata = {}
-    # exif = {}
-    
-    # for key, val in exifdata.items():
-    #     if key in ExifTags.TAGS:
-    #         #int(key, " : ", ExifTags.TAGS[key], ":", val)
-    #         name = ExifTags.TAGS.get(key, key)
-    #         exif[name] = val
-    # gps = {}
-    # # print(exifdata['34853'])
-    # for key in exif['GPSInfo'].keys():
-    #     name = ExifTags.GPSTAGS.get(key,key)
-    #     gps[name] = exif['GPSInfo'][key]
-    # print(gps)
+    for key, val in exifdata.items():
+        if key in ExifTags.TAGS:
+            #int(key, " : ", ExifTags.TAGS[key], ":", val)
+            name = ExifTags.TAGS.get(key, key)
+            exif[name] = val
+    # print(exifdata['34853'])
+    print(exif.keys())
+    gps = {}
+    gps_coords = []
+    if 'GPSInfo' in exif.keys():
+        for key in exif['GPSInfo'].keys():
+            name = ExifTags.GPSTAGS.get(key,key)
+            gps[name] = exif['GPSInfo'][key]
+
+        decimal_lat =float( gps['GPSLatitude'][0] + ((gps['GPSLatitude'][1])/60) + ((gps['GPSLatitude'][2])/3600))
+
+        if (gps['GPSLatitudeRef'] == 'S') :
+            decimal_lat = decimal_lat * -1
+
+        decimal_long =float( gps['GPSLongitude'][0] + ((gps['GPSLongitude'][1])/60) + ((gps['GPSLongitude'][2])/3600))
+
+        if (gps['GPSLongitudeRef'] == 'W') :
+            decimal_long = decimal_long * -1
+        gps_coords = [decimal_lat, decimal_long]
 
     # print(exifdata)
     # print(exif)
@@ -79,13 +90,13 @@ def getinfo(path, filename, username):
 
     if len(exifdata) == 0:
         # len wid --- --- --- tags
-        return jsonify([image.size[0], image.size[1], "---", "---", "---", is_favorited])
+        return jsonify([image.size[0], image.size[1], "---", "---", "---", is_favorited, gps_coords])
     else:
         #print(datetime.strptime(exifdata[306], '%Y:%m:%d %H:%M:%S').strftime("%B %d, %Y -- %I:%M:%S %p"))
         formatted = datetime.strptime(exifdata[306], '%Y:%m:%d %H:%M:%S').strftime("%B %d, %Y -- %I:%M:%S %p")
 
         # len wid make model datetime tags
-        return jsonify([image.size[0], image.size[1], exifdata[271], exifdata[272], formatted, is_favorited])
+        return jsonify([image.size[0], image.size[1], exifdata[271], exifdata[272], formatted, is_favorited, gps_coords])
 
 def allowed_file(filename):
     return '.' in filename and \

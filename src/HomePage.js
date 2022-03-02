@@ -81,6 +81,7 @@ class HomePage extends Component {
     }
 
     render() {
+        console.log(this.state.link_name_id_info)
         const img = this.state.link_name_id_info.map(picture => {
             return <ImagePane
                 picture={picture.link}

@@ -6,25 +6,29 @@ export class MapContainer extends Component {
     render() {
         const style = {
             width: '90%',
-            height: '40%',
-            display: 'inline-block'
+            height: '30%'
         }
 
         return (
-            <Map
-                google={this.props.google}
-                zoom={14}
-                draggable={false}
-                disableDoubleClickZoom={true}
-                fullscreenControl={false}
-                streetViewControl={false}
-                mapTypeControl={false}
-                style={style}
-            >
-
-                <Marker onClick={this.onMarkerClick}
-                    name={'Current location'} />
-            </Map>
+            <div className="map">
+                <Map
+                    google={this.props.google}
+                    initialCenter={{
+                        lat: this.props.lat,
+                        lng: this.props.long
+                      }}
+                    zoom={14}
+                    draggable={false}
+                    disableDoubleClickZoom={true}
+                    fullscreenControl={false}
+                    streetViewControl={false}
+                    mapTypeControl={false}
+                    style={style}
+                >
+                    <Marker onClick={this.onMarkerClick}
+                        name={'Current location'} />
+                </Map>
+            </div>
         );
     }
 }

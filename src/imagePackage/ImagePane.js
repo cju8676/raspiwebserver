@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Button, Icon, Card, Image, Modal, Divider, Dropdown, Confirm, Grid } from 'semantic-ui-react'
+import { Button, Icon, Card, Image, Modal, Divider, Dropdown, Confirm, Grid, Container } from 'semantic-ui-react'
 import PeopleTags from './PeopleTags'
 import MapContainer from '../MapContainer'
 import Tags from './Tags'
@@ -21,7 +21,11 @@ class ImagePane extends Component {
 
             open: false,
             openDel: false,
-            refresh: props.refresh
+            refresh: props.refresh,
+            map: {
+                lat: "",
+                long: ""
+            }
         }
     }
     open = () => this.setState({ open: true })
@@ -74,6 +78,13 @@ class ImagePane extends Component {
                 // }))
                 this.setState({ info: output });
                 this.setState({ favorited: Boolean(output[5]) })
+                // console.log(output[6])
+                if (output[6].length!== 0) this.setState({map : {
+                    lat: output[6][0],
+                    long: output[6][1] 
+                }})
+                else this.setState({map: null})
+                // console.log(this.state.map)
             })
     }
 
@@ -214,7 +225,7 @@ class ImagePane extends Component {
                                         content='This will remove this file from the album'
                                     />
                                     <Divider />
-                                    {/* <MapContainer /> */}
+                                    {this.state.map !== null && <MapContainer lat={this.state.map.lat} long={this.state.map.long} />}
                                 </Grid.Column>
                                 <Grid.Column>
                                     <h3>{this.state.name}</h3>
