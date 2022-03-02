@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import { Button, Icon, Card, Image, Modal, Divider, Dropdown, Confirm, Grid, Container } from 'semantic-ui-react'
-import PeopleTags from './PeopleTags'
+import { Button, Icon, Card, Image, Modal, Divider, Dropdown, Confirm, Grid } from 'semantic-ui-react'
+// import PeopleTags from './PeopleTags'
 import MapContainer from '../MapContainer'
 import Tags from './Tags'
 import People from './People'
@@ -22,10 +22,7 @@ class ImagePane extends Component {
             open: false,
             openDel: false,
             refresh: props.refresh,
-            map: {
-                lat: "",
-                long: ""
-            }
+            map: null
         }
     }
     open = () => this.setState({ open: true })
@@ -78,13 +75,10 @@ class ImagePane extends Component {
                 // }))
                 this.setState({ info: output });
                 this.setState({ favorited: Boolean(output[5]) })
-                // console.log(output[6])
                 if (output[6].length!== 0) this.setState({map : {
                     lat: output[6][0],
                     long: output[6][1] 
                 }})
-                else this.setState({map: null})
-                // console.log(this.state.map)
             })
     }
 
@@ -165,20 +159,6 @@ class ImagePane extends Component {
                 this.handleRemove()
             })
     }
-
-    // initMap() {
-    //     const myLatLng = { lat: -25.363, lng: 131.044 };
-    //     const map = new google.maps.Map(document.getElementById("map"), {
-    //       zoom: 4,
-    //       center: myLatLng,
-    //     });
-
-    //     new google.maps.Marker({
-    //       position: myLatLng,
-    //       map,
-    //       title: "Hello World!",
-    //     });
-    //   }
 
     componentDidMount() {
         // todo split info into its own component
