@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Label, Icon, Dropdown, Segment, Input, Button } from 'semantic-ui-react'
 
 export default function People(props) {
@@ -20,26 +20,30 @@ export default function People(props) {
         { label: { color: 'black' }, text: 'Black', value: 'black' },
     ]
 
-    const [people, setPeople] = useState(() => {
+    const [people, setPeople] = useState([]);
+    const [availPeople, setAvailPeople] = useState([]);
+    const [tagModal, setTagModal] = useState(false);
+    const [nameBlank, setNameBlank] = useState(false);
+    const [colorBlank, setColorBlank] = useState(false);
+    const [newTag, setNewTag] = useState({ name: "", color: "" });
+    
+    useEffect(() => {
         fetch('/getPeople/' + id).then(response => response.json())
             .then(jsonOutput => {
                 if (jsonOutput.length !== 0)
                     setPeople(jsonOutput)
                 else setPeople([])
             })
-    })
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
-    const [availPeople, setAvailPeople] = useState(() => {
+    useEffect(() => {
         fetch('/getAvailPeople/' + id).then(response => response.json())
             .then(jsonOutput => {
                 setAvailPeople(jsonOutput)
             })
-    })
-
-    const [tagModal, setTagModal] = useState(false);
-    const [nameBlank, setNameBlank] = useState(false);
-    const [colorBlank, setColorBlank] = useState(false);
-    const [newTag, setNewTag] = useState({name: "", color: ""});
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     function delTag(per) {
         const data = {
@@ -88,14 +92,14 @@ export default function People(props) {
 
     function update(event) {
         if (event.target.id === 'enteredName') {
-            setNewTag({name: event.target.value, color: newTag.color});
+            setNewTag({ name: event.target.value, color: newTag.color });
             setNameBlank(false);
         }
     }
 
     function handleDrop(e, data) {
         if (data.id === 'enteredColor') {
-            setNewTag({name: newTag.name, color: data.value})
+            setNewTag({ name: newTag.name, color: data.value })
             setColorBlank(false);
         }
     }
@@ -121,7 +125,7 @@ export default function People(props) {
                 // confirm tag has been created
                 setTagModal(false);
                 setAvailPeople([...availPeople, [newTag.name, newTag.color]])
-                setNewTag({name: "", color: ""})
+                setNewTag({ name: "", color: "" })
                 setNameBlank(false)
                 setColorBlank(false)
             })
