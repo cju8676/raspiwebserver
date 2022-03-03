@@ -246,3 +246,13 @@ class DeletePerson(Resource):
             AND people = %s
         """
         return exec_commit(sql, (id, name, color, 1))
+
+# Get all of the album_names this image id is a part of
+class GetImageAlbums(Resource):
+    def get(self, id, user):
+        sql = """
+            SELECT album_name FROM albums
+            WHERE id = %s
+            AND username = %s;
+        """
+        return exec_get_all(sql, (id, user))

@@ -4,6 +4,7 @@ import { Button, Icon, Card, Image, Modal, Divider, Dropdown, Confirm, Grid } fr
 import MapContainer from '../MapContainer'
 import Tags from './Tags'
 import People from './People'
+import AddToAlbumButton from './AddToAlbumButton'
 
 class ImagePane extends Component {
     constructor(props) {
@@ -87,40 +88,6 @@ class ImagePane extends Component {
         this.setState({ infoModal: !this.state.infoModal })
     }
 
-    getOptions = () => {
-        if (this.state.albums.length === 0) return [];
-        else {
-            const op = this.state.albums.map(album => {
-                return { key: album, text: album, value: album }
-            })
-            return op
-        }
-    }
-
-    handleAlbumAdd = (output) => {
-        //TODO handle response - success or failed to add to album
-        // quick success pop up
-        console.log(output)
-    }
-
-    selectAlbum = (e, data) => {
-        const postData = {
-            username: this.props.user,
-            album_name: data.value,
-            id: this.state.id
-        }
-        const reqOptions = {
-            method: 'POST',
-            headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-            body: JSON.stringify(postData)
-        }
-        fetch('/addPicToAlbum/', reqOptions)
-            .then(response => response.json())
-            .then(jsonOutput => {
-                this.handleAlbumAdd(jsonOutput)
-            })
-    }
-
     handleRemove = () => {
         this.props.inAlbum && this.close();
         !this.props.inAlbum && this.closeDel();
@@ -187,13 +154,12 @@ class ImagePane extends Component {
                                         Favorite
                                     </Button>
                                     {!this.props.inAlbum &&
-                                        <Dropdown
-                                            text='Add to Album'
-                                            icon='add' floating labeled button
-                                            className='icon'
-                                            options={this.getOptions()}
-                                            onChange={this.selectAlbum}>
-                                        </Dropdown>}
+                                        <AddToAlbumButton 
+                                            albums={this.state.albums} 
+                                            selectAlbum={this.selectAlbum} 
+                                            id={this.state.id}
+                                            user={this.props.user}
+                                            />}
                                     {this.props.inAlbum &&
                                         <Button color='red' onClick={this.open}>
                                             Remove

@@ -160,6 +160,7 @@ api.add_resource(UpdateName, '/updateName/')
 api.add_resource(UpdateUsername, '/updateUsername/')
 api.add_resource(UpdatePassword, '/updatePassword/')
 api.add_resource(DeleteImage, '/deleteImage/<string:id>/<string:path>/<string:name>')
+api.add_resource(GetImageAlbums, '/getImageAlbums/<string:id>/<string:user>')
 
 if __name__ == '__main__':
     print("Starting Flask backend")

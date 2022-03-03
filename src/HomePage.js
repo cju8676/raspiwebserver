@@ -17,8 +17,6 @@ class HomePage extends Component {
             logout: props.onChange,
             refresh: props.onRefresh,
 
-
-
             //lets see
             files: [],
             link_name_id_info: [],
