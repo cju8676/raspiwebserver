@@ -43,7 +43,6 @@ class AlbumPage extends Component {
                 for (let i = 0; i < this.state.files.length; i++) {
                     //FIXME for some reason it doesn't like encoding / so i do it manually
                     var path = (this.state.files[i].path).replace('/', '%2F');
-                    //fixme could change this to just the id to simplify
                     this.setState(prevState => ({
                         ...prevState,
                         id_path: {
@@ -51,7 +50,7 @@ class AlbumPage extends Component {
                             [this.state.files[i].id]:[path]
                         }
                     }))
-                    fetch('/files/' + encodeURIComponent(path) + '/' + encodeURIComponent(this.state.files[i].name))
+                    fetch('/files/' + this.state.files[i].id)
                         .then(response => response.blob())
                         .then(imageBlob => {
                             const imageURL = URL.createObjectURL(imageBlob);

@@ -24,11 +24,19 @@ api = Api(app)
 def home():
     return "<html><body><h1>Flask backend. Visit port 3000 to view front end</h1></body></html>"
 
-@app.route('/files/<path>/<filename>', methods=['GET'])
-def getpic(path, filename):
+@app.route('/files/<id>', methods=['GET'])
+def getpic(id):
     #decode UTF-8
-    path_str = urllib.parse.unquote(path)
-    filename_str = urllib.parse.unquote(filename)
+    sql = """
+        SELECT name, filepath
+        FROM files
+        WHERE id = %s;
+    """
+    res = exec_get_one(sql, (id, ))
+    filename_str = res[0]
+    path_str = res[1]
+    # path_str = urllib.parse.unquote(path)
+    # filename_str = urllib.parse.unquote(filename)
 
     # FIXME ADD for RASPI
     # For windows, assume we know everything is in C:/Users/corey/...
@@ -55,9 +63,6 @@ def getinfo(path, filename, username):
     gps_coords = []
     if exif is not None and 'GPSInfo' in exif.keys():
         gps_coords = get_coords(exif)
-
-
-    # TODO get Shot and ISO info added to this
     
     # check if img is already faved
     sql = """
