@@ -77,8 +77,14 @@ class SettingsPage extends Component {
     }
 
     update = (e, val) => {
-        if (e === 'Name') this.setState({ name: val })
-        else if (e === 'Username') this.setState({ user: val })
+        if (e === 'Name') {
+            this.setState({ name: val })
+            localStorage.setItem('name', JSON.stringify(val));
+        }
+        else if (e === 'Username') {
+            this.setState({ user: val })
+            localStorage.setItem('name', JSON.stringify(val));
+        }
         //else todo password
         this.componentDidMount();
     }

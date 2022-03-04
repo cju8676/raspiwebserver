@@ -12,8 +12,8 @@ class HomePage extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            currentUserName: props.user,
-            currentName: props.name,
+            currentUserName: JSON.parse(localStorage.getItem('user')) || null,
+            currentName: JSON.parse(localStorage.getItem('name')) || null,
             logout: props.onChange,
             refresh: props.onRefresh,
 
