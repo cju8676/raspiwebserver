@@ -10,13 +10,17 @@ class PageHandle extends Component {
         super(props)
         this.state = {
             redirect: "/login",
-            currentUser: null,
-            currentName: null
+            currentUser: JSON.parse(localStorage.getItem('user')) || null,
+            currentName: JSON.parse(localStorage.getItem('name')) || null
         }
     }
 
     handleUserChange = (output) => {
-        this.setState({currentUser: output[0], currentName: output[1], redirect: "/home"})
+        this.setState({currentUser: output[0], currentName: output[1], redirect: "/home"},
+        () => {
+            localStorage.setItem('user', JSON.stringify(this.state.currentUser));
+            localStorage.setItem('name', JSON.stringify(this.state.currentName));
+        })
     }
 
     handleLogout = () => {
@@ -34,7 +38,7 @@ class PageHandle extends Component {
     render() {
         return ( 
             <HashRouter>
-                <Redirect to={this.state.redirect}/>
+                {this.state.currentUser ? <Redirect to="/home"/> : <Redirect to={this.state.redirect}/> }
                 <Route path="/login" component={(props) => <LoginScreen newUser={this.state.currentUser} onChange={this.handleUserChange}/>} />
                 <Route path="/home" component={(props) => <HomePage user={this.state.currentUser} name={this.state.currentName} onChange={this.handleLogout} onRefresh={this.handleHomeRefresh}/>}/>
                 <Route path="/album/:album" component={(props) => <AlbumPage {...props} user={this.state.currentUser} onChange={this.handleRefresh}/>}/>

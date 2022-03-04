@@ -132,12 +132,6 @@ class ImagePane extends Component {
         this.state.infoModal && this.fetchInfo();
     }
 
-    goAway = () => {
-        setTimeout(() => {
-            this.setState({infoModal : false})
-        }, 2000);
-    }
-
     render() {
         return (
             <Card>
@@ -198,7 +192,6 @@ class ImagePane extends Component {
                                     {this.state.info[4]}
                                     <Divider />
                                     ID: {this.state.id}
-                                    <Button onClick={this.goAway}/>
                                 </Grid.Column>
                             </Grid>
                         </Modal.Content>
