@@ -1,12 +1,9 @@
 import React, { Component } from 'react'
 import { Header, Tab, Icon, Button } from 'semantic-ui-react'
-
 import Gallery from './galleryPackage/Gallery'
 import FavoritesGallery from './FavoritesGallery'
 import Albums from './Albums'
 import ImagePane from './imagePackage/ImagePane'
-
-
 
 class HomePage extends Component {
     constructor(props) {
@@ -78,7 +75,7 @@ class HomePage extends Component {
     }
 
     render() {
-        console.log(this.state.link_name_id_info)
+        // console.log(this.state.link_name_id_info)
         const img = this.state.link_name_id_info.map(picture => {
             return <ImagePane
                 picture={picture.link}

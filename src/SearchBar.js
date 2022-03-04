@@ -2,12 +2,6 @@ import _ from 'lodash'
 import React from 'react'
 import { Search, Grid, Header, Segment } from 'semantic-ui-react'
 
-const source = _.times(5, () => ({
-  title: "faker.company.companyName()",
-  description: "faker.company.catchPhrase()",
-  image: "faker.internet.avatar()",
-  price: "faker.finance.amount(0, 100, 2, '$')",
-}))
 
 const initialState = {
   loading: false,
@@ -34,7 +28,7 @@ function exampleReducer(state, action) {
 function SearchBar(props) {
   const [state, dispatch] = React.useReducer(exampleReducer, initialState)
   const { loading, results, value } = state
-  const { onChange } = props;
+  const { onChange, source } = props;
 
   const timeoutRef = React.useRef()
   const handleSearchChange = React.useCallback((e, data) => {
@@ -47,12 +41,16 @@ function SearchBar(props) {
         return
       }
 
-      const re = new RegExp(_.escapeRegExp(data.value), 'i')
-      const isMatch = (result) => re.test(result.title)
+      const result = source.filter(src => src.props.filename.includes(data.value))
+
+      const guy = source[0]
+      console.log(guy)
 
       dispatch({
         type: 'FINISH_SEARCH',
-        results: _.filter(source, isMatch),
+        results: result.map(res => {
+            return {"title": res.props.filename, "image": res.props.picture}}
+        ),
       })
     }, 300)
   }, [])
@@ -64,8 +62,8 @@ function SearchBar(props) {
   }, [])
 
   return (
-    <Grid>
-      <Grid.Column width={6}>
+    // <Grid>
+    //   <Grid.Column width={6}>
         <Search
           loading={loading}
           placeholder='Search...'
@@ -76,17 +74,17 @@ function SearchBar(props) {
           results={results}
           value={value}
         />
-      </Grid.Column>
+    //   </Grid.Column>
 
-      <Grid.Column width={10}>
-        <Segment>
-          <Header>State</Header>
-          <pre style={{ overflowX: 'auto' }}>
-            {JSON.stringify({ loading, results, value }, null, 2)}
-          </pre>
-        </Segment>
-      </Grid.Column>
-    </Grid>
+    //   <Grid.Column width={10}>
+        // <Segment>
+        //   <Header>State</Header>
+        //   <pre style={{ overflowX: 'auto' }}>
+            // {JSON.stringify({ loading, results, value }, null, 2)}
+        //   </pre>
+        // </Segment>
+    //   </Grid.Column>
+    // </Grid>
   )
 }
 

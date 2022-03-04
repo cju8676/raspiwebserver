@@ -1,55 +1,45 @@
-import React, { Component } from 'react'
-import { Card, Search, Divider, Header } from 'semantic-ui-react'
+import React, { useState, useEffect } from 'react'
+import { Card, Divider, Header } from 'semantic-ui-react'
 import UploadFileModal from './UploadFileModal'
 import SearchBar from '../SearchBar'
 
 
-class Gallery extends Component {
-    constructor(props) {
-        super(props)
-        this.state = {
-            albums: [],
-            currentUser: props.user,
-            uploadFile : false,
-            refresh : props.onRefresh,
-            cards: props.img 
-        }
-    }
+export default function Gallery(props) {
+    const { user, onRefresh, img } = props;
+    const [shownImg, setShownImg] = useState([])
+    const [searchInput, setSearchInput] = useState("")
 
     //fixme maximum update depth exceeded
-    searchResults = (result) => {
-        console.log(result);
-        // if (result === null) {
-        //     this.setState({cards: this.props.img.map(picture => picture)})
-        // }
-        // else {
-        //     this.setState({cards: this.props.img.map(picture => picture)[0]})
-        // }
+    function searchResults(val) {
+        setSearchInput(val);
     }
 
-    // componentDidMount() {
-    //     this.setState({ cards : this.props.img.map(picture => picture)})
-    // }
+    useEffect(() => {
+        if (searchInput === "") setShownImg(img)
+        else {
+            const filter = img.filter(pic => pic.props.filename.includes(searchInput))
+            setShownImg(filter);
+        }
+    }, [searchInput])
 
-    render() {
-        return (
+    useEffect(() => {
+        setShownImg(img)
+    }, [img])
+
+    return (
+        <div>
             <div>
-                <div>
-                    <Header as='h3' size='small '>
-                        <UploadFileModal onRefresh={this.state.refresh}/>
-                        <SearchBar onChange={this.searchResults}/>
-                    </Header>
-                </div>
-                <Divider />
-                <div>
-                    <Card.Group itemsPerRow={4}>
-                        {/* {this.state.cards} */}
-                        {this.props.img.map(picture => picture)}
-                    </Card.Group>
-                </div>
+                <Header as='h3' size='small '>
+                    <UploadFileModal onRefresh={onRefresh} />
+                    <SearchBar onChange={searchResults} source={img}/>
+                </Header>
             </div>
-        )
-    }
+            <Divider />
+            <div>
+                <Card.Group itemsPerRow={4}>
+                    {shownImg.map(picture => picture)}
+                </Card.Group>
+            </div>
+        </div>
+    )
 }
-
-export default Gallery;

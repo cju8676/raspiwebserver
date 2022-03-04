@@ -12,11 +12,12 @@ export default function PageHandle(props) {
     const [currentName, setCurrentName] = useState(JSON.parse(localStorage.getItem('name')) || null)
 
     function handleUserChange(output) {
+        console.log(output)
         setCurrentUser(output[0])
         setCurrentName(output[1])
         setRedirect("/home")
-        localStorage.setItem('user', JSON.stringify(currentUser));
-        localStorage.setItem('name', JSON.stringify(currentName));
+        localStorage.setItem('user', JSON.stringify(output[0]));
+        localStorage.setItem('name', JSON.stringify(output[1]));
     }
 
     function handleLogout() {
