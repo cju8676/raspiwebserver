@@ -118,12 +118,19 @@ def fileUpload():
     print(target)
     print(filename)
     file.save(destination)
+    file_location = target + '/' + filename
+    exif = Image.open(file_location)
+    exifdata = exif._getexif()
+    if exifdata is None:
+        date = datetime.today()
+    else:
+        date = datetime.strptime(dict(exifdata)[306], '%Y:%m:%d %H:%M:%S')
     # Save file to db
     sql = """
-        INSERT INTO files (name, filepath)
-        VALUES (%s, %s)
+        INSERT INTO files (name, filepath, date)
+        VALUES (%s, %s, %s)
     """
-    exec_commit(sql, (filename, target.replace('C:/Users/corey/', "")))
+    exec_commit(sql, (filename, target.replace('C:/Users/corey/', ""), date))
     # Get created tags at idx -2 and transfer them to our new file's id and delete them from -2 idx
     sql_tags = """
         UPDATE tags

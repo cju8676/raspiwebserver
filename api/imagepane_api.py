@@ -21,8 +21,9 @@ class GetImage(Resource):
 class GetAllImages(Resource):
     def get(self):
         sql = """
-            SELECT name, filepath, id 
+            SELECT name, filepath, id, date
             FROM files
+            ORDER by date DESC
         """
         res = exec_get_all(sql, [])
         files_json = []
@@ -31,7 +32,8 @@ class GetAllImages(Resource):
                 {
                     "name": l[0],
                     "path": l[1],
-                    "id": l[2]
+                    "id": l[2],
+                    "date": l[3]
                 })
         return json.dumps(files_json)
 

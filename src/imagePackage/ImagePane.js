@@ -23,7 +23,7 @@ class ImagePane extends Component {
             open: false,
             openDel: false,
             refresh: props.refresh,
-            map: null
+            map: null,
         }
     }
     open = () => this.setState({ open: true })

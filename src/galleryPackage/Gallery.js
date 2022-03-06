@@ -5,7 +5,7 @@ import SearchBar from '../SearchBar'
 
 
 export default function Gallery(props) {
-    const { user, onRefresh, img } = props;
+    const { user, onRefresh, img, cardGroups } = props;
     const [shownImg, setShownImg] = useState([])
     const [searchInput, setSearchInput] = useState("")
 
@@ -35,10 +35,13 @@ export default function Gallery(props) {
                 </Header>
             </div>
             <Divider />
-            <div>
-                <Card.Group itemsPerRow={4}>
+            {/* <div>
+                <Card.Group stackable itemsPerRow={4}>
                     {shownImg.map(picture => picture)}
                 </Card.Group>
+            </div> */}
+            <div>
+                {cardGroups.map(group => group)}
             </div>
         </div>
     )

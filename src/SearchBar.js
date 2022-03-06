@@ -1,6 +1,5 @@
-import _ from 'lodash'
 import React from 'react'
-import { Search, Grid, Header, Segment } from 'semantic-ui-react'
+import { Search, /*Grid, Header, Segment*/ } from 'semantic-ui-react'
 
 
 const initialState = {

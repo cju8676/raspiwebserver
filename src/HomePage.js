@@ -1,9 +1,10 @@
 import React, { Component } from 'react'
-import { Header, Tab, Icon, Button } from 'semantic-ui-react'
+import { Header, Tab, Icon, Button, Card } from 'semantic-ui-react'
 import Gallery from './galleryPackage/Gallery'
 import FavoritesGallery from './FavoritesGallery'
 import Albums from './Albums'
 import ImagePane from './imagePackage/ImagePane'
+import { sortByYear, mapByYear } from './imageUtils'
 
 class HomePage extends Component {
     constructor(props) {
@@ -13,33 +14,23 @@ class HomePage extends Component {
             currentName: JSON.parse(localStorage.getItem('name')) || null,
             logout: props.onChange,
             refresh: props.onRefresh,
-
-            //lets see
-            files: [],
             link_name_id_info: [],
-            id_path: {},
-
-            imgPanes: []
+            filesLen: -1,
         }
     }
 
-    fetchPictures = () => {
-        fetch('/getAllImages/').then(response => response.json())
+    fetchPictures = async () => {
+        var files = [];
+        var id_path = {};
+        let data = await fetch('/getAllImages/').then(response => response.json())
             .then(JSONresponse => {
-                this.setState({ files: JSON.parse(JSONresponse) })
-                console.log(this.state.files)
-                for (let i = 0; i < this.state.files.length; i++) {
-                    //FIXME for some reason it doesn't like encoding / so i do it manually
-                    var path = (this.state.files[i].path).replace('/', '%2F');
-                    this.setState(prevState => ({
-                        ...prevState,
-                        id_path: {
-                            ...prevState.id_path,
-                            [this.state.files[i].id]: [path]
-                        }
-                    }))
+                files = JSON.parse(JSONresponse)
+                this.setState({filesLen: files.length})
+                for (let i = 0; i < files.length; i++) {
+                    var path = (files[i].path).replace('/', '%2F');
+                    id_path[files[i].id] = path
 
-                    fetch('/files/' + this.state.files[i].id)
+                    fetch('/files/' + files[i].id)
                         .then(response => response.blob())
                         .then(imageBlob => {
                             const imageURL = URL.createObjectURL(imageBlob);
@@ -49,18 +40,23 @@ class HomePage extends Component {
                                     [...prevState.link_name_id_info,
                                     {
                                         link: imageURL,
-                                        name: this.state.files[i].name,
-                                        id: this.state.files[i].id,
-                                        info: this.state.id_path[this.state.files[i].id],
-                                        // info: path
+                                        name: files[i].name,
+                                        id: files[i].id,
+                                        info: id_path[files[i].id],
+                                        date: files[i].date
                                     }]
                             }));
                         })
                 }
             })
-
-
     }
+    // status = (response) => {
+    //     if (response.status >= 200 && response.status < 300) {
+    //         return Promise.resolve(response)
+    //     } else {
+    //         return Promise.reject(new Error(response.statusText))
+    //     }
+    // }
 
     fetchAlbums = () => {
         fetch('/getAlbums/' + this.props.user).then(response => response.json())
@@ -72,10 +68,13 @@ class HomePage extends Component {
     componentDidMount() {
         this.fetchAlbums();
         this.fetchPictures();
+        // let sort = sortByYear();
+        // console.log(sort)
     }
 
     render() {
-        // console.log(this.state.link_name_id_info)
+        if (this.state.filesLen === -1) return <></>
+        
         const img = this.state.link_name_id_info.map(picture => {
             return <ImagePane
                 picture={picture.link}
@@ -87,21 +86,24 @@ class HomePage extends Component {
                 path={picture.info}
                 inAlbum={false}
                 refresh={this.state.refresh}
+                date={picture.date}
             />
         })
 
-        // for(var i = 0; i < img.length ; i++) {
-        //     console.log(img[i])
-        // }
-
+        var cardGroups = []
+        if (img.length === this.state.filesLen) {
+            const sortedPanes = sortByYear(img);
+            cardGroups = mapByYear(sortedPanes);
+        }
+        
         const panes = [
             {
                 menuItem: 'Gallery',
-                /*pane:*/render: () => <Tab.Pane attached={false}><Gallery user={this.state.currentUserName} onRefresh={this.state.refresh} img={img} /></Tab.Pane>
+                /*pane:*/render: () => <Tab.Pane attached={false}><Gallery user={this.state.currentUserName} onRefresh={this.state.refresh} img={img} cardGroups={cardGroups}/></Tab.Pane>
             },
             {
                 menuItem: 'Favorites',
-                /*pane:*/render: () => <Tab.Pane attached={false}><FavoritesGallery user={this.state.currentUserName} onRefresh={this.state.refresh}/></Tab.Pane>
+                /*pane:*/render: () => <Tab.Pane attached={false}><FavoritesGallery user={this.state.currentUserName} onRefresh={this.state.refresh} /></Tab.Pane>
             },
             {
                 menuItem: 'Albums',
