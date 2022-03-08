@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Dropdown, SearchResults } from "semantic-ui-react";
+import { Dropdown } from "semantic-ui-react";
 
 
 export default function AddToAlbumButton(props) {
@@ -17,20 +17,21 @@ export default function AddToAlbumButton(props) {
     // filter out albums this photo is already a part of
     const [availAlbums, setAvailAlbums] = useState([])
 
-    useEffect(async () => {
+    useEffect(() => {
         const options = getOptions()
-        // const optionsValues = options.map((item) => item.value)
-        // const valuesValuesMap = optionsValues.map((item) => item[0])
-        const result = await fetch('/getImageAlbums/' + id + '/' + user).then(response => response.json())
-            .then(res => {
-                // return JSONresponse
-                return res.map((item) => item[0])
-            })
-
-        setAvailAlbums(options.filter(item => {
-            return !result.includes(item.value[0])
-        }))
-
+        async function fetchData() {
+            const result = await fetch('/getImageAlbums/' + id + '/' + user).then(response => response.json())
+                .then(res => {
+                    // return JSONresponse
+                    return res.map((item) => item[0])
+                })
+    
+            setAvailAlbums(options.filter(item => {
+                return !result.includes(item.value[0])
+            }))    
+        }
+        fetchData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     function selectAlbum(e, data) {
@@ -65,7 +66,7 @@ export default function AddToAlbumButton(props) {
             options={availAlbums}>
             <Dropdown.Menu>
                 {availAlbums.map(item => {
-                    return <Dropdown.Item text={item.value} onClick={selectAlbum} />
+                    return <Dropdown.Item key={item.value} text={item.value} onClick={selectAlbum} />
                 })}
             </Dropdown.Menu>
         </Dropdown >

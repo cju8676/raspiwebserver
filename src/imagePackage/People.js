@@ -146,7 +146,7 @@ export default function People(props) {
                     <Dropdown icon='add'>
                         <Dropdown.Menu>
                             {availPeople && availPeople.map(person => {
-                                return (<Dropdown.Item text={person[0]} label={{ color: person[1] }} onClick={selectTag} />)
+                                return (<Dropdown.Item key={person[0]} text={person[0]} label={{ color: person[1] }} onClick={selectTag} />)
                             })}
                             <Dropdown.Item text='Create New Person' onClick={() => setTagModal(true)} />
                         </Dropdown.Menu>

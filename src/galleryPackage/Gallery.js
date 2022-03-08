@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { Card, Divider, Header } from 'semantic-ui-react'
+import { Divider, Header, Card } from 'semantic-ui-react'
 import UploadFileModal from './UploadFileModal'
 import SearchBar from '../SearchBar'
 
 
 export default function Gallery(props) {
-    const { user, onRefresh, img, cardGroups } = props;
+    const { /*user,*/ onRefresh, img, cardGroups } = props;
     const [shownImg, setShownImg] = useState([])
     const [searchInput, setSearchInput] = useState("")
 
@@ -15,33 +15,32 @@ export default function Gallery(props) {
     }
 
     useEffect(() => {
-        if (searchInput === "") setShownImg(img)
+        if (searchInput === "") setShownImg([])
         else {
             const filter = img.filter(pic => pic.props.filename.includes(searchInput))
             setShownImg(filter);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchInput])
-
-    useEffect(() => {
-        setShownImg(img)
-    }, [img])
 
     return (
         <div>
             <div>
-                <Header as='h3' size='small '>
+                <Header as='h3'>
                     <UploadFileModal onRefresh={onRefresh} />
-                    <SearchBar onChange={searchResults} source={img}/>
+                    <SearchBar onChange={searchResults} source={img} />
                 </Header>
             </div>
             <Divider />
-            {/* <div>
-                <Card.Group stackable itemsPerRow={4}>
-                    {shownImg.map(picture => picture)}
-                </Card.Group>
-            </div> */}
-            <div>
-                {cardGroups.map(group => group)}
+            <div className='gallery-scroll'>
+                <div>
+                    <Card.Group stackable itemsPerRow={4}>
+                        {shownImg.map(picture => picture)}
+                    </Card.Group>
+                </div>
+                <div>
+                    {cardGroups.map(group => group)}
+                </div>
             </div>
         </div>
     )

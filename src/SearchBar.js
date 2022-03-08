@@ -41,17 +41,18 @@ function SearchBar(props) {
       }
 
       const result = source.filter(src => src.props.filename.includes(data.value))
-
-      const guy = source[0]
-      console.log(guy)
+      // const guy = source[0]
+      // console.log(guy)
 
       dispatch({
         type: 'FINISH_SEARCH',
         results: result.map(res => {
-            return {"title": res.props.filename, "image": res.props.picture}}
+          return { "title": res.props.filename, "image": res.props.picture }
+        }
         ),
       })
     }, 300)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   onChange(value)
   React.useEffect(() => {
@@ -63,25 +64,25 @@ function SearchBar(props) {
   return (
     // <Grid>
     //   <Grid.Column width={6}>
-        <Search
-          loading={loading}
-          placeholder='Search...'
-          onResultSelect={(e, data) =>
-            dispatch({ type: 'UPDATE_SELECTION', selection: data.result.title })
-          }
-          onSearchChange={handleSearchChange}
-          results={results}
-          value={value}
-        />
+    <Search
+      loading={loading}
+      placeholder='Search...'
+      onResultSelect={(e, data) =>
+        dispatch({ type: 'UPDATE_SELECTION', selection: data.result.title })
+      }
+      onSearchChange={handleSearchChange}
+      results={results}
+      value={value}
+    />
     //   </Grid.Column>
 
     //   <Grid.Column width={10}>
-        // <Segment>
-        //   <Header>State</Header>
-        //   <pre style={{ overflowX: 'auto' }}>
-            // {JSON.stringify({ loading, results, value }, null, 2)}
-        //   </pre>
-        // </Segment>
+    // <Segment>
+    //   <Header>State</Header>
+    //   <pre style={{ overflowX: 'auto' }}>
+    // {JSON.stringify({ loading, results, value }, null, 2)}
+    //   </pre>
+    // </Segment>
     //   </Grid.Column>
     // </Grid>
   )

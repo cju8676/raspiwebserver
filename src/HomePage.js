@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Header, Tab, Icon, Button, Card } from 'semantic-ui-react'
+import { Header, Tab, Icon, Button } from 'semantic-ui-react'
 import Gallery from './galleryPackage/Gallery'
 import FavoritesGallery from './FavoritesGallery'
 import Albums from './Albums'
@@ -20,11 +20,10 @@ class HomePage extends Component {
     }
 
     fetchPictures = async () => {
-        var files = [];
         var id_path = {};
-        let data = await fetch('/getAllImages/').then(response => response.json())
-            .then(JSONresponse => {
-                files = JSON.parse(JSONresponse)
+        await fetch('/getAllImages/').then(response => response.json())
+        .then(JSONresponse => {
+                var files = JSON.parse(JSONresponse)
                 this.setState({filesLen: files.length})
                 for (let i = 0; i < files.length; i++) {
                     var path = (files[i].path).replace('/', '%2F');
@@ -90,6 +89,8 @@ class HomePage extends Component {
             />
         })
 
+        const imgCopy = [...img]
+
         var cardGroups = []
         if (img.length === this.state.filesLen) {
             const sortedPanes = sortByYear(img);
@@ -99,7 +100,7 @@ class HomePage extends Component {
         const panes = [
             {
                 menuItem: 'Gallery',
-                /*pane:*/render: () => <Tab.Pane attached={false}><Gallery user={this.state.currentUserName} onRefresh={this.state.refresh} img={img} cardGroups={cardGroups}/></Tab.Pane>
+                /*pane:*/render: () => <Tab.Pane attached={false}><Gallery user={this.state.currentUserName} onRefresh={this.state.refresh} img={imgCopy} cardGroups={cardGroups}/></Tab.Pane>
             },
             {
                 menuItem: 'Favorites',

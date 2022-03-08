@@ -76,10 +76,12 @@ class ImagePane extends Component {
                 // }))
                 this.setState({ info: output });
                 this.setState({ favorited: Boolean(output[5]) })
-                if (output[6].length!== 0) this.setState({map : {
-                    lat: output[6][0],
-                    long: output[6][1] 
-                }})
+                if (output[6].length !== 0) this.setState({
+                    map: {
+                        lat: output[6][0],
+                        long: output[6][1]
+                    }
+                })
             })
     }
 
@@ -127,6 +129,25 @@ class ImagePane extends Component {
             })
     }
 
+    date = () => {
+        if (this.state.info[4] === '---') {
+            return (
+                <>
+                    <h2>Date Uploaded</h2>
+                    {new Date(this.props.date).toDateString()}
+                </>
+            )
+        }
+        else {
+            return (
+                <>
+                    <h2>Date Taken</h2>
+                    {this.state.info[4]}
+                </>
+            )
+        }
+    }
+
     componentDidMount() {
         // todo split info into its own component
         this.state.infoModal && this.fetchInfo();
@@ -154,12 +175,12 @@ class ImagePane extends Component {
                                         Favorite
                                     </Button>
                                     {!this.props.inAlbum &&
-                                        <AddToAlbumButton 
-                                            albums={this.state.albums} 
-                                            selectAlbum={this.selectAlbum} 
+                                        <AddToAlbumButton
+                                            albums={this.state.albums}
+                                            selectAlbum={this.selectAlbum}
                                             id={this.state.id}
                                             user={this.props.user}
-                                            />}
+                                        />}
                                     {this.props.inAlbum &&
                                         <Button color='red' onClick={this.open}>
                                             Remove
@@ -188,8 +209,7 @@ class ImagePane extends Component {
                                     {this.state.info[2]}
                                     <h2>Model</h2>
                                     {this.state.info[3]}
-                                    <h2>Date Taken</h2>
-                                    {this.state.info[4]}
+                                    {this.date()}
                                     <Divider />
                                     ID: {this.state.id}
                                 </Grid.Column>

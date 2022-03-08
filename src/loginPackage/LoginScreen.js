@@ -18,7 +18,6 @@ class LoginScreen extends Component {
     }
 
     handleOutput = (output) => {
-        console.log(output)
         if (output === null) {
             this.setState({error : true})
         }
@@ -40,7 +39,6 @@ class LoginScreen extends Component {
         fetch(getURL).then(
             response => response.json()
         ).then(jsonOutput => {
-            console.log(jsonOutput)
             this.handleOutput(jsonOutput)
         })
     }

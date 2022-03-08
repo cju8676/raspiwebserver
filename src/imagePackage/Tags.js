@@ -153,7 +153,7 @@ export default function Tags(props) {
                     <Dropdown icon='add'>
                         <Dropdown.Menu>
                             {availTags && availTags.map(tag => {
-                                return (<Dropdown.Item text={tag[0]} label={{ color: tag[1] }} onClick={selectTag} />)
+                                return (<Dropdown.Item key={tag[0]} text={tag[0]} label={{ color: tag[1] }} onClick={selectTag} />)
                             })}
                             <Dropdown.Item text='New Tag' onClick={() => setTagModal(true)} />
                         </Dropdown.Menu>
