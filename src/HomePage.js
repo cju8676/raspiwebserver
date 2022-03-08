@@ -100,22 +100,22 @@ class HomePage extends Component {
         const panes = [
             {
                 menuItem: 'Gallery',
-                /*pane:*/render: () => <Tab.Pane attached={false}><Gallery user={this.state.currentUserName} onRefresh={this.state.refresh} img={imgCopy} cardGroups={cardGroups}/></Tab.Pane>
+                /*pane:*/render: () => <Tab.Pane attached={false}><Gallery user={this.props.user} onRefresh={this.state.refresh} img={imgCopy} cardGroups={cardGroups}/></Tab.Pane>
             },
             {
                 menuItem: 'Favorites',
-                /*pane:*/render: () => <Tab.Pane attached={false}><FavoritesGallery user={this.state.currentUserName} onRefresh={this.state.refresh} /></Tab.Pane>
+                /*pane:*/render: () => <Tab.Pane attached={false}><FavoritesGallery user={this.props.user} onRefresh={this.state.refresh} /></Tab.Pane>
             },
             {
                 menuItem: 'Albums',
-                /*pane:*/render: () => <Tab.Pane attached={false}><Albums user={this.state.currentUserName} /></Tab.Pane>
+                /*pane:*/render: () => <Tab.Pane attached={false}><Albums user={this.props.user} /></Tab.Pane>
             },
         ]
         return (
             <div>
                 <Header as='h2'>
                     <div>
-                        Welcome, {this.state.currentName}.
+                        Welcome, {this.props.name}.
 
                         <Button href='#settings' floated='right' size='large'>
                             <Icon name='setting' />

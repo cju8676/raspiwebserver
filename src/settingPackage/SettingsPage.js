@@ -80,10 +80,12 @@ class SettingsPage extends Component {
         if (e === 'Name') {
             this.setState({ name: val })
             localStorage.setItem('name', JSON.stringify(val));
+            this.props.setPage('name', val)
         }
         else if (e === 'Username') {
             this.setState({ user: val })
-            localStorage.setItem('name', JSON.stringify(val));
+            localStorage.setItem('user', JSON.stringify(val));
+            this.props.setPage('user', val)
         }
         //else todo password
         this.componentDidMount();

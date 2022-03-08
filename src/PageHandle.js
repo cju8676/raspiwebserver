@@ -23,19 +23,28 @@ export default function PageHandle(props) {
     function handleLogout() {
             setCurrentUser(null);
             setCurrentName(null);
+            localStorage.removeItem('user');
+            localStorage.removeItem('name')
             setRedirect("/login");
     }
 
     function handleRefresh(album) {
-       setRedirect("/album/" + album);
+        console.log("handle refresh", album)
+       setRedirect("/album/:" + album);
     }
 
     function handleHomeRefresh() {
         setRedirect("/home");
     }
 
+    function setPage(item, val) {
+        if (item === 'name')
+            setCurrentName(val)
+        else if (item === 'user') 
+            setCurrentUser(val);
+    }
+
     useEffect(() => {
-        setRedirect('/home')
     }, [currentName])
 
     return (
@@ -44,7 +53,7 @@ export default function PageHandle(props) {
             <Route path="/login" component={(props) => <LoginScreen newUser={currentUser} onChange={handleUserChange} />} />
             <Route path="/home" component={(props) => <HomePage user={currentUser} name={currentName} onChange={handleLogout} onRefresh={handleHomeRefresh} />} />
             <Route path="/album/:album" component={(props) => <AlbumPage {...props} user={currentUser} onChange={handleRefresh} />} />
-            <Route path="/settings" component={(props) => <SettingsPage {...props} onChange={handleLogout} name={currentName} user={currentUser} />} />
+            <Route path="/settings" component={(props) => <SettingsPage {...props} onChange={handleLogout} name={currentName} user={currentUser} setPage={setPage} />} />
         </HashRouter>
     )
 }

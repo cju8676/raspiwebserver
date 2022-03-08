@@ -78,7 +78,8 @@ class FavoritesGallery extends Component {
                         favorited='true'
                         albums={this.state.albums}
                         path={picture.info}
-                        refresh={this.props.onRefresh}/>
+                        refresh={this.props.onRefresh}
+                        inFavs={true}/>
                     })}
                 </Card.Group>
             </div>

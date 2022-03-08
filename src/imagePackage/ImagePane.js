@@ -46,6 +46,7 @@ class ImagePane extends Component {
         }
         if (this.state.favorited) {
             this.setState({ favorited: false })
+            this.props.inFavs && this.props.refresh();
             // delete where user and picture id
             const getUrl = '/removeFav/' + this.props.user + '/' + this.state.id
             fetch(getUrl, reqOptions)
@@ -91,9 +92,10 @@ class ImagePane extends Component {
     }
 
     handleRemove = () => {
+        console.log("handle remove")
         this.props.inAlbum && this.close();
+        this.props.inAlbum && this.state.refresh(this.props.inAlbum);
         !this.props.inAlbum && this.closeDel();
-        this.state.refresh();
     }
 
     removeFromAlbum = () => {
