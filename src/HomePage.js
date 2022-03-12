@@ -152,7 +152,7 @@ class HomePage extends Component {
                 menuItem: 'Albums',
                 /*pane:*/render: () => {
                     return <Tab.Pane attached={false}>
-                                <AlbumsList user={this.props.user} />
+                                <AlbumsList user={this.props.user}/>
                             </Tab.Pane>
                 }
             },

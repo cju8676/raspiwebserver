@@ -3,32 +3,23 @@ import { Dropdown } from "semantic-ui-react";
 
 
 export default function AddToAlbumButton(props) {
-    const { albums, id, user } = props;
-    function getOptions() {
-        if (albums.length === 0) return [];
-        else {
-            const op = albums.map(album => {
-                return { key: album, text: album, value: album }
-            })
-            return op
-        }
-    }
-
+    const { id, user } = props;
     // filter out albums this photo is already a part of
     const [availAlbums, setAvailAlbums] = useState([])
 
     useEffect(() => {
-        const options = getOptions()
         async function fetchData() {
-            const result = await fetch('/getImageAlbums/' + id + '/' + user).then(response => response.json())
-                .then(res => {
-                    // return JSONresponse
-                    return res.map((item) => item[0])
-                })
-    
-            setAvailAlbums(options.filter(item => {
-                return !result.includes(item.value[0])
-            }))    
+            const res = await fetch('/getAlbums/' + user)
+            const ops = await res.json()
+            const options = ops.flat().map(op => { return { key: op, text: op, value: op } })
+            if (options.length === 0) return;
+            const response = await fetch('/getImageAlbums/' + id + '/' + user)
+            const result = (await response.json()).flat()
+            if (result.length === 0) setAvailAlbums(options)
+            else
+                setAvailAlbums(options.filter(item => {
+                    return !result.includes(item.value)
+                }))
         }
         fetchData();
         // eslint-disable-next-line react-hooks/exhaustive-deps

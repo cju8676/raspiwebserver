@@ -16,7 +16,6 @@ class ImagePane extends Component {
             favorited: props.favorited,
             id: props.id,
             infoModal: false,
-            albums: props.albums,
             // [len, wid, make, modal, datetime, [lat, long]]
             info: [],
 
@@ -178,7 +177,6 @@ class ImagePane extends Component {
                                     </Button>
                                     {!this.props.inAlbum &&
                                         <AddToAlbumButton
-                                            albums={this.state.albums}
                                             selectAlbum={this.selectAlbum}
                                             id={this.state.id}
                                             user={this.props.user}
