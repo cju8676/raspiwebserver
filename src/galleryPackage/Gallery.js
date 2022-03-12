@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Divider, Header, Card } from 'semantic-ui-react'
 import UploadFileModal from './UploadFileModal'
 import SearchBar from '../SearchBar'
 
 
 export default function Gallery(props) {
-    const { /*user,*/ onRefresh, img, cardGroups } = props;
+    const { /*user,*/ onRefresh, img, cardGroups, years } = props;
     const [shownImg, setShownImg] = useState([])
     const [searchInput, setSearchInput] = useState("")
 
@@ -23,6 +23,26 @@ export default function Gallery(props) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchInput])
 
+
+    const prevScrollY = useRef(0);
+    const [goingUp, setGoingUp] = useState(false);
+
+    const onScroll = (e) => {
+        const currentScrollY = e.target.scrollTop;
+        if (prevScrollY.current < currentScrollY && goingUp) {
+            setGoingUp(false);
+        }
+        if (prevScrollY.current > currentScrollY && !goingUp) {
+            setGoingUp(true);
+        }
+        prevScrollY.current = currentScrollY;
+        // console.log(goingUp, currentScrollY);
+    };
+
+    const theYears = [].concat(years)
+        .sort((a, b) => a < b ? 1 : -1)
+        .map((yr, i) => <h4 key={i}>{yr}</h4>);
+
     return (
         <div>
             <div>
@@ -32,14 +52,19 @@ export default function Gallery(props) {
                 </Header>
             </div>
             <Divider />
-            <div className='gallery-scroll'>
-                <div>
-                    <Card.Group stackable itemsPerRow={4}>
-                        {shownImg.map(picture => picture)}
-                    </Card.Group>
+            <div className='gallery-scroll' onScroll={onScroll}>
+                <div className='gallery'>
+                    <div>
+                        <Card.Group stackable itemsPerRow={4}>
+                            {shownImg.map(picture => picture)}
+                        </Card.Group>
+                    </div>
+                    <div>
+                        {cardGroups.map(group => group)}
+                    </div>
                 </div>
-                <div>
-                    {cardGroups.map(group => group)}
+                <div className='scrollbar'>
+                    {theYears}
                 </div>
             </div>
         </div>

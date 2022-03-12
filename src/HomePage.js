@@ -92,15 +92,26 @@ class HomePage extends Component {
         const imgCopy = [...img]
 
         var cardGroups = []
+        var years = []
         if (img.length === this.state.filesLen) {
             const sortedPanes = sortByYear(img);
+            years = sortedPanes.map(obj => obj.year) 
             cardGroups = mapByYear(sortedPanes);
         }
         
         const panes = [
             {
                 menuItem: 'Gallery',
-                /*pane:*/render: () => <Tab.Pane attached={false}><Gallery user={this.props.user} onRefresh={this.state.refresh} img={imgCopy} cardGroups={cardGroups}/></Tab.Pane>
+                /*pane:*/render: () => {
+                    return <Tab.Pane attached={false}>
+                                <Gallery user={this.props.user} 
+                                    onRefresh={this.state.refresh} 
+                                    img={imgCopy} 
+                                    cardGroups={cardGroups}
+                                    years={years}
+                                    />
+                            </Tab.Pane>
+                }
             },
             {
                 menuItem: 'Favorites',
