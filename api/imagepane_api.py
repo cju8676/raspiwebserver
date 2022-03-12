@@ -74,6 +74,16 @@ class GetFavorites(Resource):
                 })
         return json.dumps(files_json)
 
+class GetFavoriteIDs(Resource):
+    def get(self, username):
+        sql = """
+            SELECT f.id
+            FROM files f, favorites s
+            WHERE s.username = %s
+            AND f.id = s.id
+        """
+        return exec_get_all(sql, [username])
+
 class GetMyTags(Resource):
     def get(self, id):
         sql = """
