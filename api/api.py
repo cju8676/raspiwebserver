@@ -78,16 +78,18 @@ def getinfo(path, filename, username):
     """
     is_favorited = exec_get_one(sql, (username, urllib.parse.unquote(filename), urllib.parse.unquote(path)))[0]
 
-
     if len(exifdata) == 0:
         # len wid --- --- --- tags
         return jsonify([image.size[0], image.size[1], "---", "---", "---", is_favorited, gps_coords])
     else:
         #print(datetime.strptime(exifdata[306], '%Y:%m:%d %H:%M:%S').strftime("%B %d, %Y -- %I:%M:%S %p"))
         formatted = datetime.strptime(exifdata[306], '%Y:%m:%d %H:%M:%S').strftime("%B %d, %Y -- %I:%M:%S %p")
+        make = exifdata.get(271, "---")
+        model = exifdata.get(272, "---")
+
 
         # len wid make model datetime tags
-        return jsonify([image.size[0], image.size[1], exifdata[271], exifdata[272], formatted, is_favorited, gps_coords])
+        return jsonify([image.size[0], image.size[1], make, model, formatted, is_favorited, gps_coords])
 
 def allowed_file(filename):
     return '.' in filename and \
