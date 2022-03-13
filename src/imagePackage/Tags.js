@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Label, Icon, Dropdown, Segment, Input, Button } from 'semantic-ui-react';
 
 export default function Tags(props) {
-    const { id } = props;
+    const { id, bulk } = props;
 
     const options = [
         { label: { color: 'red' }, text: 'Red', value: 'red' },
@@ -140,11 +140,11 @@ export default function Tags(props) {
 
     return (
         <div>
-            <h2>Tags</h2>
+            <h2>Tags {bulk && " for each file"}</h2>
             <Label.Group>
                 {tags && tags.map(tag => {
                     return (
-                        <Label color={tag[1]} >
+                        <Label color={tag[1]} key={tag[0]}>
                             {tag[0]}
                             <Icon name='delete' onClick={e => delTag(tag)} />
                         </Label>)

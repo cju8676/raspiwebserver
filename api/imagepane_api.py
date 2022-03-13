@@ -268,3 +268,11 @@ class GetImageAlbums(Resource):
             AND username = %s;
         """
         return exec_get_all(sql, (id, user))
+
+class DeleteUploadTags(Resource):
+    def post(self):
+        sql = """
+            DELETE FROM tags
+            WHERE id = -2;
+        """
+        return str(exec_commit(sql, ()))

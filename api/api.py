@@ -114,11 +114,18 @@ def fileUpload():
     target=os.path.join(UPLOAD_FOLDER, datetime.today().strftime("%m-%d-%Y"))
     if not os.path.isdir(target):
         os.mkdir(target)
-    file = request.files['file'] 
-    filename = secure_filename(file.filename)
+    file = request.files['file']
+    if "/" in file.filename:
+        idx = file.filename.find('/')
+        target=os.path.join(target, file.filename[0:idx])
+        if not os.path.isdir(target):
+            os.mkdir(target)
+        filename = secure_filename(file.filename[idx:])
+    else:
+        filename = secure_filename(file.filename)
     destination="/".join([target, filename])
-    print(target)
-    print(filename)
+    # print(target)
+    # print(filename)
     file.save(destination)
     file_location = target + '/' + filename
     exif = Image.open(file_location)
@@ -134,18 +141,20 @@ def fileUpload():
     """
     exec_commit(sql, (filename, target.replace('C:/Users/corey/', ""), date))
     # Get created tags at idx -2 and transfer them to our new file's id and delete them from -2 idx
+    sql_id = """
+        SELECT id FROM files WHERE name = %s AND filepath = %s;
+    """
+    id = exec_get_one(sql_id, (filename, target.replace('C:/Users/corey/', "")))
+
     sql_tags = """
-        UPDATE tags
-        SET id = (
-            SELECT id
-            FROM files
-            WHERE name = %s
-            AND filepath = %s
-        )
+        INSERT INTO tags (name, id, color, people)
+        SELECT name, %s, color, people
+        FROM tags
         WHERE id = -2;
     """
-    return str(exec_commit(sql_tags, (filename, target.replace('C:/Users/corey/', ""))))
-
+    return str(exec_commit(sql_tags, (id)))
+    
+api.add_resource(DeleteUploadTags, '/deleteUploadTags/')
 api.add_resource(CreateUser, '/createUser/')
 api.add_resource(LoginUser, '/login/<string:username>/<string:password>')
 api.add_resource(GetImage, '/getImage/<string:filename>')
