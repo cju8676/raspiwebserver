@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { Header, Button, Divider, Confirm, Container } from 'semantic-ui-react'
 import EditForm from "./EditForm"
+import EditPeople from './EditPeople';
+import EditTags from './EditTags';
 //import { withRouter } from 'react-router-dom'
 
 class SettingsPage extends Component {
@@ -100,7 +102,7 @@ class SettingsPage extends Component {
                     <Button color='orange' size='large' href='#home'>Back</Button>
                     Settings
                 </Header>
-                <Container>
+                <Container className="settings">
                     <h2>Name</h2>
                     {this.state.name} <Button basic compact icon='edit' color='black' onClick={this.toggleName} />
                     {this.state.nameModal && (
@@ -136,6 +138,12 @@ class SettingsPage extends Component {
                             errorMsg={"This is your current password"}
                         />
                     )}
+                    <Divider />
+                    <h2>Edit Tag Labels</h2>
+                    <EditTags user={this.state.user} />
+                    <Divider />
+                    <h2>Edit People Labels</h2>
+                    <EditPeople user={this.state.user} />
                     <Divider />
                     <Button onClick={this.state.logout}>Logout</Button>
                     <Button color='red' size='large' onClick={this.open}>Delete Account</Button>

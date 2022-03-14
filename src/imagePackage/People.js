@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Label, Icon, Dropdown, Segment, Input, Button } from 'semantic-ui-react'
 
 export default function People(props) {
-    const { id, bulk } = props;
+    const { user, id, bulk } = props;
 
     const options = [
         { label: { color: 'red' }, text: 'Red', value: 'red' },
@@ -48,7 +48,7 @@ export default function People(props) {
     function delTag(per) {
         const data = {
             name: per[0],
-            color: per[1]
+            color: per[1],
         }
         const reqOptions = {
             method: 'POST',
@@ -69,7 +69,7 @@ export default function People(props) {
         //     return false;
         const data = {
             name: name,
-            color: color
+            color: color,
         }
         const reqOptions = {
             method: 'POST',
@@ -112,14 +112,15 @@ export default function People(props) {
         }
         const data = {
             name: newTag.name,
-            color: newTag.color
+            color: newTag.color,
+            owner: user
         }
         const reqOptions = {
             method: 'POST',
             headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         }
-        fetch('/createTag/', reqOptions)
+        fetch('/createPerson/', reqOptions)
             .then(response => response.json())
             .then(() => {
                 // confirm tag has been created

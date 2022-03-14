@@ -197,11 +197,11 @@ class ImagePane extends Component {
                                 <Grid.Column>
                                     <h3>{this.state.name}</h3>
                                     <Divider />
-                                    <Tags id={this.state.id} />
+                                    <Tags id={this.state.id} user={this.props.user}/>
                                     <Divider />
                                     {/* <PeopleTags picture={this.state.picture} id={this.state.id} /> */}
                                     {/* <Divider /> */}
-                                    <People id={this.state.id} />
+                                    <People id={this.state.id} user={this.props.user}/>
                                     <Divider />
                                     <h2>Dimensions</h2>
                                     {this.state.info[0]} x {this.state.info[1]}

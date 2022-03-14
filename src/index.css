@@ -32,6 +32,28 @@ h1 {
   padding: 25px 0px 25px
 }
 
+.settings {
+  overflow-y: auto;
+  height: 80vh;
+  min-height: auto;
+}
+
+.tagRow {
+  display:flex;
+  height: 50px;
+}
+
+.rowButtons {
+  display: flex;
+  /* padding: 0px 0px 0px 50px; */
+  flex: 1;
+}
+
+
+.rowLabel {
+  flex: 1;
+}
+
 .gallery-scroll {
   overflow-y: auto;
   overflow-x: hidden;
@@ -59,4 +81,12 @@ h1 {
 
 .previewImgs img {
   padding: 10px;
+}
+
+.editTags {
+  padding: 10px;
+}
+
+.editTag {
+  padding: 5px;
 }

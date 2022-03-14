@@ -154,7 +154,6 @@ def fileUpload():
     """
     return str(exec_commit(sql_tags, (id)))
     
-api.add_resource(DeleteUploadTags, '/deleteUploadTags/')
 api.add_resource(CreateUser, '/createUser/')
 api.add_resource(LoginUser, '/login/<string:username>/<string:password>')
 api.add_resource(GetImage, '/getImage/<string:filename>')
@@ -185,6 +184,11 @@ api.add_resource(UpdateUsername, '/updateUsername/')
 api.add_resource(UpdatePassword, '/updatePassword/')
 api.add_resource(DeleteImage, '/deleteImage/<string:id>/<string:path>/<string:name>')
 api.add_resource(GetImageAlbums, '/getImageAlbums/<string:id>/<string:user>')
+api.add_resource(DeleteUploadTags, '/deleteUploadTags/')
+api.add_resource(GetEditTags, '/getEditTags/<string:username>')
+api.add_resource(GetEditPeople, '/getEditPeople/<string:username>')
+api.add_resource(DeleteTagOverall, '/deleteTagOverall/<string:name>/<string:color>')
+api.add_resource(DeletePersonOverall, '/deletePersonOverall/<string:name>/<string:color>')
 
 if __name__ == '__main__':
     print("Starting Flask backend")

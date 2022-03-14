@@ -103,10 +103,10 @@ class UploadFileModal extends Component {
                             <Image size="large" src={this.state.file} />
                             <Divider />
                             <Container>
-                                <Tags id={'-2'} />
+                                <Tags id={'-2'} user={this.props.user}/>
                             </Container>
                             <Container>
-                                <People id={'-2'} />
+                                <People id={'-2'} user={this.props.user}/>
                             </Container>
                             <Divider />
                             <Button as='a' onClick={this.toggleUpload}>Cancel</Button>
@@ -128,10 +128,10 @@ class UploadFileModal extends Component {
                             </div>
                             <Divider />
                             <Container>
-                                <Tags id={'-2'} bulk={true} />
+                                <Tags id={'-2'} bulk={true} user={this.props.user}/>
                             </Container>
                             <Container>
-                                <People id={'-2'} bulk={true} />
+                                <People id={'-2'} bulk={true} user={this.props.user}/>
                             </Container>
                             <Divider />
                             <Button as='a' onClick={this.toggleUpload}>Cancel</Button>

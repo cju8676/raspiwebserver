@@ -162,32 +162,36 @@ class CreateTag(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('name', type=str)
         parser.add_argument('color', type=str)
+        parser.add_argument('owner', type=str)
         args = parser.parse_args()
 
         name = args['name']
         color = args['color']
+        owner = args['owner']
 
         sql = """
-            INSERT into tags (name, color)
-            VALUES (%s, %s)
+            INSERT into tags (name, color, owner)
+            VALUES (%s, %s, %s)
         """
-        return exec_commit(sql, (name, color))
+        return exec_commit(sql, (name, color, owner))
 
 class CreatePerson(Resource):
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('name', type=str)
         parser.add_argument('color', type=str)
+        parser.add_argument('owner', type=str)
         args = parser.parse_args()
 
         name = args['name']
         color = args['color']
+        owner = args['owner']
 
         sql = """
-            INSERT into tags (name, color, people)
-            VALUES (%s, %s, %s)
+            INSERT into tags (name, color, people, owner)
+            VALUES (%s, %s, %s, %s)
         """
-        return exec_commit(sql, (name, color, 1))
+        return exec_commit(sql, (name, color, 1, owner))
 
 
 class AddTag(Resource):
@@ -276,3 +280,42 @@ class DeleteUploadTags(Resource):
             WHERE id = -2;
         """
         return str(exec_commit(sql, ()))
+
+class GetEditTags(Resource):
+    def get(self, username):
+        sql = """
+            SELECT name, color
+            FROM tags
+            WHERE owner = %s
+            AND people = %s;
+        """
+        return exec_get_all(sql, (username, "0"))
+
+class GetEditPeople(Resource):
+    def get(self, username):
+        sql = """
+            SELECT name, color
+            FROM tags
+            WHERE owner = %s
+            AND people = %s;
+        """
+        return exec_get_all(sql, (username, "1"))
+
+class DeleteTagOverall(Resource):
+    def post(self, name, color):
+        sql = """
+            DELETE FROM tags
+            WHERE name = %s
+            AND color = %s
+        """
+        return str(exec_commit(sql, (name, color)))
+
+class DeletePersonOverall(Resource):
+    def post(self, name, color):
+        sql = """
+            DELETE FROM tags
+            WHERE name = %s
+            AND color = %s
+            AND people = %s;
+        """
+        return str(exec_commit(sql, (name, color, 1)))

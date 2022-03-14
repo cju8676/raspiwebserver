@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Label, Icon, Dropdown, Segment, Input, Button } from 'semantic-ui-react';
 
 export default function Tags(props) {
-    const { id, bulk } = props;
+    const { user, id, bulk } = props;
 
     const options = [
         { label: { color: 'red' }, text: 'Red', value: 'red' },
@@ -53,7 +53,7 @@ export default function Tags(props) {
         //     return false;
         const data = {
             name: name,
-            color: color
+            color: color,
         }
         const reqOptions = {
             method: 'POST',
@@ -114,7 +114,8 @@ export default function Tags(props) {
         }
         const data = {
             name: newTag.name,
-            color: newTag.color
+            color: newTag.color,
+            owner: user
         }
         const reqOptions = {
             method: 'POST',

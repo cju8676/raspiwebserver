@@ -5,7 +5,7 @@ import SearchBar from '../SearchBar'
 
 
 export default function Gallery(props) {
-    const { /*user,*/ onRefresh, img, cardGroups, years } = props;
+    const { user, onRefresh, img, cardGroups, years } = props;
     const [shownImg, setShownImg] = useState([])
     const [searchInput, setSearchInput] = useState("")
 
@@ -47,7 +47,7 @@ export default function Gallery(props) {
         <div>
             <div>
                 <Header as='h3'>
-                    <UploadFileModal onRefresh={onRefresh} />
+                    <UploadFileModal onRefresh={onRefresh} user={user}/>
                     <SearchBar onChange={searchResults} source={img} />
                 </Header>
             </div>
