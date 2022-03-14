@@ -4,25 +4,25 @@ import EditForm from "./EditForm";
 import TagRow from "./TagRow";
 
 
-export default function EditTags(props) {
+export default function EditLabels(props) {
 
-    const { user } = props;
+    // tags if true, people if false...
+    const { user, isTags } = props;
     const [tags, setTags] = useState([])
 
     useEffect(() => {
-        fetch('/getEditTags/' + user)
+        fetch(`/getEdit${isTags ? 'Tags' : 'People'}/` + user)
             .then(res => res.json())
             .then(data => setTags(data))
     }, [])
 
     function delTag(name, color) {
-        console.log("deleting", name, color)
         setTags(tags.filter(tag => !((tag[0] === name) && (tag[1] === color)) ))
-        fetch('/deleteTagOverall/' + name + '/' + color, {
+        fetch(`/delete${isTags ? 'Tag' : 'Person'}Overall/` + name + '/' + color, {
             method: 'POST'
         })
             .then(res => res.text())
-            .then(data => console.log(data));
+            .then(data => data/*todo success msg if true failure msg if false*/);
     }
 
     return (
@@ -32,7 +32,7 @@ export default function EditTags(props) {
                 {tags.map(tag => {
                     return <div className="editTag">
                         <Divider />
-                        <TagRow name={tag[0]} color={tag[1]} delTag={delTag} />
+                        <TagRow name={tag[0]} color={tag[1]} delTag={delTag}/>
                     </div>
                 })}
             </div>

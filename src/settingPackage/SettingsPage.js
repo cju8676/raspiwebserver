@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
 import { Header, Button, Divider, Confirm, Container } from 'semantic-ui-react'
 import EditForm from "./EditForm"
-import EditPeople from './EditPeople';
-import EditTags from './EditTags';
+import EditLabels from "./EditLabels"
 //import { withRouter } from 'react-router-dom'
 
 class SettingsPage extends Component {
@@ -140,10 +139,10 @@ class SettingsPage extends Component {
                     )}
                     <Divider />
                     <h2>Edit Tag Labels</h2>
-                    <EditTags user={this.state.user} />
+                    <EditLabels user={this.state.user} isTags={true} />
                     <Divider />
                     <h2>Edit People Labels</h2>
-                    <EditPeople user={this.state.user} />
+                    <EditLabels user={this.state.user} isTags={false} />
                     <Divider />
                     <Button onClick={this.state.logout}>Logout</Button>
                     <Button color='red' size='large' onClick={this.open}>Delete Account</Button>

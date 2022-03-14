@@ -12,7 +12,6 @@ export default function TagRow(props) {
 
     useEffect(() => {
         if (confirm) {
-            console.log("turned on")
             const timer = setTimeout(() => {
                 setColor('red');
                 setConf(false);
@@ -72,10 +71,6 @@ export default function TagRow(props) {
                         </Button.Content>
                     </Button>
                 </div>
-                {/* <div>
-                    {confirm && <Button color='red' size='mini' icon='cancel' content='Cancel' />}
-                    {confirm && <Button color='green' size='mini' icon='check circle' content='Confirm' />}
-                </div> */}
             </div>
             {/* <EditForm
                             user={user}
