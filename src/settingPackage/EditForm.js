@@ -1,79 +1,111 @@
-import { React, Component } from "react"
-import { Button, Segment, Input, Label, Divider } from 'semantic-ui-react'
+import { React, useState } from "react"
+import { Button, Segment, Input, Label, Divider, Dropdown } from 'semantic-ui-react'
 
-class EditForm extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            blank : false,
-            error : false
-        };
-        this.updateInfo = "";
-    }
+export default function EditForm(props) {
+    const [blank, setBlank] = useState(false);
+    const [colorBlank, setColorBlank] = useState(false)
+    const [error, setError] = useState(false);
+    const [updateInfo, setUpdateInfo] = useState("")
+    // applicable to tags
+    const [updateColor, setUpdateColor] = useState("")
 
-    handleUpdate = (e, output) => {
+    function handleUpdate(e, output) {
+        console.log(e, output)
         if (output) {
-            this.props.update(e, this.updateInfo);
-            this.updateInfo = "";
-            this.props.toggle();
+            if (props.name === 'Tag') {
+                props.updateName(updateInfo);
+                props.updateColor(updateColor);
+                setUpdateColor("");
+            }
+            else 
+                props.update(e, updateInfo);
+            setUpdateInfo("");
+            props.toggle();
         }
         else {
-            this.setState({
-                blank : true,
-                error : true
-            })
-
+            setBlank(true);
+            setError(true);
         }
     }
 
-    submitUpdate = () => {
-        if (this.props.visible && this.updateInfo === "") {
-            this.setState({blank : true });
+    function submitUpdate() {
+        if (props.name === 'Tag' && ( updateInfo === "" || updateColor === "")) {
+            if (updateInfo === "") setBlank(true)
+            if (updateColor === "") setColorBlank(true);
+            return;
+        }
+        if (props.visible && updateInfo === "") {
+            setBlank(true);
             return;
         }
         const data = {
-            username : this.props.user,
-            new_name : this.updateInfo
+            username: props.user,
+            new_name: updateInfo,
+            
+            // if tag
+            new_color: updateColor,
+            old_name: props.tagName,
+            old_color: props.tagColor
         }
+        console.log(data)
         const reqOptions = {
-            method : 'POST',
-            headers : { Accept : 'application/json', 'Content-Type' : 'application/json'},
-            body : JSON.stringify(data)
+            method: 'POST',
+            headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
         }
-        fetch(`/update${this.props.name}/`, reqOptions).then(res => res.json())
+        fetch(`/update${props.name}/`, reqOptions).then(res => res.json())
             .then(output => {
                 //todo handle success pop up
-                this.handleUpdate(this.props.name, output)
-                }
+                handleUpdate(props.name, output)
+            }
             )
 
     }
 
-    update = (event) => {
-        this.updateInfo = event.target.value;
+    function update(event) {
+        setUpdateInfo(event.target.value);
         if (event.target.value !== "") {
-            this.setState({
-                blank : false,
-                error : false
-            })
+            setBlank(false);
+            setError(false);
         }
     }
 
-    render() {
+    const options = [
+        { label: { color: 'red' }, text: 'Red', value: 'red' },
+        { label: { color: 'orange' }, text: 'Orange', value: 'orange' },
+        { label: { color: 'yellow' }, text: 'Yellow', value: 'yellow' },
+        { label: { color: 'olive' }, text: 'Olive', value: 'olive' },
+        { label: { color: 'green' }, text: 'Green', value: 'green' },
+        { label: { color: 'teal' }, text: 'Teal', value: 'teal' },
+        { label: { color: 'blue' }, text: 'Blue', value: 'blue' },
+        { label: { color: 'violet' }, text: 'Violet', value: 'violet' },
+        { label: { color: 'purple' }, text: 'Purple', value: 'purple' },
+        { label: { color: 'pink' }, text: 'Pink', value: 'pink' },
+        { label: { color: 'brown' }, text: 'Brown', value: 'brown' },
+        { label: { color: 'grey' }, text: 'Grey', value: 'grey' },
+        { label: { color: 'black' }, text: 'Black', value: 'black' },
+    ]
 
-        return (
-            <div>
-                <Segment>
-                    <h4>Edit {this.props.name}</h4>
-                    <Input type='text' id={'entered'+this.props.name} placeholder={this.props.name} onChange={this.update} error={this.state.blank} />
-                    {this.state.error && <Label pointing='left' color='red'>{this.props.errorMsg}</Label>}
-                    <Divider />
-                    <Button color='black' onClick={this.props.toggle}>Cancel</Button>
-                    <Button positive onClick={this.submitUpdate}>Confirm</Button>
-                </Segment>
-            </div>
-        )
+    function handleDrop(e, data) {
+        if (data.id === 'enteredColor') {
+            setUpdateColor(data.value)
+            setColorBlank(false);
+        }
     }
-}
 
-export default EditForm;
+    return (
+        <div>
+            <Segment>
+                <h4>Edit {props.name}</h4>
+                <Input type='text' id={'entered' + props.name} placeholder={props.name} onChange={update} error={blank} />
+                {error && <Label pointing='left' color='red'>{props.errorMsg}</Label>}
+                {props.name === 'Tag' &&
+                    <Dropdown placeholder='Color' search selection options={options} id='enteredColor' onChange={handleDrop} error={colorBlank} />
+                }
+                <Divider />
+                <Button color='black' onClick={props.toggle}>Cancel</Button>
+                <Button positive onClick={submitUpdate}>Confirm</Button>
+            </Segment>
+        </div>
+    )
+}

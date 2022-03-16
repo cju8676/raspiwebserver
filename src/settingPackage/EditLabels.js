@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Button, Divider, Icon, Label } from "semantic-ui-react";
-import EditForm from "./EditForm";
 import TagRow from "./TagRow";
 
 
@@ -17,7 +16,7 @@ export default function EditLabels(props) {
     }, [])
 
     function delTag(name, color) {
-        setTags(tags.filter(tag => !((tag[0] === name) && (tag[1] === color)) ))
+        setTags(tags.filter(tag => !((tag[0] === name) && (tag[1] === color))))
         fetch(`/delete${isTags ? 'Tag' : 'Person'}Overall/` + name + '/' + color, {
             method: 'POST'
         })
@@ -32,7 +31,7 @@ export default function EditLabels(props) {
                 {tags.map(tag => {
                     return <div className="editTag">
                         <Divider />
-                        <TagRow name={tag[0]} color={tag[1]} delTag={delTag}/>
+                        <TagRow name={tag[0]} color={tag[1]} delTag={delTag} />
                     </div>
                 })}
             </div>

@@ -319,3 +319,26 @@ class DeletePersonOverall(Resource):
             AND people = %s;
         """
         return str(exec_commit(sql, (name, color, 1)))
+
+class UpdateTag(Resource):
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('new_name', type=str)
+        parser.add_argument('new_color', type=str)
+        parser.add_argument('old_name', type=str)
+        parser.add_argument('old_color', type=str)
+        args = parser.parse_args()
+
+        new_name = args['new_name']
+        new_color = args['new_color']
+        old_name = args['old_name']
+        old_color = args['old_color']
+
+        sql = """
+            UPDATE tags
+            SET name = %s, color = %s
+            WHERE name = %s
+            AND color = %s;
+        """
+
+        return str(exec_commit(sql, (new_name, new_color, old_name, old_color)))

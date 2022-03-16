@@ -6,9 +6,12 @@ export default function TagRow(props) {
 
     const { name, color } = props
     const [confirm, setConf] = useState(false);
+    const [labelName, setLabelName]= useState(props.name)
+    const [labelColor, setLabelColor] = useState(props.color)
     const [buttonColor, setColor] = useState('red');
     //todo fake loading for now
     const [loading, setLoading] = useState(false);
+    const [editModal, setEditModal] = useState(false);
 
     useEffect(() => {
         if (confirm) {
@@ -48,37 +51,49 @@ export default function TagRow(props) {
         }
     }
 
+    function updateColor(color) {
+        setLabelColor(color)
+    }
+
+    function updateName(name) {
+        setLabelName(name);
+    }
+
     return (
-        <div className="tagRow">
-            <div className="rowLabel">
-                <Label color={color} key={name}>
-                    {name}
-                </Label>
-            </div>
-            <div className="rowButtons">
-                <div>
-                    <Button color='orange' content="Edit" icon="edit" />
+        <>
+            <div className="tagRow">
+                <div className="rowLabel">
+                    <Label color={labelColor} key={labelName}>
+                        {labelName}
+                    </Label>
                 </div>
-                <div>
-                    <Button
-                        loading={loading}
-                        color={buttonColor}
-                        active={confirm}
-                        onClick={() => handleClick()}>
-                        <Button.Content visible>
-                            {confirm ? <Icon name='check circle' /> : <Icon name="trash" />}
-                            {confirm ? "Confirm Delete" : "Delete Tag?"}
-                        </Button.Content>
-                    </Button>
+                <div className="rowButtons">
+                    <div>
+                        <Button color='orange' content="Edit" icon="edit" onClick={() => setEditModal(true)} />
+                    </div>
+                    <div>
+                        <Button
+                            loading={loading}
+                            color={buttonColor}
+                            active={confirm}
+                            onClick={() => handleClick()}>
+                            <Button.Content visible>
+                                {confirm ? <Icon name='check circle' /> : <Icon name="trash" />}
+                                {confirm ? "Confirm Delete" : "Delete Tag?"}
+                            </Button.Content>
+                        </Button>
+                    </div>
                 </div>
             </div>
-            {/* <EditForm
-                            user={user}
-                            name="Name"
-                            //visible={this.state.nameModal}
-                            //toggle={this.toggleName}
-                            //update={this.update}
-                        /> */}
-        </div>
+            {editModal && <EditForm
+                //user={user}
+                name="Tag"
+                toggle={() => setEditModal(!editModal)}
+                updateColor={updateColor}
+                updateName={updateName}
+                tagName={labelName}
+                tagColor={labelColor}
+            />}
+        </>
     )
 }
