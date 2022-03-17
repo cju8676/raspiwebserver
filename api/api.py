@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, redirect, url_for
 from flask_restful import Resource, Api
 import urllib.parse
 from werkzeug.utils import secure_filename
+import imghdr
 
 from PIL import Image, ExifTags
 
@@ -46,50 +47,61 @@ def getpic(id):
 
 @app.route('/info/<path>/<filename>/<username>', methods=['GET'])
 def getinfo(path, filename, username):
-    path_str = 'C:/Users/corey/' + urllib.parse.unquote(path) + '/' + urllib.parse.unquote(filename)
-    image = Image.open(path_str)
-    exif = image._getexif()
-    if exif is not None:
-        exifdata = dict(exif)
-    else:
-        exifdata = {}
-    for key, val in exifdata.items():
-        if key in ExifTags.TAGS:
-            #int(key, " : ", ExifTags.TAGS[key], ":", val)
-            name = ExifTags.TAGS.get(key, key)
-            exif[name] = val
-    # print(exifdata['34853'])
-    # print(exif.keys())
-    gps_coords = []
-    if exif is not None and 'GPSInfo' in exif.keys():
-        gps_coords = get_coords(exif)
+    file_name = urllib.parse.unquote(filename)
+    path_str = 'C:/Users/corey/' + urllib.parse.unquote(path) + '/' + file_name
+    print(file_name[file_name.find('.'):])
+
+    # if the file is a photo, gather photo info
+    if(imghdr.what(path_str) is not None):
+
+        image = Image.open(path_str)
+        exif = image._getexif()
+        if exif is not None:
+            exifdata = dict(exif)
+        else:
+            exifdata = {}
+        for key, val in exifdata.items():
+            if key in ExifTags.TAGS:
+                #int(key, " : ", ExifTags.TAGS[key], ":", val)
+                name = ExifTags.TAGS.get(key, key)
+                exif[name] = val
+        # print(exifdata['34853'])
+        # print(exif.keys())
+        gps_coords = []
+        if exif is not None and 'GPSInfo' in exif.keys():
+            gps_coords = get_coords(exif)
+        
+        # check if img is already faved
+        sql = """
+            SELECT COUNT(1)
+            FROM favorites
+            WHERE username = %s
+            AND id IN (
+                SELECT id
+                FROM files
+                WHERE name = %s
+                AND filepath = %s
+            )
+        """
+        is_favorited = exec_get_one(sql, (username, urllib.parse.unquote(filename), urllib.parse.unquote(path)))[0]
+
+        if len(exifdata) == 0:
+            # len wid --- --- --- tags
+            return jsonify([image.size[0], image.size[1], "---", "---", "---", is_favorited, gps_coords])
+        else:
+            #print(datetime.strptime(exifdata[306], '%Y:%m:%d %H:%M:%S').strftime("%B %d, %Y -- %I:%M:%S %p"))
+            formatted = datetime.strptime(exifdata[306], '%Y:%m:%d %H:%M:%S').strftime("%B %d, %Y -- %I:%M:%S %p")
+            make = exifdata.get(271, "---")
+            model = exifdata.get(272, "---")
+
+
+            # len wid make model datetime tags
+            return jsonify([image.size[0], image.size[1], make, model, formatted, is_favorited, gps_coords])
     
-    # check if img is already faved
-    sql = """
-        SELECT COUNT(1)
-        FROM favorites
-        WHERE username = %s
-        AND id IN (
-            SELECT id
-            FROM files
-            WHERE name = %s
-            AND filepath = %s
-        )
-    """
-    is_favorited = exec_get_one(sql, (username, urllib.parse.unquote(filename), urllib.parse.unquote(path)))[0]
-
-    if len(exifdata) == 0:
-        # len wid --- --- --- tags
-        return jsonify([image.size[0], image.size[1], "---", "---", "---", is_favorited, gps_coords])
+    # otherwise gather video info
     else:
-        #print(datetime.strptime(exifdata[306], '%Y:%m:%d %H:%M:%S').strftime("%B %d, %Y -- %I:%M:%S %p"))
-        formatted = datetime.strptime(exifdata[306], '%Y:%m:%d %H:%M:%S').strftime("%B %d, %Y -- %I:%M:%S %p")
-        make = exifdata.get(271, "---")
-        model = exifdata.get(272, "---")
+        return jsonify(["---", "---", "---", "---", "---", None, []])
 
-
-        # len wid make model datetime tags
-        return jsonify([image.size[0], image.size[1], make, model, formatted, is_favorited, gps_coords])
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -115,6 +127,7 @@ def fileUpload():
     if not os.path.isdir(target):
         os.mkdir(target)
     file = request.files['file']
+    print("=--------" + file.content_type)
     if "/" in file.filename:
         idx = file.filename.find('/')
         target=os.path.join(target, file.filename[0:idx])
@@ -128,8 +141,17 @@ def fileUpload():
     # print(filename)
     file.save(destination)
     file_location = target + '/' + filename
-    exif = Image.open(file_location)
-    exifdata = exif._getexif()
+    if(file.content_type[0:5] == 'image'):
+        exif = Image.open(file_location)
+        exifdata = exif._getexif()
+    elif(file.content_type[0:5] == 'video'):
+        #todo extract date info from vid
+        exifdata = None
+    else:
+        print("Unrecognized file type : " + file.content_type)
+        print("File was still saved.")
+        exifdata = None
+
     if exifdata is None:
         date = datetime.today()
     else:

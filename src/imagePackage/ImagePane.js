@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
-import { Button, Icon, Card, Image, Modal, Divider, Confirm, Grid } from 'semantic-ui-react'
+import { Button, Icon, Card, Image, Modal, Divider, Confirm, Grid, Embed } from 'semantic-ui-react'
 // import PeopleTags from './PeopleTags'
 import MapContainer from '../MapContainer'
 import Tags from './Tags'
 import People from './People'
 import AddToAlbumButton from './AddToAlbumButton'
+import ReactPlayer from 'react-player'
 
 class ImagePane extends Component {
     constructor(props) {
@@ -23,6 +24,8 @@ class ImagePane extends Component {
             openDel: false,
             refresh: props.refresh,
             map: null,
+
+            vidPreview: false,
         }
     }
     open = () => this.setState({ open: true })
@@ -155,9 +158,16 @@ class ImagePane extends Component {
     }
 
     render() {
+        console.log(this.state)
+        
         return (
             <Card>
-                <Image src={this.state.picture} alt="pic" />
+                {this.props.isVideo && 
+                    <div onMouseEnter={() => this.setState({vidPreview:true})} onMouseLeave={() => this.setState({vidPreview:false})}>
+                        <ReactPlayer url={this.state.picture} playing={this.state.vidPreview} loop muted width='100%' /*height='100%'*/ />
+                    </div>
+                }
+                {!this.props.isVideo && <Image src={this.state.picture} alt="pic" />}
                 <Card.Content>
                     <Modal
                         open={this.state.infoModal}
@@ -165,7 +175,19 @@ class ImagePane extends Component {
                         <Modal.Content>
                             <Grid columns={2} divided>
                                 <Grid.Column>
-                                    <Image fluid src={this.state.picture} alt={this.state.name} />
+                                    {this.props.isVideo && 
+                                    <div className='player-wrapper'>
+                                        <ReactPlayer
+                                            className='react-player' 
+                                            url={this.state.picture}
+                                            playing
+                                            loop
+                                            width='100%'
+                                            height='100%'
+                                        /> 
+                                    </div>
+                                    }
+                                    {!this.props.isVideo && <Image fluid src={this.state.picture} alt={this.state.name} />}
                                     <Divider />
                                     <a href={this.state.picture} download={this.state.name}>
                                         <Button type="submit"><Icon name='download' />Save</Button>

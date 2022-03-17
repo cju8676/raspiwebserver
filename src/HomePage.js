@@ -34,6 +34,8 @@ class HomePage extends Component {
                         .then(response => response.blob())
                         .then(imageBlob => {
                             const imageURL = URL.createObjectURL(imageBlob);
+                            const isVideo = imageBlob.type === 'video/mp4' ? true : false
+                            if (isVideo) console.log(imageURL)
                             this.setState(prevState => ({
                                 ...prevState,
                                 link_name_id_info:
@@ -43,7 +45,8 @@ class HomePage extends Component {
                                         name: files[i].name,
                                         id: files[i].id,
                                         info: id_path[files[i].id],
-                                        date: files[i].date
+                                        date: files[i].date,
+                                        video: isVideo
                                     }]
                             }));
                         })
@@ -95,6 +98,7 @@ class HomePage extends Component {
                 inAlbum={false}
                 refresh={this.state.refresh}
                 date={picture.date}
+                isVideo={picture.video}
             />
         })
 
