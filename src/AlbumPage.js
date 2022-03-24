@@ -1,9 +1,11 @@
 import React, {Component} from 'react'
 import {Header, Button, Card, Divider, Confirm } from 'semantic-ui-react'
 import ImagePane from './imagePackage/ImagePane';
+import { UserContext } from './UserContext';
 //import {withRouter} from 'react-router-dom'
 
 class AlbumPage extends Component {
+    static contextType = UserContext
     constructor(props) {
         super(props);
         this.state = {
@@ -25,7 +27,7 @@ class AlbumPage extends Component {
             method: 'POST',
             headers: {Accept:'application/json', 'Content-Type':'application/json'},
         }
-        fetch('/delAlbum/' + this.props.user + '/' + this.props.match.params.album, reqOptions)
+        fetch('/delAlbum/' + this.context.user + '/' + this.props.match.params.album, reqOptions)
             .then(response => response.json())
             .then(JSONresponse => 
                 JSONresponse ? this.props.history.push('/home') : console.log("not del"))
@@ -37,7 +39,7 @@ class AlbumPage extends Component {
         // get those instead to be more efficient
         // todo to do this we would change every /files/ instance to just the id, fetch
         // id's from db first then use those id's to fetch /files/ 
-        fetch('/getAlbumPhotos/'+ this.props.user + '/' + this.props.match.params.album).then(response => response.json())
+        fetch('/getAlbumPhotos/'+ this.context.user + '/' + this.props.match.params.album).then(response => response.json())
             .then(JSONresponse => {
                 this.setState({files : JSON.parse(JSONresponse)})
                 for (let i = 0; i < this.state.files.length; i++) {
@@ -96,8 +98,7 @@ class AlbumPage extends Component {
                             return <ImagePane 
                             picture={picture.link} 
                             filename={picture.name} 
-                            id={picture.id} 
-                            user={this.props.user}
+                            id={picture.id}
                             albums={[]}
                             path={picture.info}
                             inAlbum={this.props.match.params.album}

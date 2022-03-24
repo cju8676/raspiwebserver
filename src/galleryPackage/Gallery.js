@@ -1,11 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useContext } from 'react'
 import { Divider, Header, Card } from 'semantic-ui-react'
 import UploadFileModal from './UploadFileModal'
 import SearchBar from '../SearchBar'
+import { UserContext } from '../UserContext';
 
 
 export default function Gallery(props) {
-    const { user, onRefresh, img, cardGroups, years } = props;
+    const { onRefresh, img, cardGroups, years } = props;
+    const { user } = useContext(UserContext)
     const [shownImg, setShownImg] = useState([])
     const [searchInput, setSearchInput] = useState("")
 

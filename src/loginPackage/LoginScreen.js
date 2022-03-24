@@ -3,7 +3,6 @@ import CreateNewAccount from './CreateNewAccount'
 import { Button, Form, Grid, Header, Message, Segment } from 'semantic-ui-react'
 
 
-
 class LoginScreen extends Component {
     constructor(props) {
         super(props)
@@ -84,7 +83,6 @@ class LoginScreen extends Component {
             </Grid>
         )
     }
-
 }
 
 export default LoginScreen

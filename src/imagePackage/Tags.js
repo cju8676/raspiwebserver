@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { Label, Icon, Dropdown, Segment, Input, Button } from 'semantic-ui-react';
+import { UserContext } from '../UserContext';
 
 export default function Tags(props) {
-    const { user, id, bulk } = props;
+    const { id, bulk } = props;
+    const { user } = useContext(UserContext)
 
     const options = [
         { label: { color: 'red' }, text: 'Red', value: 'red' },

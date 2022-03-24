@@ -6,8 +6,10 @@ import Tags from './Tags'
 import People from './People'
 import AddToAlbumButton from './AddToAlbumButton'
 import ReactPlayer from 'react-player'
+import { UserContext } from '../UserContext'
 
 class ImagePane extends Component {
+    static contextType = UserContext;
     constructor(props) {
         super(props)
         this.state = {
@@ -38,7 +40,7 @@ class ImagePane extends Component {
 
     favorite = () => {
         const data = {
-            username: this.props.user,
+            username: this.context.user,
             id: this.state.id
         }
         const reqOptions = {
@@ -50,7 +52,7 @@ class ImagePane extends Component {
             this.setState({ favorited: false })
             this.props.inFavs && this.props.refresh();
             // delete where user and picture id
-            const getUrl = '/removeFav/' + this.props.user + '/' + this.state.id
+            const getUrl = '/removeFav/' + this.context.user + '/' + this.state.id
             fetch(getUrl, reqOptions)
                 .then(response => response.json())
                 .then(this.fetchData)
@@ -58,7 +60,7 @@ class ImagePane extends Component {
         else {
             this.setState({ favorited: true })
             // post user and picture id
-            const getUrl = '/addFav/' + this.props.user + '/' + this.state.id
+            const getUrl = '/addFav/' + this.context.user + '/' + this.state.id
             fetch(getUrl, reqOptions)
                 .then(response => response.json())
                 .then(this.fetchData)
@@ -66,7 +68,7 @@ class ImagePane extends Component {
     }
 
     fetchInfo = () => {
-        fetch('/info/' + encodeURIComponent(this.props.path) + '/' + encodeURIComponent(this.state.name) + '/' + this.props.user)
+        fetch('/info/' + encodeURIComponent(this.props.path) + '/' + encodeURIComponent(this.state.name) + '/' + this.context.user)
             .then(response => response.json())
             .then(output => {
                 // var id = this.state.id;
@@ -102,7 +104,7 @@ class ImagePane extends Component {
 
     removeFromAlbum = () => {
         const postData = {
-            username: this.props.user,
+            username: this.context.user,
             album_name: this.props.inAlbum,
             id: this.state.id
         }
@@ -158,8 +160,6 @@ class ImagePane extends Component {
     }
 
     render() {
-        console.log(this.state)
-        
         return (
             <Card>
                 {this.props.isVideo && 
@@ -201,7 +201,6 @@ class ImagePane extends Component {
                                         <AddToAlbumButton
                                             selectAlbum={this.selectAlbum}
                                             id={this.state.id}
-                                            user={this.props.user}
                                         />}
                                     {this.props.inAlbum &&
                                         <Button color='red' onClick={this.open}>
@@ -219,11 +218,11 @@ class ImagePane extends Component {
                                 <Grid.Column>
                                     <h3>{this.state.name}</h3>
                                     <Divider />
-                                    <Tags id={this.state.id} user={this.props.user}/>
+                                    <Tags id={this.state.id} />
                                     <Divider />
                                     {/* <PeopleTags picture={this.state.picture} id={this.state.id} /> */}
                                     {/* <Divider /> */}
-                                    <People id={this.state.id} user={this.props.user}/>
+                                    <People id={this.state.id} />
                                     <Divider />
                                     <h2>Dimensions</h2>
                                     {this.state.info[0]} x {this.state.info[1]}

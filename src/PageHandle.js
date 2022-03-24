@@ -4,6 +4,7 @@ import LoginScreen from './loginPackage/LoginScreen'
 import HomePage from './HomePage'
 import AlbumPage from './AlbumPage'
 import SettingsPage from './settingPackage/SettingsPage'
+import { UserContext } from './UserContext'
 
 export default function PageHandle(props) {
 
@@ -21,16 +22,16 @@ export default function PageHandle(props) {
     }
 
     function handleLogout() {
-            setCurrentUser(null);
-            setCurrentName(null);
-            localStorage.removeItem('user');
-            localStorage.removeItem('name')
-            setRedirect("/login");
+        setCurrentUser(null);
+        setCurrentName(null);
+        localStorage.removeItem('user');
+        localStorage.removeItem('name')
+        setRedirect("/login");
     }
 
     function handleRefresh(album) {
         console.log("handle refresh", album)
-       setRedirect("/album/:" + album);
+        setRedirect("/album/:" + album);
     }
 
     function handleHomeRefresh() {
@@ -40,7 +41,7 @@ export default function PageHandle(props) {
     function setPage(item, val) {
         if (item === 'name')
             setCurrentName(val)
-        else if (item === 'user') 
+        else if (item === 'user')
             setCurrentUser(val);
     }
 
@@ -49,11 +50,13 @@ export default function PageHandle(props) {
 
     return (
         <HashRouter>
-            {currentUser ? <Redirect to="/home" /> : <Redirect to={redirect} />}
-            <Route path="/login" component={(props) => <LoginScreen newUser={currentUser} onChange={handleUserChange} />} />
-            <Route path="/home" component={(props) => <HomePage user={currentUser} name={currentName} onChange={handleLogout} onRefresh={handleHomeRefresh} />} />
-            <Route path="/album/:album" component={(props) => <AlbumPage {...props} user={currentUser} onChange={handleRefresh} />} />
-            <Route path="/settings" component={(props) => <SettingsPage {...props} onChange={handleLogout} name={currentName} user={currentUser} setPage={setPage} />} />
+            <UserContext.Provider value={{ user: currentUser, name: currentName }}>
+                {currentUser ? <Redirect to="/home" /> : <Redirect to={redirect} />}
+                <Route path="/login" component={(props) => <LoginScreen newUser={currentUser} onChange={handleUserChange} />} />
+                <Route path="/home" component={(props) => <HomePage onChange={handleLogout} onRefresh={handleHomeRefresh} />} />
+                <Route path="/album/:album" component={(props) => <AlbumPage {...props} onChange={handleRefresh} />} />
+                <Route path="/settings" component={(props) => <SettingsPage {...props} onChange={handleLogout} setPage={setPage} />} />
+            </UserContext.Provider>
         </HashRouter>
     )
 }

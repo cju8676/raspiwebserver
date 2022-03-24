@@ -1,16 +1,16 @@
 import React, { Component } from 'react'
 import { Header, Button, Divider, Confirm, Container } from 'semantic-ui-react'
+import { UserContext } from '../UserContext'
 import EditForm from "./EditForm"
 import EditLabels from "./EditLabels"
 //import { withRouter } from 'react-router-dom'
 
 class SettingsPage extends Component {
+    static contextType = UserContext
     constructor(props) {
         super(props);
         this.state = {
             open: false,
-            name: props.name,
-            user: props.user,
             logout: props.onChange,
             nameModal: false,
             usernameModal: false,
@@ -31,7 +31,7 @@ class SettingsPage extends Component {
             method: 'POST',
             headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
         }
-        fetch('/delAcc/' + this.props.user, reqOptions)
+        fetch('/delAcc/' + this.context.user, reqOptions)
             .then(response => response.json())
             .then(JSONresponse =>
                 JSONresponse ? this.state.logout() : console.log("not del"))
@@ -103,10 +103,9 @@ class SettingsPage extends Component {
                 </Header>
                 <Container className="settings">
                     <h2>Name</h2>
-                    {this.state.name} <Button basic compact icon='edit' color='black' onClick={this.toggleName} />
+                    {this.context.name} <Button basic compact icon='edit' color='black' onClick={this.toggleName} />
                     {this.state.nameModal && (
                         <EditForm
-                            user={this.state.user}
                             name="Name"
                             visible={this.state.nameModal}
                             toggle={this.toggleName}
@@ -114,10 +113,9 @@ class SettingsPage extends Component {
                         />
                     )}
                     <h2>Username</h2>
-                    {this.state.user} <Button basic compact icon='edit' color='black' onClick={this.toggleuserName} />
+                    {this.context.user} <Button basic compact icon='edit' color='black' onClick={this.toggleuserName} />
                     {this.state.usernameModal && (
                         <EditForm
-                            user={this.state.user}
                             name="Username"
                             visible={this.state.usernameModal}
                             toggle={this.toggleuserName}
@@ -129,7 +127,6 @@ class SettingsPage extends Component {
                     <Button basic compact icon='edit' color='black' onClick={this.togglePass} />
                     {this.state.passModal && (
                         <EditForm
-                            user={this.state.user}
                             name="Password"
                             visible={this.state.passModal}
                             toggle={this.togglePass}
@@ -139,10 +136,10 @@ class SettingsPage extends Component {
                     )}
                     <Divider />
                     <h2>Edit Tag Labels</h2>
-                    <EditLabels user={this.state.user} isTags={true} />
+                    <EditLabels isTags={true} />
                     <Divider />
                     <h2>Edit People Labels</h2>
-                    <EditLabels user={this.state.user} isTags={false} />
+                    <EditLabels isTags={false} />
                     <Divider />
                     <Button onClick={this.state.logout}>Logout</Button>
                     <Button color='red' size='large' onClick={this.open}>Delete Account</Button>

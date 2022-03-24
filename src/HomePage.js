@@ -5,8 +5,10 @@ import Favorited from './Favorited'
 import AlbumsList from './AlbumsList'
 import ImagePane from './imagePackage/ImagePane'
 import { sortByYear, mapByYear } from './imageUtils'
+import { UserContext } from './UserContext'
 
 class HomePage extends Component {
+    static contextType = UserContext;
     constructor(props) {
         super(props)
         this.state = {
@@ -64,7 +66,7 @@ class HomePage extends Component {
     // }
 
     fetchAlbums = () => {
-        fetch('/getAlbums/' + this.props.user).then(response => response.json())
+        fetch('/getAlbums/' + this.context.user).then(response => response.json())
             .then(JSONresponse => {
                 this.setState({ albums: JSONresponse })
             })
@@ -72,7 +74,7 @@ class HomePage extends Component {
 
     // returns the IDs of the image panes we need to extract
     fetchFavorites = () => {
-        fetch('/getFavoriteIDs/' + this.props.user).then(res => res.json())
+        fetch('/getFavoriteIDs/' + this.context.user).then(res => res.json())
             .then(JSONresponse => this.setState({favs : JSONresponse.flat()}))
     }
 
@@ -83,6 +85,7 @@ class HomePage extends Component {
     }
 
     render() {
+        let name = this.context.name;
         
         if (this.state.filesLen === -1) return <></>
         
@@ -92,7 +95,6 @@ class HomePage extends Component {
                 filename={picture.name}
                 id={picture.id}
                 key={picture.id}
-                user={this.props.user}
                 albums={this.state.albums}
                 path={picture.info}
                 inAlbum={false}
@@ -110,7 +112,6 @@ class HomePage extends Component {
                     filename={picture.name}
                     id={picture.id}
                     key={picture.id}
-                    user={this.props.user}
                     favorited='true'
                     albums={this.state.albums}
                     path={picture.info}
@@ -135,7 +136,7 @@ class HomePage extends Component {
                 menuItem: 'Gallery',
                 /*pane:*/render: () => {
                     return <Tab.Pane attached={false}>
-                                <Gallery user={this.props.user} 
+                                <Gallery 
                                     onRefresh={this.state.refresh} 
                                     img={imgCopy} 
                                     cardGroups={cardGroups}
@@ -156,7 +157,7 @@ class HomePage extends Component {
                 menuItem: 'Albums',
                 /*pane:*/render: () => {
                     return <Tab.Pane attached={false}>
-                                <AlbumsList user={this.props.user}/>
+                                <AlbumsList />
                             </Tab.Pane>
                 }
             },
@@ -165,7 +166,7 @@ class HomePage extends Component {
             <div>
                 <Header as='h2'>
                     <div>
-                        Welcome, {this.props.name}.
+                        Welcome, {name}.
 
                         <Button href='#settings' floated='right' size='large'>
                             <Icon name='setting' />

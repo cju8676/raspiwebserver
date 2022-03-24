@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Card, Icon, Button, Modal, Input, Message } from 'semantic-ui-react'
+import { UserContext } from "./UserContext";
 
 
 
 export default function AlbumsList(props) {
-    const { user } = props;
+    const { user } = useContext(UserContext);
     const [albums, setAlbums] = useState([]);
     const [modal, toggleModal] = useState(false);
     const [duplicate, toggleDuplicate] = useState(false);

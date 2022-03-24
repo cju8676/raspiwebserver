@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Button, Divider, Icon, Label } from "semantic-ui-react";
+import { UserContext } from "../UserContext";
 import TagRow from "./TagRow";
 
 
 export default function EditLabels(props) {
 
     // tags if true, people if false...
-    const { user, isTags } = props;
+    const { isTags } = props;
     const [tags, setTags] = useState([])
+    const { user } = useContext(UserContext)
 
     useEffect(() => {
         fetch(`/getEdit${isTags ? 'Tags' : 'People'}/` + user)

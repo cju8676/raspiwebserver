@@ -1,7 +1,9 @@
-import { React, useState } from "react"
+import { React, useState, useContext } from "react"
 import { Button, Segment, Input, Label, Divider, Dropdown } from 'semantic-ui-react'
+import { UserContext } from "../UserContext";
 
 export default function EditForm(props) {
+    const { user } = useContext(UserContext)
     const [blank, setBlank] = useState(false);
     const [colorBlank, setColorBlank] = useState(false)
     const [error, setError] = useState(false);
@@ -39,7 +41,7 @@ export default function EditForm(props) {
             return;
         }
         const data = {
-            username: props.user,
+            username: user,
             new_name: updateInfo,
             
             // if tag

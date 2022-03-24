@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { Dropdown } from "semantic-ui-react";
+import { UserContext } from "../UserContext";
 
 
 export default function AddToAlbumButton(props) {
-    const { id, user } = props;
+    const { id } = props;
+    const { user } = useContext(UserContext)
     // filter out albums this photo is already a part of
     const [availAlbums, setAvailAlbums] = useState([])
 
