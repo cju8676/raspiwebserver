@@ -32,7 +32,9 @@ export const mapByYear = (sorted) => {
         return <div className='year'>
             <Header as='h2'>{category.year}</Header>
             <Card.Group>
-                {category.panes.map(pane => pane)}
+                {category.panes
+                    .sort((a, b) => new Date(a.props.date) < new Date(b.props.date) ? 1 : -1)
+                    .map(pane => pane)}
             </Card.Group>
         </div>
     })
