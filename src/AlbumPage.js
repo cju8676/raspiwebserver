@@ -11,9 +11,7 @@ class AlbumPage extends Component {
         this.state = {
             albName: props.match.params.album,
             link_name_id_info: [],
-            files: [],
             open: false,
-            id_path: {}
         }
     }
 
@@ -34,38 +32,31 @@ class AlbumPage extends Component {
         
     }
 
-    fetchAlbumPhotos = () => {
-        //fixme if these are already previously fetched by gallery then we would just want to
-        // get those instead to be more efficient
-        // todo to do this we would change every /files/ instance to just the id, fetch
-        // id's from db first then use those id's to fetch /files/ 
-        fetch('/getAlbumPhotos/'+ this.context.user + '/' + this.props.match.params.album).then(response => response.json())
+    fetchAlbumPhotos = async () => {
+        var id_path = {};
+        await fetch('/getAlbumPhotos/'+ this.context.user + '/' + this.props.match.params.album).then(response => response.json())
             .then(JSONresponse => {
-                this.setState({files : JSON.parse(JSONresponse)})
-                for (let i = 0; i < this.state.files.length; i++) {
-                    //FIXME for some reason it doesn't like encoding / so i do it manually
-                    var path = (this.state.files[i].path).replace('/', '%2F');
-                    this.setState(prevState => ({
-                        ...prevState,
-                        id_path: {
-                            ...prevState.id_path,
-                            [this.state.files[i].id]:[path]
-                        }
-                    }))
-                    fetch('/files/' + this.state.files[i].id)
+                var files = JSON.parse(JSONresponse)
+                for (let i = 0; i < files.length; i++) {
+                    var path = (files[i].path).replace('/', '%2F');
+                    id_path[files[i].id] = path
+
+                    fetch('/files/' + files[i].id)
                         .then(response => response.blob())
                         .then(imageBlob => {
                             const imageURL = URL.createObjectURL(imageBlob);
+                            const isVideo = imageBlob.type === 'video/mp4' ? true : false
                             this.setState(prevState => ({
                                 ...prevState,
                                 link_name_id_info:
                                     [...prevState.link_name_id_info, 
                                         {
                                             link: imageURL,
-                                            name: this.state.files[i].name, 
-                                            id: this.state.files[i].id, 
-                                            info: this.state.id_path[this.state.files[i].id],
-                                            // info: path
+                                            name: files[i].name, 
+                                            id: files[i].id, 
+                                            info: id_path[files[i].id],
+                                            date: files[i].date,
+                                            video: isVideo
                                         }]
                             }));
                         })
@@ -99,10 +90,13 @@ class AlbumPage extends Component {
                             picture={picture.link} 
                             filename={picture.name} 
                             id={picture.id}
+                            key={picture.id}
                             albums={[]}
                             path={picture.info}
                             inAlbum={this.props.match.params.album}
                             refresh={this.props.onChange}
+                            date={picture.date}
+                            isVideo={picture.video}
                             />
                         })}
                     </Card.Group>

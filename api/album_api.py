@@ -48,7 +48,7 @@ class GetAlbumPhotos(Resource):
     def get(self, username, album_name):
         
         sql = """
-            SELECT f.name, f.filepath, f.id 
+            SELECT f.name, f.filepath, f.id, f.date
             FROM files f, albums a
             WHERE f.id = a.id
             AND a.username = %s
@@ -61,7 +61,8 @@ class GetAlbumPhotos(Resource):
                 {
                     "name": l[0],
                     "path": l[1],
-                    "id": l[2]
+                    "id": l[2],
+                    "date": l[3]
                 })
         return json.dumps(files_json)
 

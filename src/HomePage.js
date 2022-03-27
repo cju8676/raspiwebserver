@@ -37,7 +37,6 @@ class HomePage extends Component {
                         .then(imageBlob => {
                             const imageURL = URL.createObjectURL(imageBlob);
                             const isVideo = imageBlob.type === 'video/mp4' ? true : false
-                            if (isVideo) console.log(imageURL)
                             this.setState(prevState => ({
                                 ...prevState,
                                 link_name_id_info:
@@ -118,7 +117,9 @@ class HomePage extends Component {
                     inAlbum={false}
                     inFavs={true}
                     refresh={this.state.refresh}
-                    date={picture.date} />
+                    date={picture.date} 
+                    isVideo={picture.video}
+                    />
             })
 
         const imgCopy = [...img]
