@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Button, Icon, Card, Image, Modal, Divider, Confirm, Grid, Embed } from 'semantic-ui-react'
+import { Button, Icon, Card, Image, Modal, Divider, Confirm, Grid, Embed, Placeholder } from 'semantic-ui-react'
 // import PeopleTags from './PeopleTags'
 import MapContainer from '../MapContainer'
 import Tags from './Tags'
@@ -7,6 +7,7 @@ import People from './People'
 import AddToAlbumButton from './AddToAlbumButton'
 import ReactPlayer from 'react-player'
 import { UserContext } from '../UserContext'
+import handleViewport from 'react-in-viewport'
 
 class ImagePane extends Component {
     static contextType = UserContext;
@@ -28,6 +29,8 @@ class ImagePane extends Component {
             map: null,
 
             vidPreview: false,
+
+            loading: true
         }
     }
     open = () => this.setState({ open: true })
@@ -157,100 +160,126 @@ class ImagePane extends Component {
     componentDidMount() {
         // todo split info into its own component
         this.state.infoModal && this.fetchInfo();
+        // use this code to test loading
+        //setTimeout(() => {
+            this.setState({ loading: false })
+        //}, 3000)
     }
 
     render() {
+        // console.log(this.props.inViewport)
+        // console.log(this.props.enterCount)
         return (
-            <Card>
-                {this.props.isVideo && 
-                    <div onMouseEnter={() => this.setState({vidPreview:true})} onMouseLeave={() => this.setState({vidPreview:false})}>
-                        <ReactPlayer url={this.state.picture} playing={this.state.vidPreview} loop muted width='100%' /*height='100%'*/ />
-                    </div>
-                }
-                {!this.props.isVideo && <Image src={this.state.picture} alt="pic" />}
-                <Card.Content>
-                    <Modal
-                        open={this.state.infoModal}
-                        trigger={<Button onClick={this.toggleInfoModal}><Icon name='info' /></Button>}>
-                        <Modal.Content>
-                            <Grid columns={2} divided>
-                                <Grid.Column>
-                                    {this.props.isVideo && 
-                                    <div className='player-wrapper'>
-                                        <ReactPlayer
-                                            className='react-player' 
-                                            url={this.state.picture}
-                                            playing
-                                            loop
-                                            width='100%'
-                                            height='100%'
-                                        /> 
-                                    </div>
-                                    }
-                                    {!this.props.isVideo && <Image fluid src={this.state.picture} alt={this.state.name} />}
-                                    <Divider />
-                                    <a href={this.state.picture} download={this.state.name}>
-                                        <Button type="submit"><Icon name='download' />Save</Button>
-                                    </a>
-                                    <Button onClick={this.favorite}>
-                                        {!this.state.favorited && <Icon name='favorite' />}
-                                        {this.state.favorited && <Icon name='favorite' color='yellow' />}
-                                        Favorite
-                                    </Button>
-                                    {!this.props.inAlbum &&
-                                        <AddToAlbumButton
-                                            selectAlbum={this.selectAlbum}
-                                            id={this.state.id}
-                                        />}
-                                    {this.props.inAlbum &&
-                                        <Button color='red' onClick={this.open}>
-                                            Remove
-                                        </Button>}
-                                    <Confirm
-                                        open={this.state.open}
-                                        onCancel={this.close}
-                                        onConfirm={this.removeFromAlbum}
-                                        content='This will remove this file from the album'
-                                    />
-                                    <Divider />
-                                    {this.state.map !== null && <MapContainer lat={this.state.map.lat} long={this.state.map.long} />}
-                                </Grid.Column>
-                                <Grid.Column>
-                                    <h3>{this.state.name}</h3>
-                                    <Divider />
-                                    <Tags id={this.state.id} />
-                                    <Divider />
-                                    {/* <PeopleTags picture={this.state.picture} id={this.state.id} /> */}
-                                    {/* <Divider /> */}
-                                    <People id={this.state.id} />
-                                    <Divider />
-                                    <h2>Dimensions</h2>
-                                    {this.state.info[0]} x {this.state.info[1]}
-                                    <h2>Make</h2>
-                                    {this.state.info[2]}
-                                    <h2>Model</h2>
-                                    {this.state.info[3]}
-                                    {this.date()}
-                                    <Divider />
-                                    ID: {this.state.id}
-                                </Grid.Column>
-                            </Grid>
-                        </Modal.Content>
-                        <Modal.Actions>
-                            <Button color='black' onClick={this.toggleInfoModal}>Close</Button>
-                        </Modal.Actions>
-                    </Modal>
-                    <Button negative icon='trash' onClick={this.openDel}></Button>
-                    <Confirm
-                        open={this.state.openDel}
-                        onCancel={this.closeDel}
-                        onConfirm={this.delete}
-                        header='Delete File?'
-                        content='This will delete this file for EVERYONE! Are you sure you want to proceed?'
-                    />
-                </Card.Content>
-            </Card>
+            <div ref={this.props.forwardedRef}> {(this.props.inViewport || this.props.enterCount > 1)? (
+                <Card>
+                    {this.props.isVideo ? (
+                        <>
+                            {this.state.loading ? (
+                                <Placeholder><Placeholder.Image square /></Placeholder>
+                            ) : (
+                                <div onMouseEnter={() => this.setState({ vidPreview: true })} onMouseLeave={() => this.setState({ vidPreview: false })}>
+                                    <ReactPlayer url={this.state.picture} playing={this.state.vidPreview} loop muted width='100%' /*height='100%'*/ />
+                                </div>
+                            )}
+                        </>
+                    ) : (
+                        <>
+                            {this.state.loading ? (
+                                <Placeholder><Placeholder.Image square /></Placeholder>
+                            ) : (
+                                <Image src={this.state.picture} alt="pic" />
+                            )}
+                        </>
+                    )}
+                    <Card.Content>
+                        <Modal
+                            open={this.state.infoModal}
+                            trigger={<Button onClick={this.toggleInfoModal} disabled={this.state.loading}><Icon name='info' /></Button>}>
+                            <Modal.Content>
+                                <Grid columns={2} divided>
+                                    <Grid.Column>
+                                        {this.props.isVideo &&
+                                            <div className='player-wrapper'>
+                                                <ReactPlayer
+                                                    className='react-player'
+                                                    url={this.state.picture}
+                                                    playing
+                                                    loop
+                                                    width='100%'
+                                                    height='100%'
+                                                />
+                                            </div>
+                                        }
+                                        {!this.props.isVideo && <Image fluid src={this.state.picture} alt={this.state.name} />}
+                                        <Divider />
+                                        <a href={this.state.picture} download={this.state.name}>
+                                            <Button type="submit"><Icon name='download' />Save</Button>
+                                        </a>
+                                        <Button onClick={this.favorite}>
+                                            {!this.state.favorited && <Icon name='favorite' />}
+                                            {this.state.favorited && <Icon name='favorite' color='yellow' />}
+                                            Favorite
+                                        </Button>
+                                        {!this.props.inAlbum &&
+                                            <AddToAlbumButton
+                                                selectAlbum={this.selectAlbum}
+                                                id={this.state.id}
+                                            />}
+                                        {this.props.inAlbum &&
+                                            <Button color='red' onClick={this.open}>
+                                                Remove
+                                            </Button>}
+                                        <Confirm
+                                            open={this.state.open}
+                                            onCancel={this.close}
+                                            onConfirm={this.removeFromAlbum}
+                                            content='This will remove this file from the album'
+                                        />
+                                        <Divider />
+                                        {this.state.map !== null && <MapContainer lat={this.state.map.lat} long={this.state.map.long} />}
+                                    </Grid.Column>
+                                    <Grid.Column>
+                                        <h3>{this.state.name}</h3>
+                                        <Divider />
+                                        <Tags id={this.state.id} />
+                                        <Divider />
+                                        {/* <PeopleTags picture={this.state.picture} id={this.state.id} /> */}
+                                        {/* <Divider /> */}
+                                        <People id={this.state.id} />
+                                        <Divider />
+                                        <h2>Dimensions</h2>
+                                        {this.state.info[0]} x {this.state.info[1]}
+                                        <h2>Make</h2>
+                                        {this.state.info[2]}
+                                        <h2>Model</h2>
+                                        {this.state.info[3]}
+                                        {this.date()}
+                                        <Divider />
+                                        ID: {this.state.id}
+                                    </Grid.Column>
+                                </Grid>
+                            </Modal.Content>
+                            <Modal.Actions>
+                                <Button color='black' onClick={this.toggleInfoModal}>Close</Button>
+                            </Modal.Actions>
+                        </Modal>
+                        <Button negative icon='trash' onClick={this.openDel} disabled={this.state.loading}></Button>
+                        <Confirm
+                            open={this.state.openDel}
+                            onCancel={this.closeDel}
+                            onConfirm={this.delete}
+                            header='Delete File?'
+                            content='This will delete this file for EVERYONE! Are you sure you want to proceed?'
+                        />
+                    </Card.Content>
+                </Card>
+            ) : (
+                <Card><Placeholder><Placeholder.Image square /></Placeholder></Card>
+            )}
+            </div>
         )
     }
 }
-export default ImagePane
+const MyImagePane = handleViewport(ImagePane, /*options: {}, config{} */);
+
+export default MyImagePane
