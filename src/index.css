@@ -101,3 +101,7 @@ h1 {
   top: 0;
   left: 0;
 }
+
+.shared-with {
+  display: flex
+}

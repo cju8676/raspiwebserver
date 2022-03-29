@@ -51,10 +51,9 @@ class GetAlbumPhotos(Resource):
             SELECT f.name, f.filepath, f.id, f.date
             FROM files f, albums a
             WHERE f.id = a.id
-            AND a.username = %s
             AND a.album_name = %s;
         """
-        res = exec_get_all(sql, [username, album_name])
+        res = exec_get_all(sql, [album_name])
         files_json = []
         for l in res:
             files_json.append(
@@ -93,3 +92,27 @@ class RemoveFromAlbum(Resource):
             AND id = %s
         """
         return exec_commit(sql, (username, album_name, id))
+
+class GetAvailableShareUsers(Resource):
+    def get(self, album_name):
+        sql = """
+            SELECT username, name
+            FROM users
+            WHERE username NOT IN
+            (
+                SELECT username
+                FROM albums
+                WHERE album_name = %s
+            );
+        """
+        res = exec_get_all(sql, [album_name,])
+        print(res)
+        return res
+
+class AddUserToAlbum(Resource):
+    def post(self, album_name, new_user):
+        sql = """
+            INSERT INTO albums (username, album_name, id)
+            VALUES (%s, %s, -1)
+        """
+        return exec_commit(sql, [new_user, album_name])
