@@ -6,6 +6,7 @@ import AlbumsList from './AlbumsList'
 import ImagePane from './imagePackage/ImagePane'
 import { sortByYear, mapByYear, sortByMonth } from './imageUtils'
 import { UserContext } from './UserContext'
+import { toHaveDisplayValue } from '@testing-library/jest-dom/dist/matchers'
 
 class HomePage extends Component {
     static contextType = UserContext;
@@ -77,6 +78,12 @@ class HomePage extends Component {
             .then(JSONresponse => this.setState({ favs: JSONresponse.flat() }))
     }
 
+    // favs were updated - lets refetch
+    favorite = () => {
+        console.log("CALLED")
+        this.fetchFavorites();
+    }
+
     componentDidMount() {
         this.fetchAlbums();
         this.fetchFavorites();
@@ -100,6 +107,7 @@ class HomePage extends Component {
                 refresh={this.state.refresh}
                 date={picture.date}
                 isVideo={picture.video}
+                favorite={this.favorite}
             />
         })
 
@@ -119,6 +127,7 @@ class HomePage extends Component {
                     refresh={this.state.refresh}
                     date={picture.date}
                     isVideo={picture.video}
+                    favorite={this.favorite}
                 />
             })
 

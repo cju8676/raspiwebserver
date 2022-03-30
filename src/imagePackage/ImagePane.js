@@ -68,6 +68,7 @@ class ImagePane extends Component {
                 .then(response => response.json())
                 .then(this.fetchData)
         }
+        this.props.favorite();
     }
 
     fetchInfo = () => {
