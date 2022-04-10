@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Header, Button, Card, Divider, Confirm, Segment, Icon, Dropdown, Label } from 'semantic-ui-react'
 import ImagePane from './imagePackage/ImagePane';
+import SharePane from './SharePane';
 import { UserContext } from './UserContext';
 //import {withRouter} from 'react-router-dom'
 
@@ -15,8 +16,6 @@ class AlbumPage extends Component {
             confirmDelete: false,
             // is share Modal visible
             shareModal: false,
-            availShareUsers: [],
-            sharedWith: [],
         }
     }
 
@@ -30,7 +29,6 @@ class AlbumPage extends Component {
             .then(response => response.json())
             .then(JSONresponse =>
                 JSONresponse ? this.props.history.push('/home') : console.log("not del"))
-
     }
 
     fetchAlbumPhotos = async () => {
@@ -65,62 +63,9 @@ class AlbumPage extends Component {
             })
     }
 
-    // TODO track which person is owner
-    // if signed in user is owner of this album, they can delete a person off of album
-
-    // share this album to user
-    addUser = (user) => {
-        console.log(user)
-        const reqOptions = {
-            method: 'POST',
-            headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-        }
-        fetch('/shareAlbum/' + this.state.albName + '/' + user, reqOptions)
-            .then(response => response.json())
-            .then(JSONresponse =>
-                JSONresponse ? console.log("ADDED") : console.log("not ADDED"))
-        this.setState(prevState => ({
-            ...prevState,
-            availShareUsers: [...prevState.availShareUsers.filter(item => item[0] !== user)],
-            sharedWith: [...prevState.sharedWith, ...prevState.availShareUsers.find(i => i.includes(user))]
-        }))
-    }
-
-    //TODO track which person is with owner and make only them have privileges to delete
-    // any other person just tell them who the owner is
-
-
-    // fetch a list of users who are not yet able to view this album
-    async getAvailShareUsers() {
-        await fetch('/getAvailShareUsers/' + this.state.albName)
-            .then(res => res.json())
-            .then(JSONresponse => {
-                this.setState({ availShareUsers: JSONresponse })
-            })
-    }
-
-    // excluding the user logged in, get list of users that are shared on this album
-    async getSharedWith() {
-        console.log("enter ")
-        await fetch('/getSharedWith/' + this.state.albName + '/' + this.context.user)
-            .then(res => res.json())
-            .then(JSONresponse => {
-                this.setState({ sharedWith: JSONresponse })
-            })
-    }
-
     componentDidMount() {
         this.fetchAlbumPhotos();
     }
-
-    componentDidUpdate() {
-        //if it our first time opening shareModal then fetch availShareUsers
-        if (this.state.shareModal && this.state.availShareUsers.length === 0) {
-            this.getAvailShareUsers();
-            this.getSharedWith();
-        }
-    }
-
 
     // TODO if not owner then disable delete functionality
     render() {
@@ -139,40 +84,11 @@ class AlbumPage extends Component {
                         />
                     </Header>
                     <Divider />
-                    {this.state.shareModal &&
-                        <>
-                            <Segment>
-                                <div className='shared-with'>
-                                    <h4 style={{padding: "10px 10px 10px 10px"}}>Shared With:</h4>
-                                    <Label.Group style={{padding: "10px 10px 10px 0px"}}>
-                                        {/* <Label color='red'>
-                                            {"testing"}
-                                            <Icon name='delete' onClick={e => console.log(e)} />
-                                        </Label>
-                                        <Label color='red'>
-                                            {"tester"}
-                                            <Icon name='delete' onClick={e => console.log(e)} />
-                                        </Label> */}
-                                        {this.state.sharedWith && this.state.sharedWith.map(user => <Label>{`${user[1]} (${user[0]})`}</Label>)}
-                                    </Label.Group>
-                                </div>
-                                <Dropdown
-                                    text='Add User'
-                                    icon='add' selection labeled
-                                    options={this.state.availShareUsers}
-                                >
-                                    <Dropdown.Menu>
-                                        {this.state.availShareUsers.map(item => {
-                                            return <Dropdown.Item key={item[0]} text={`${item[1]} (${item[0]})`} onClick={() => this.addUser(item[0])} />
-                                        })}
-                                    </Dropdown.Menu>
-                                </Dropdown>
-                                <Divider />
-                                <Button color='red' onClick={() => this.setState({ shareModal: false })} content='Cancel' />
-                            </Segment>
-                            <Divider />
-                        </>
-                    }
+                    {this.state.shareModal && 
+                        <SharePane 
+                            albName={this.state.albName}
+                            closeModal={() => this.setState({ shareModal: false })}
+                        /> }
                     <Segment>
                         <div>
                             <Card.Group itemsPerRow={4}>
