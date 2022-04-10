@@ -30,7 +30,12 @@ class ImagePane extends Component {
 
             vidPreview: false,
 
-            loading: true
+            loading: true,
+            video: {
+                displayVidControls: false,
+                playing: true,
+                muted: false
+            }
         }
     }
     open = () => this.setState({ open: true })
@@ -163,7 +168,7 @@ class ImagePane extends Component {
         this.state.infoModal && this.fetchInfo();
         // use this code to test loading
         //setTimeout(() => {
-            this.setState({ loading: false })
+        this.setState({ loading: false })
         //}, 3000)
     }
 
@@ -171,7 +176,7 @@ class ImagePane extends Component {
         // console.log(this.props.inViewport)
         // console.log(this.props.enterCount)
         return (
-            <div ref={this.props.forwardedRef}> {(this.props.inViewport || this.props.enterCount > 1)? (
+            <div ref={this.props.forwardedRef}> {(this.props.inViewport || this.props.enterCount > 1) ? (
                 <Card>
                     {this.props.isVideo ? (
                         <>
@@ -200,15 +205,32 @@ class ImagePane extends Component {
                                 <Grid columns={2} divided>
                                     <Grid.Column>
                                         {this.props.isVideo &&
-                                            <div className='player-wrapper'>
-                                                <ReactPlayer
-                                                    className='react-player'
-                                                    url={this.state.picture}
-                                                    playing
-                                                    loop
-                                                    width='100%'
-                                                    height='100%'
-                                                />
+                                            <div
+                                                onMouseEnter={() => this.setState({ video: { ...this.state.video, displayVidControls: true } })}
+                                                onMouseLeave={() => this.setState({ video: { ...this.state.video, displayVidControls: false } })}
+                                            >
+                                                <div
+                                                    className='player-wrapper'
+                                                    onClick={() => this.setState({ video: { ...this.state.video, playing: !this.state.video.playing } })}
+                                                >
+                                                    <ReactPlayer
+                                                        className='react-player'
+                                                        url={this.state.picture}
+                                                        playing={this.state.video.playing}
+                                                        loop
+                                                        width='100%'
+                                                        height='100%'
+                                                        volume={null}
+                                                        muted={this.state.video.muted}
+                                                    />
+                                                </div>
+                                                {this.state.video.displayVidControls &&
+                                                    <>
+                                                        <Button onClick={() => this.setState({ video: { ...this.state.video, muted: !this.state.video.muted } })}>Mute</Button>
+                                                        <Button onClick={() => this.setState({ video: { ...this.state.video, playing: !this.state.video.playing } })}>Play/Pause</Button>
+                                                    </>
+                                                }
+
                                             </div>
                                         }
                                         {!this.props.isVideo && <Image fluid src={this.state.picture} alt={this.state.name} />}
