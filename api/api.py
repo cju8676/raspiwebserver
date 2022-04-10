@@ -3,9 +3,9 @@ from flask_restful import Resource, Api
 import urllib.parse
 from werkzeug.utils import secure_filename
 import imghdr
-
+from pprint import pprint
 from PIL import Image, ExifTags
-
+from tinytag import TinyTag
 from datetime import datetime
 
 from db_utils import *
@@ -48,6 +48,7 @@ def getpic(id):
 @app.route('/info/<path>/<filename>/<username>', methods=['GET'])
 def getinfo(path, filename, username):
     file_name = urllib.parse.unquote(filename)
+    directory = 'C:/Users/corey/' + urllib.parse.unquote(path) + '/'
     path_str = 'C:/Users/corey/' + urllib.parse.unquote(path) + '/' + file_name
     print(file_name[file_name.find('.'):])
 
@@ -100,6 +101,11 @@ def getinfo(path, filename, username):
     
     # otherwise gather video info
     else:
+        # video = TinyTag.get(path_str)
+        # print(video)
+        # print(video.year)
+        print(os.stat(path_str))
+        print(datetime.fromtimestamp(os.path.getatime(path_str)).strftime('%Y-%m-%d %H:%M:%S'))
         return jsonify(["---", "---", "---", "---", "---", None, []])
 
 
