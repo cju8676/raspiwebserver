@@ -109,6 +109,18 @@ class GetAvailableShareUsers(Resource):
         print(res)
         return res
 
+class GetSharedWith(Resource):
+    def get(self, album_name, user):
+        sql = """
+            SELECT u.username, u.name
+            FROM albums a, users u
+            WHERE a.album_name = %s
+            AND a.username <> %s
+            AND a.username = u.username
+        """
+        res = exec_get_all(sql, [album_name, user])
+        return res
+
 class AddUserToAlbum(Resource):
     def post(self, album_name, new_user):
         sql = """

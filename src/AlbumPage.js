@@ -15,7 +15,8 @@ class AlbumPage extends Component {
             confirmDelete: false,
             // is share Modal visible
             shareModal: false,
-            availShareUsers: []
+            availShareUsers: [],
+            sharedWith: [],
         }
     }
 
@@ -80,38 +81,32 @@ class AlbumPage extends Component {
                 JSONresponse ? console.log("ADDED") : console.log("not ADDED"))
         this.setState(prevState => ({
             ...prevState,
-            availShareUsers: [...prevState.availShareUsers.filter(item => item[0] !== user)]
-        }));
+            availShareUsers: [...prevState.availShareUsers.filter(item => item[0] !== user)],
+            sharedWith: [...prevState.sharedWith, ...prevState.availShareUsers.find(i => i.includes(user))]
+        }))
     }
 
     //TODO track which person is with owner and make only them have privileges to delete
     // any other person just tell them who the owner is
 
-    // fetch the list of users who has this album available to them, excluding the signed in user
-    // and then convert that into a list of tags that can be deleted
-    getSharedWith = () => {
-        // return tags where isOwner = true can delete people from viewing
-    }
 
     // fetch a list of users who are not yet able to view this album
     async getAvailShareUsers() {
         await fetch('/getAvailShareUsers/' + this.state.albName)
             .then(res => res.json())
             .then(JSONresponse => {
-                console.log(JSONresponse)
-                // const map = JSONresponse.map(arr => {
-                //     // name (username)
-                //     // const name = `${arr[1]} (${arr[0]})`
-                //     // return <Dropdown.Item key={arr[0]} text={"testing"} onClick={this.addUser} />
-                //     this.setState({availShareUsers :})
-                // })
-                // console.log(map)
-                // return map
                 this.setState({ availShareUsers: JSONresponse })
             })
-        // return [
-        //     {key: 'test', value: 'test', text: 'test'}
-        // ]
+    }
+
+    // excluding the user logged in, get list of users that are shared on this album
+    async getSharedWith() {
+        console.log("enter ")
+        await fetch('/getSharedWith/' + this.state.albName + '/' + this.context.user)
+            .then(res => res.json())
+            .then(JSONresponse => {
+                this.setState({ sharedWith: JSONresponse })
+            })
     }
 
     componentDidMount() {
@@ -122,6 +117,7 @@ class AlbumPage extends Component {
         //if it our first time opening shareModal then fetch availShareUsers
         if (this.state.shareModal && this.state.availShareUsers.length === 0) {
             this.getAvailShareUsers();
+            this.getSharedWith();
         }
     }
 
@@ -149,14 +145,15 @@ class AlbumPage extends Component {
                                 <div className='shared-with'>
                                     <h4 style={{padding: "10px 10px 10px 10px"}}>Shared With:</h4>
                                     <Label.Group style={{padding: "10px 10px 10px 0px"}}>
-                                        <Label color='red'>
+                                        {/* <Label color='red'>
                                             {"testing"}
                                             <Icon name='delete' onClick={e => console.log(e)} />
                                         </Label>
                                         <Label color='red'>
                                             {"tester"}
                                             <Icon name='delete' onClick={e => console.log(e)} />
-                                        </Label>
+                                        </Label> */}
+                                        {this.state.sharedWith && this.state.sharedWith.map(user => <Label>{`${user[1]} (${user[0]})`}</Label>)}
                                     </Label.Group>
                                 </div>
                                 <Dropdown
