@@ -5,7 +5,7 @@ from werkzeug.utils import secure_filename
 import imghdr
 from pprint import pprint
 from PIL import Image, ExifTags
-from tinytag import TinyTag
+# from tinytag import TinyTag
 from datetime import datetime
 
 from db_utils import *
@@ -13,6 +13,7 @@ from user_api import *
 from album_api import *
 from imagepane_api import *
 from utils import *
+import json
 
 UPLOAD_FOLDER='C:/Users/corey/Pictures/dbtest'
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg'}
@@ -85,19 +86,43 @@ def getinfo(path, filename, username):
             )
         """
         is_favorited = exec_get_one(sql, (username, urllib.parse.unquote(filename), urllib.parse.unquote(path)))[0]
+        gps_json = None
+        if len(gps_coords) != 0:
+            gps_json = {
+                    "lat" : gps_coords[0],
+                    "long" : gps_coords[1]
+                }
 
         if len(exifdata) == 0:
             # len wid --- --- --- tags
-            return jsonify([image.size[0], image.size[1], "---", "---", "---", is_favorited, gps_coords])
+            # return jsonify([image.size[0], image.size[1], "---", "---", "---", is_favorited, gps_coords])
+            return json.dumps({
+                "len" : image.size[0],
+                "wid" : image.size[1],
+                "make" : "---",
+                "model" : "---",
+                "date" : "---",
+                "isFavorited" : is_favorited,
+                "gps" : gps_json
+            })
         else:
             #print(datetime.strptime(exifdata[306], '%Y:%m:%d %H:%M:%S').strftime("%B %d, %Y -- %I:%M:%S %p"))
-            formatted = datetime.strptime(exifdata[306], '%Y:%m:%d %H:%M:%S').strftime("%B %d, %Y -- %I:%M:%S %p")
+            formatted = datetime.strptime(exifdata.get(306, "---"), '%Y:%m:%d %H:%M:%S').strftime("%B %d, %Y -- %I:%M:%S %p")
             make = exifdata.get(271, "---")
             model = exifdata.get(272, "---")
 
 
             # len wid make model datetime tags
-            return jsonify([image.size[0], image.size[1], make, model, formatted, is_favorited, gps_coords])
+            # return jsonify([image.size[0], image.size[1], make, model, formatted, is_favorited, gps_coords])
+            return json.dumps({
+                "len" : image.size[0],
+                "wid" : image.size[1],
+                "make" : make,
+                "model" : model,
+                "date" : formatted,
+                "isFavorited" : is_favorited,
+                "gps" : gps_json
+            })
     
     # otherwise gather video info
     else:
@@ -106,7 +131,16 @@ def getinfo(path, filename, username):
         # print(video.year)
         print(os.stat(path_str))
         print(datetime.fromtimestamp(os.path.getatime(path_str)).strftime('%Y-%m-%d %H:%M:%S'))
-        return jsonify(["---", "---", "---", "---", "---", None, []])
+        # return jsonify(["---", "---", "---", "---", "---", None, []])
+        return json.dumps({
+                "len" : "---",
+                "wid" :  "---",
+                "make" : "---",
+                "model" : "---",
+                "date" : "---",
+                "isFavorited" : None,
+                "gps" : None
+            })
 
 
 def allowed_file(filename):
@@ -161,7 +195,8 @@ def fileUpload():
     if exifdata is None:
         date = datetime.today()
     else:
-        date = datetime.strptime(dict(exifdata)[306], '%Y:%m:%d %H:%M:%S')
+        dict_exif = dict(exifdata)
+        date = datetime.strptime(dict_exif.get(306, datetime.today().strftime('%Y:%m:%d %H:%M:%S')), '%Y:%m:%d %H:%M:%S')
     # Save file to db
     sql = """
         INSERT INTO files (name, filepath, date)

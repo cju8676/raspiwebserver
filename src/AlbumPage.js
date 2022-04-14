@@ -69,6 +69,7 @@ class AlbumPage extends Component {
 
     // TODO if not owner then disable delete functionality
     render() {
+        console.log(this.props.match.params)
         return (
             <div>
                 <Segment>

@@ -1,13 +1,12 @@
 import React, { Component } from 'react'
-import { Button, Icon, Card, Image, Modal, Divider, Confirm, Grid, Embed, Placeholder } from 'semantic-ui-react'
-// import PeopleTags from './PeopleTags'
+import { Button, Icon, Card, Image, Modal, Divider, Confirm, Grid, Placeholder } from 'semantic-ui-react'
 import MapContainer from '../MapContainer'
-import Tags from './Tags'
-import People from './People'
 import AddToAlbumButton from './AddToAlbumButton'
 import ReactPlayer from 'react-player'
 import { UserContext } from '../UserContext'
 import handleViewport from 'react-in-viewport'
+import PaneMedia from './PaneMedia'
+import PaneInfo from './PaneInfo'
 
 class ImagePane extends Component {
     static contextType = UserContext;
@@ -19,32 +18,24 @@ class ImagePane extends Component {
             picture: props.picture,
             favorited: props.favorited,
             id: props.id,
-            infoModal: false,
-            // [len, wid, make, modal, datetime, [lat, long]]
-            info: [],
+            
+            // modals
+            infoModal: false,   // info panel
+            removeModal: false, // confirm remove from album
+            delModal: false,    // confirm delete from app
 
-            open: false,
-            openDel: false,
             refresh: props.refresh,
             map: null,
-
             vidPreview: false,
-
             loading: true,
-            video: {
-                displayVidControls: false,
-                playing: true,
-                muted: false
-            }
         }
     }
-    open = () => this.setState({ open: true })
 
-    openDel = () => this.setState({ openDel: true })
+    toggleRemoveModal = () => this.setState({ removeModal: !this.state.removeModal })
 
-    close = () => this.setState({ open: false })
+    toggleDelModal = () => this.setState({ delModal : !this.state.delModal })
 
-    closeDel = () => this.setState({ openDel: false })
+    toggleInfoModal = () => this.setState({ infoModal: !this.state.infoModal })
 
     favorite = () => {
         const data = {
@@ -76,39 +67,11 @@ class ImagePane extends Component {
         this.props.favorite();
     }
 
-    fetchInfo = () => {
-        fetch('/info/' + encodeURIComponent(this.props.path) + '/' + encodeURIComponent(this.state.name) + '/' + this.context.user)
-            .then(response => response.json())
-            .then(output => {
-                // var id = this.state.id;
-                // this.setState(prevState => ({
-                //     ...prevState,
-                //     id_info: {
-                //         ...prevState.id_info,
-                //         [id]: output
-                //     }
-                // }))
-                this.setState({ info: output });
-                this.setState({ favorited: Boolean(output[5]) })
-                if (output[6].length !== 0) this.setState({
-                    map: {
-                        lat: output[6][0],
-                        long: output[6][1]
-                    }
-                })
-            })
-    }
-
-    toggleInfoModal = () => {
-        this.fetchInfo();
-        this.setState({ infoModal: !this.state.infoModal })
-    }
-
     handleRemove = () => {
         console.log("handle remove")
-        this.props.inAlbum && this.close();
+        this.props.inAlbum && this.toggleRemoveModal();
         this.props.inAlbum && this.state.refresh(this.props.inAlbum);
-        !this.props.inAlbum && this.closeDel();
+        !this.props.inAlbum && this.toggleDelModal();
     }
 
     removeFromAlbum = () => {
@@ -144,28 +107,13 @@ class ImagePane extends Component {
             })
     }
 
-    date = () => {
-        if (this.state.info[4] === '---') {
-            return (
-                <>
-                    <h2>Date Uploaded</h2>
-                    {new Date(this.props.date).toDateString()}
-                </>
-            )
-        }
-        else {
-            return (
-                <>
-                    <h2>Date Taken</h2>
-                    {this.state.info[4]}
-                </>
-            )
-        }
-    }
+    // update favorited state from PaneInfo child
+    setFavorited = (boolean) => this.setState({ favorited: boolean })
+
+    // update map state from PaneInfo child
+    setMap = (mapObj) => this.setState({ map: mapObj })
 
     componentDidMount() {
-        // todo split info into its own component
-        this.state.infoModal && this.fetchInfo();
         // use this code to test loading
         //setTimeout(() => {
         this.setState({ loading: false })
@@ -173,8 +121,6 @@ class ImagePane extends Component {
     }
 
     render() {
-        // console.log(this.props.inViewport)
-        // console.log(this.props.enterCount)
         return (
             <div ref={this.props.forwardedRef}> {(this.props.inViewport || this.props.enterCount > 1) ? (
                 <Card>
@@ -204,36 +150,7 @@ class ImagePane extends Component {
                             <Modal.Content>
                                 <Grid columns={2} divided>
                                     <Grid.Column>
-                                        {this.props.isVideo &&
-                                            <div
-                                                onMouseEnter={() => this.setState({ video: { ...this.state.video, displayVidControls: true } })}
-                                                onMouseLeave={() => this.setState({ video: { ...this.state.video, displayVidControls: false } })}
-                                            >
-                                                <div
-                                                    className='player-wrapper'
-                                                    onClick={() => this.setState({ video: { ...this.state.video, playing: !this.state.video.playing } })}
-                                                >
-                                                    <ReactPlayer
-                                                        className='react-player'
-                                                        url={this.state.picture}
-                                                        playing={this.state.video.playing}
-                                                        loop
-                                                        width='100%'
-                                                        height='100%'
-                                                        volume={null}
-                                                        muted={this.state.video.muted}
-                                                    />
-                                                </div>
-                                                {this.state.video.displayVidControls &&
-                                                    <>
-                                                        <Button onClick={() => this.setState({ video: { ...this.state.video, muted: !this.state.video.muted } })}>Mute</Button>
-                                                        <Button onClick={() => this.setState({ video: { ...this.state.video, playing: !this.state.video.playing } })}>Play/Pause</Button>
-                                                    </>
-                                                }
-
-                                            </div>
-                                        }
-                                        {!this.props.isVideo && <Image fluid src={this.state.picture} alt={this.state.name} />}
+                                        <PaneMedia media={this.state.picture} name={this.state.name} isVideo={this.props.isVideo} />
                                         <Divider />
                                         <a href={this.state.picture} download={this.state.name}>
                                             <Button type="submit"><Icon name='download' />Save</Button>
@@ -243,53 +160,44 @@ class ImagePane extends Component {
                                             {this.state.favorited && <Icon name='favorite' color='yellow' />}
                                             Favorite
                                         </Button>
-                                        {!this.props.inAlbum &&
-                                            <AddToAlbumButton
-                                                selectAlbum={this.selectAlbum}
-                                                id={this.state.id}
-                                            />}
-                                        {this.props.inAlbum &&
-                                            <Button color='red' onClick={this.open}>
-                                                Remove
-                                            </Button>}
+                                        {
+                                            this.props.inAlbum ?
+                                                (
+                                                    <Button color='red' onClick={this.toggleRemoveModal} content='Remove' />
+                                                ) : (
+                                                    <AddToAlbumButton
+                                                        selectAlbum={this.selectAlbum}
+                                                        id={this.state.id}
+                                                    />
+                                                )
+                                        }
                                         <Confirm
-                                            open={this.state.open}
-                                            onCancel={this.close}
+                                            open={this.state.removeModal}
+                                            onCancel={this.toggleInfoModal}
                                             onConfirm={this.removeFromAlbum}
                                             content='This will remove this file from the album'
                                         />
                                         <Divider />
                                         {this.state.map !== null && <MapContainer lat={this.state.map.lat} long={this.state.map.long} />}
                                     </Grid.Column>
-                                    <Grid.Column>
-                                        <h3>{this.state.name}</h3>
-                                        <Divider />
-                                        <Tags id={this.state.id} />
-                                        <Divider />
-                                        {/* <PeopleTags picture={this.state.picture} id={this.state.id} /> */}
-                                        {/* <Divider /> */}
-                                        <People id={this.state.id} />
-                                        <Divider />
-                                        <h2>Dimensions</h2>
-                                        {this.state.info[0]} x {this.state.info[1]}
-                                        <h2>Make</h2>
-                                        {this.state.info[2]}
-                                        <h2>Model</h2>
-                                        {this.state.info[3]}
-                                        {this.date()}
-                                        <Divider />
-                                        ID: {this.state.id}
-                                    </Grid.Column>
+                                    <PaneInfo
+                                        setFavorited={this.setFavorited}
+                                        setMap={this.setMap}
+                                        path={this.props.path}
+                                        name={this.state.name}
+                                        date={this.props.date}
+                                        id={this.state.id}
+                                    />
                                 </Grid>
                             </Modal.Content>
                             <Modal.Actions>
                                 <Button color='black' onClick={this.toggleInfoModal}>Close</Button>
                             </Modal.Actions>
                         </Modal>
-                        <Button negative icon='trash' onClick={this.openDel} disabled={this.state.loading}></Button>
+                        <Button negative icon='trash' onClick={this.toggleDelModal} disabled={this.state.loading}></Button>
                         <Confirm
-                            open={this.state.openDel}
-                            onCancel={this.closeDel}
+                            open={this.state.delModal}
+                            onCancel={this.toggleDelModal}
                             onConfirm={this.delete}
                             header='Delete File?'
                             content='This will delete this file for EVERYONE! Are you sure you want to proceed?'
