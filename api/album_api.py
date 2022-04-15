@@ -51,7 +51,8 @@ class GetAlbumPhotos(Resource):
             SELECT f.name, f.filepath, f.id, f.date
             FROM files f, albums a
             WHERE f.id = a.id
-            AND a.album_name = %s;
+            AND a.album_name = %s
+            ORDER BY f.date DESC;
         """
         res = exec_get_all(sql, [album_name])
         files_json = []

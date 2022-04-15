@@ -32,6 +32,10 @@ h1 {
   padding: 25px 0px 25px
 }
 
+.month {
+  padding: 25px 0px 25px
+}
+
 .settings {
   overflow-y: auto;
   height: 80vh;

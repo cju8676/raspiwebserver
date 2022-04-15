@@ -75,6 +75,7 @@ class UploadFileModal extends Component {
 
     handleChange(event) {
 
+        
         // get all non-unique file names in array of filenames
         // count accumulates an object of names to their count in given array
         const count = names =>
@@ -88,6 +89,9 @@ class UploadFileModal extends Component {
 
         // FileList => Array
         var filesArray = Array.from(event.target.files);
+
+
+
         // parse for live photos
         // get names along with truncating file extension
         const filenames = filesArray.map(i => i.name.replace(/\.[^/.]+$/, ""))

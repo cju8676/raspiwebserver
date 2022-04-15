@@ -99,16 +99,18 @@ export const mapByYear = (sorted) => {
         return <div className='year'>
             <Header as='h2'>{group.year}</Header>
             <>
-                {group.months.map(subgroup => {
-                    return <div>
-                        <Header as='h3'>{MONTHS_MAPPING[subgroup.month]}</Header>
-                        <Card.Group>
-                            {subgroup.panes
-                                .sort((a, b) => new Date(a.props.date) < new Date(b.props.date) ? 1 : -1)
-                                .map(pane => pane)}
-                        </Card.Group>
-                    </div>
-                })}
+                {group.months
+                    .sort((a, b) => a.month < b.month ? 1 : -1)
+                    .map(subgroup => {
+                        return <div className='month'>
+                            <Header as='h3'>{MONTHS_MAPPING[subgroup.month]}</Header>
+                            <Card.Group>
+                                {subgroup.panes
+                                    .sort((a, b) => new Date(a.props.date) < new Date(b.props.date) ? 1 : -1)
+                                    .map(pane => pane)}
+                            </Card.Group>
+                        </div>
+                    })}
             </>
         </div>
     })

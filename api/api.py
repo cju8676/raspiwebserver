@@ -4,7 +4,7 @@ import urllib.parse
 from werkzeug.utils import secure_filename
 import imghdr
 from pprint import pprint
-from PIL import Image, ExifTags
+from PIL import Image, ExifTags, GifImagePlugin
 # from tinytag import TinyTag
 from datetime import datetime
 
@@ -57,7 +57,11 @@ def getinfo(path, filename, username):
     if(imghdr.what(path_str) is not None):
 
         image = Image.open(path_str)
-        exif = image._getexif()
+        exif = None
+        if(isinstance(image, GifImagePlugin.GifImageFile)):
+            exifdata = {}
+        else: 
+            exif = image._getexif()
         if exif is not None:
             exifdata = dict(exif)
         else:
@@ -183,7 +187,10 @@ def fileUpload():
     file_location = target + '/' + filename
     if(file.content_type[0:5] == 'image'):
         exif = Image.open(file_location)
-        exifdata = exif._getexif()
+        if(isinstance(exif, GifImagePlugin.GifImageFile)):
+            exifdata = None
+        else:
+            exifdata = exif._getexif()
     elif(file.content_type[0:5] == 'video'):
         #todo extract date info from vid
         exifdata = None

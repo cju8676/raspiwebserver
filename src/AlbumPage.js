@@ -93,7 +93,9 @@ class AlbumPage extends Component {
                     <Segment>
                         <div>
                             <Card.Group itemsPerRow={4}>
-                                {this.state.link_name_id_info.map(picture => {
+                                {this.state.link_name_id_info
+                                .sort((a, b) => new Date(a.date) < new Date(b.date) ? 1 : -1)
+                                .map(picture => {
                                     return <ImagePane
                                         picture={picture.link}
                                         filename={picture.name}
