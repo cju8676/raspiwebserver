@@ -1,121 +1,106 @@
-import React, { Component } from 'react'
-import { Header, Button, Card, Divider, Confirm, Segment, Icon, Dropdown, Label } from 'semantic-ui-react'
+import React, { useState, useEffect, useContext } from 'react'
+import { Header, Button, Card, Divider, Confirm, Segment, Icon } from 'semantic-ui-react'
 import ImagePane from './imagePackage/ImagePane';
 import SharePane from './SharePane';
 import { UserContext } from './UserContext';
 //import {withRouter} from 'react-router-dom'
 
-class AlbumPage extends Component {
-    static contextType = UserContext
-    constructor(props) {
-        super(props);
-        this.state = {
-            albName: props.match.params.album,
-            link_name_id_info: [],
-            // is confirm dialog open
-            confirmDelete: false,
-            // is share Modal visible
-            shareModal: false,
-        }
-    }
+export default function AlbumPage(props) {
+    const { user, files } = useContext(UserContext)
+    const albName = props.match.params.album;
+    // is confirm dialog open
+    const [confirmDelete, setConfirmDelete] = useState(false);
+    // is share Modal visible
+    const [shareModal, setShareModal] = useState(false);
+    const [albIDs, setAlbIDs] = useState([])
+    const [img, setImg] = useState([])
 
-    deleteAlbum = () => {
-        this.setState({ confirmDelete: false })
+    const deleteAlbum = () => {
+        setConfirmDelete(false);
         const reqOptions = {
             method: 'POST',
             headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
         }
-        fetch('/delAlbum/' + this.context.user + '/' + this.props.match.params.album, reqOptions)
+        fetch('/delAlbum/' + user + '/' + albName, reqOptions)
             .then(response => response.json())
             .then(JSONresponse =>
-                JSONresponse ? this.props.history.push('/home') : console.log("not del"))
+                JSONresponse ? props.history.push('/home') : console.log("not del"))
     }
 
-    fetchAlbumPhotos = async () => {
-        var id_path = {};
-        await fetch('/getAlbumPhotos/' + this.context.user + '/' + this.props.match.params.album).then(response => response.json())
+    useEffect(async () => {
+        // returns the IDs of the image panes we need to extract
+        await fetch('/getAlbumPhotos/' + user + '/' + albName)
+            .then(response => response.json())
             .then(JSONresponse => {
-                var files = JSON.parse(JSONresponse)
-                for (let i = 0; i < files.length; i++) {
-                    var path = (files[i].path).replace('/', '%2F');
-                    id_path[files[i].id] = path
-
-                    fetch('/files/' + files[i].id)
-                        .then(response => response.blob())
-                        .then(imageBlob => {
-                            const imageURL = URL.createObjectURL(imageBlob);
-                            const isVideo = imageBlob.type === 'video/mp4' ? true : false
-                            this.setState(prevState => ({
-                                ...prevState,
-                                link_name_id_info:
-                                    [...prevState.link_name_id_info,
-                                    {
-                                        link: imageURL,
-                                        name: files[i].name,
-                                        id: files[i].id,
-                                        info: id_path[files[i].id],
-                                        date: files[i].date,
-                                        video: isVideo
-                                    }]
-                            }));
-                        })
-                }
+                setAlbIDs(JSONresponse
+                    .flat()
+                    .filter(i => i !== -1)    
+                )
             })
-    }
 
-    componentDidMount() {
-        this.fetchAlbumPhotos();
+    }, []);
+
+    useEffect(() => {
+        setImg(
+            files
+                .filter(i => albIDs.includes(i.id))
+                .sort((a, b) => new Date(a.date) < new Date(b.date) ? 1 : -1)
+                .map(picture => {
+                    return <ImagePane
+                        picture={picture.link}
+                        filename={picture.name}
+                        id={picture.id}
+                        key={picture.id}
+                        albums={[]}
+                        path={picture.info}
+                        inAlbum={albName}
+                        updateAlb={updateAlb}
+                        date={picture.date}
+                        isVideo={picture.video}
+                    />
+                })
+        )
+    }, [files, albIDs])
+
+    // id was either added or removed from favs, update AlbumPage accordingly
+    const updateAlb = (id) => {
+        // removed case
+        if (albIDs.includes(id))
+            setAlbIDs([...albIDs].filter(i => i !== id))
+        // added case
+        else
+            setAlbIDs([...albIDs, id])
     }
 
     // TODO if not owner then disable delete functionality
-    render() {
-        console.log(this.props.match.params)
-        return (
-            <div>
+    return (
+        <div>
+            <Segment>
+                <Header>
+                    <Button color='orange' size='large' href='#home'>Back</Button>
+                    {albName}
+                    <Button color='red' size='large' floated='right' onClick={() => setConfirmDelete(!confirmDelete)}>Delete</Button>
+                    <Button color='blue' size='large' floated='right' onClick={() => setShareModal(!shareModal)}><Icon name='share' />Share</Button>
+                    <Confirm
+                        open={confirmDelete}
+                        onCancel={() => setConfirmDelete(false)}
+                        onConfirm={deleteAlbum}
+                    />
+                </Header>
+                <Divider />
+                {shareModal &&
+                    <SharePane
+                        albName={albName}
+                        closeModal={() => setShareModal(false)}
+                    />}
                 <Segment>
-                    <Header>
-                        <Button color='orange' size='large' href='#home'>Back</Button>
-                        {this.state.albName}
-                        <Button color='red' size='large' floated='right' onClick={() => this.setState({ confirmDelete: !this.state.confirmDelete })}>Delete</Button>
-                        <Button color='blue' size='large' floated='right' onClick={() => this.setState({ shareModal: !this.state.shareModal })}><Icon name='share' />Share</Button>
-                        <Confirm
-                            open={this.state.confirmDelete}
-                            onCancel={() => this.setState({ confirmDelete: false })}
-                            onConfirm={this.deleteAlbum}
-                        />
-                    </Header>
-                    <Divider />
-                    {this.state.shareModal && 
-                        <SharePane 
-                            albName={this.state.albName}
-                            closeModal={() => this.setState({ shareModal: false })}
-                        /> }
-                    <Segment>
-                        <div>
-                            <Card.Group itemsPerRow={4}>
-                                {this.state.link_name_id_info
-                                .sort((a, b) => new Date(a.date) < new Date(b.date) ? 1 : -1)
-                                .map(picture => {
-                                    return <ImagePane
-                                        picture={picture.link}
-                                        filename={picture.name}
-                                        id={picture.id}
-                                        key={picture.id}
-                                        albums={[]}
-                                        path={picture.info}
-                                        inAlbum={this.props.match.params.album}
-                                        refresh={this.props.onChange}
-                                        date={picture.date}
-                                        isVideo={picture.video}
-                                    />
-                                })}
-                            </Card.Group>
-                        </div>
-                    </Segment>
+                    <div>
+                        <Card.Group itemsPerRow={4}>
+                            {img.map(pane => pane)}
+                        </Card.Group>
+                    </div>
                 </Segment>
-            </div>
-        )
-    }
+            </Segment>
+        </div>
+    )
 }
-
-export default AlbumPage;

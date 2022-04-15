@@ -24,7 +24,6 @@ class ImagePane extends Component {
             removeModal: false, // confirm remove from album
             delModal: false,    // confirm delete from app
 
-            refresh: props.refresh,
             map: null,
             vidPreview: false,
             loading: true,
@@ -49,7 +48,7 @@ class ImagePane extends Component {
         }
         if (this.state.favorited) {
             this.setState({ favorited: false })
-            this.props.inFavs && this.props.refresh();
+            this.props.inFavs && this.props.inFavs(this.state.id)
             // delete where user and picture id
             const getUrl = '/removeFav/' + this.context.user + '/' + this.state.id
             fetch(getUrl, reqOptions)
@@ -64,13 +63,12 @@ class ImagePane extends Component {
                 .then(response => response.json())
                 .then(this.fetchData)
         }
-        this.props.favorite();
     }
 
     handleRemove = () => {
         console.log("handle remove")
         this.props.inAlbum && this.toggleRemoveModal();
-        this.props.inAlbum && this.state.refresh(this.props.inAlbum);
+        this.props.inAlbum && this.props.updateAlb(this.state.id);
         !this.props.inAlbum && this.toggleDelModal();
     }
 

@@ -48,23 +48,11 @@ class GetAlbumPhotos(Resource):
     def get(self, username, album_name):
         
         sql = """
-            SELECT f.name, f.filepath, f.id, f.date
-            FROM files f, albums a
-            WHERE f.id = a.id
-            AND a.album_name = %s
-            ORDER BY f.date DESC;
+            SELECT id
+            FROM albums
+            WHERE album_name = %s;
         """
-        res = exec_get_all(sql, [album_name])
-        files_json = []
-        for l in res:
-            files_json.append(
-                {
-                    "name": l[0],
-                    "path": l[1],
-                    "id": l[2],
-                    "date": l[3]
-                })
-        return json.dumps(files_json)
+        return exec_get_all(sql, [album_name])
 
 class DeleteAlbum(Resource):
     def post(self, username, album_name):

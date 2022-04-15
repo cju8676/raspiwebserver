@@ -3,10 +3,7 @@ import { Header, Tab, Icon, Button } from 'semantic-ui-react'
 import Gallery from './galleryPackage/Gallery'
 import Favorited from './Favorited'
 import AlbumsList from './AlbumsList'
-import ImagePane from './imagePackage/ImagePane'
-import { sortByYear, mapByYear, sortByMonth } from './imageUtils'
 import { UserContext } from './UserContext'
-import { toHaveDisplayValue } from '@testing-library/jest-dom/dist/matchers'
 
 class HomePage extends Component {
     static contextType = UserContext;
@@ -17,43 +14,7 @@ class HomePage extends Component {
             currentName: JSON.parse(localStorage.getItem('name')) || null,
             logout: props.onChange,
             refresh: props.onRefresh,
-            link_name_id_info: [],
-            filesLen: -1,
-            favs: []
         }
-    }
-
-    fetchPictures = async () => {
-        var id_path = {};
-        await fetch('/getAllImages/').then(response => response.json())
-            .then(JSONresponse => {
-                var files = JSON.parse(JSONresponse)
-                this.setState({ filesLen: files.length })
-                for (let i = 0; i < files.length; i++) {
-                    var path = (files[i].path).replace('/', '%2F');
-                    id_path[files[i].id] = path
-
-                    fetch('/files/' + files[i].id)
-                        .then(response => response.blob())
-                        .then(imageBlob => {
-                            const imageURL = URL.createObjectURL(imageBlob);
-                            const isVideo = imageBlob.type === 'video/mp4' ? true : false
-                            this.setState(prevState => ({
-                                ...prevState,
-                                link_name_id_info:
-                                    [...prevState.link_name_id_info,
-                                    {
-                                        link: imageURL,
-                                        name: files[i].name,
-                                        id: files[i].id,
-                                        info: id_path[files[i].id],
-                                        date: files[i].date,
-                                        video: isVideo
-                                    }]
-                            }));
-                        })
-                }
-            })
     }
 
     //todo use for loading
@@ -65,89 +26,7 @@ class HomePage extends Component {
     //     }
     // }
 
-    fetchAlbums = () => {
-        fetch('/getAlbums/' + this.context.user).then(response => response.json())
-            .then(JSONresponse => {
-                this.setState({ albums: JSONresponse })
-            })
-    }
-
-    // returns the IDs of the image panes we need to extract
-    fetchFavorites = () => {
-        fetch('/getFavoriteIDs/' + this.context.user).then(res => res.json())
-            .then(JSONresponse => this.setState({ favs: JSONresponse.flat() }))
-    }
-
-    // favs were updated - lets refetch
-    favorite = () => {
-        console.log("CALLED")
-        this.fetchFavorites();
-    }
-
-    componentDidMount() {
-        this.fetchAlbums();
-        this.fetchFavorites();
-        this.fetchPictures();
-    }
-
     render() {
-        let name = this.context.name;
-
-        if (this.state.filesLen === -1) return <></>
-
-        const img = this.state.link_name_id_info.map(picture => {
-            return <ImagePane
-                picture={picture.link}
-                filename={picture.name}
-                id={picture.id}
-                key={picture.id}
-                albums={this.state.albums}
-                path={picture.info}
-                inAlbum={false}
-                refresh={this.state.refresh}
-                date={picture.date}
-                isVideo={picture.video}
-                favorite={this.favorite}
-            />
-        })
-
-        const favs = this.state.link_name_id_info
-            .filter(item => this.state.favs.includes(item.id))
-            .map(picture => {
-                return <ImagePane
-                    picture={picture.link}
-                    filename={picture.name}
-                    id={picture.id}
-                    key={picture.id}
-                    favorited='true'
-                    albums={this.state.albums}
-                    path={picture.info}
-                    inAlbum={false}
-                    inFavs={true}
-                    refresh={this.state.refresh}
-                    date={picture.date}
-                    isVideo={picture.video}
-                    favorite={this.favorite}
-                />
-            })
-
-        const imgCopy = [...img]
-
-        var cardGroups = []
-        // for the side bar
-        var years = []
-
-        if (img.length === this.state.filesLen) {
-            const sortedPanes = sortByYear(img);
-            var sortedByMonth = [];
-            for (const year of sortedPanes) {
-                sortedByMonth.push(sortByMonth(year))
-            }
-            console.log(sortedByMonth);
-            years = sortedPanes.map(obj => obj.year)
-            cardGroups = mapByYear(sortedByMonth);
-        }
-
         const panes = [
             {
                 menuItem: 'Gallery',
@@ -155,9 +34,7 @@ class HomePage extends Component {
                     return <Tab.Pane attached={false}>
                         <Gallery
                             onRefresh={this.state.refresh}
-                            img={imgCopy}
-                            cardGroups={cardGroups}
-                            years={years}
+                            albums={this.state.albums}
                         />
                     </Tab.Pane>
                 }
@@ -166,7 +43,10 @@ class HomePage extends Component {
                 menuItem: 'Favorites',
                 render: () => {
                     return <Tab.Pane attached={false}>
-                        <Favorited favs={favs} />
+                        <Favorited
+                            albums={this.state.albums}
+                            onRefresh={this.state.refresh}
+                        />
                     </Tab.Pane>
                 }
             },
@@ -183,7 +63,7 @@ class HomePage extends Component {
             <div>
                 <Header as='h2'>
                     <div>
-                        Welcome, {name}.
+                        Welcome, {this.context.name}.
 
                         <Button href='#settings' floated='right' size='large'>
                             <Icon name='setting' />
