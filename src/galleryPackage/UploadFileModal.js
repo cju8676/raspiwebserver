@@ -84,7 +84,7 @@ class UploadFileModal extends Component {
     }
 
     // takes in Array of Files
-    // modifies state such that folders will include
+    // returns folders will include
     // array of objects containing Files sorted by folder
     // { name: "", files: [File, File, ..., File] }
     sortBulkUpload = (filesArray) => {
@@ -98,7 +98,7 @@ class UploadFileModal extends Component {
             const folder = this.getFolder(f.webkitRelativePath)
             // we have not seen this folder name yet, add it and push
             if (!sorted.some(f => f.name === folder)) {
-                sorted.push({ name: folder , files: [f]})
+                sorted.push({ name: folder, files: [f] })
             }
             // we have seen this folder name - add it to its respective object's array
             else {
@@ -108,6 +108,20 @@ class UploadFileModal extends Component {
         console.log("SORTED", sorted)
         // this.setState({ folders: sorted })
         return sorted
+    }
+
+    // takes in Array of Files
+    // returns Array of Files
+    // that are supported by the application
+    filterUnsupportedFiles = (filesArray) => {
+        const supported = ["jpeg", "jpg", "jfif", "gif", "mp4"]
+        return filesArray.filter(file => 
+            supported.includes(
+                file.name
+                    .split('.')
+                    .pop()
+                    .toLowerCase())
+            )
     }
 
     handleChange(event) {
@@ -126,10 +140,10 @@ class UploadFileModal extends Component {
 
         // FileList => Array
         var filesArray = Array.from(event.target.files);
-        
+
         // Sort our upload into folders to be displayed
-        
-        this.setState({ folders : this.sortBulkUpload(filesArray) })
+
+        this.setState({ folders: this.sortBulkUpload(this.filterUnsupportedFiles(filesArray)) })
 
 
         // parse for live photos
@@ -190,7 +204,7 @@ class UploadFileModal extends Component {
                         <Form onSubmit={this.handleUploadImage}>
                             <Header>Select File</Header>
                             <input type="file" onChange={this.handleChange} ref={(ref) => { this.uploadInput = ref; }} />
-                            <UploadPreview uploadFiles={this.state.file}/>
+                            <UploadPreview uploadFiles={this.state.file} />
                             <Divider />
                             <Container>
                                 <Tags id={'-2'} />
