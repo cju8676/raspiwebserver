@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
-import { Modal, Button, Form, Container, Header, Divider, Image, Tab } from 'semantic-ui-react'
+import { Modal, Button, Form, Container, Header, Divider, Image, Tab, Segment } from 'semantic-ui-react'
 import Tags from '../imagePackage/Tags';
 import People from '../imagePackage/People';
 import LivePhoto from '../LivePhoto';
+import UploadPreview from './UploadPreview';
 
 class UploadFileModal extends Component {
     constructor(props) {
@@ -11,10 +12,12 @@ class UploadFileModal extends Component {
             uploadFile: false,
             refresh: props.onRefresh,
             file: null,
-            // array of normal files URLs
+            // array of URLs with names [{name: '', url: ''}, ...]
             files: [],
             // array of objects : { vid: url, img: url }
             livePhotos: [],
+            // array of folders : { name: "", files: [File, File, File]}
+            folders: [],
         }
         this.handleChange = this.handleChange.bind(this)
     }
@@ -23,6 +26,7 @@ class UploadFileModal extends Component {
         this.setState({ uploadFile: !this.state.uploadFile })
         this.setState({ file: null })
         this.setState({ files: [] })
+        this.setState({ folders: [] })
         this.deleteUploadTags();
     }
 
@@ -73,9 +77,42 @@ class UploadFileModal extends Component {
         this.state.refresh();
     }
 
+    // parse webkitRelativePath up to
+    // the last forward slash and return that
+    getFolder = (path) => {
+        return path.substring(0, path.lastIndexOf('/'))
+    }
+
+    // takes in Array of Files
+    // modifies state such that folders will include
+    // array of objects containing Files sorted by folder
+    // { name: "", files: [File, File, ..., File] }
+    sortBulkUpload = (filesArray) => {
+        if (filesArray.length === 0) return;
+        var sorted = [];
+        var files = [...filesArray];
+        // iterate through files adding each of its respective object's array
+        while (files.length !== 0) {
+            const f = files.pop()
+            // get folder name
+            const folder = this.getFolder(f.webkitRelativePath)
+            // we have not seen this folder name yet, add it and push
+            if (!sorted.some(f => f.name === folder)) {
+                sorted.push({ name: folder , files: [f]})
+            }
+            // we have seen this folder name - add it to its respective object's array
+            else {
+                sorted.find(f => f.name === folder).files.push(f)
+            }
+        }
+        console.log("SORTED", sorted)
+        // this.setState({ folders: sorted })
+        return sorted
+    }
+
     handleChange(event) {
 
-        
+
         // get all non-unique file names in array of filenames
         // count accumulates an object of names to their count in given array
         const count = names =>
@@ -89,7 +126,10 @@ class UploadFileModal extends Component {
 
         // FileList => Array
         var filesArray = Array.from(event.target.files);
-
+        
+        // Sort our upload into folders to be displayed
+        
+        this.setState({ folders : this.sortBulkUpload(filesArray) })
 
 
         // parse for live photos
@@ -120,13 +160,16 @@ class UploadFileModal extends Component {
         console.log("files array now here", filesArray)
         if (filesArray.length > 1) {
             for (var i = 0; i < filesArray.length; i++) {
-                console.log(filesArray[i])
+                const name = filesArray[i]["name"]
                 const url = URL.createObjectURL(filesArray[i])
-                console.log("url ", url)
                 this.setState(prevState => ({
                     ...prevState,
                     files:
-                        [...prevState.files, url]
+                        [...prevState.files, {
+
+                            name: name,
+                            url: url
+                        }]
                 }))
             }
         }
@@ -138,7 +181,7 @@ class UploadFileModal extends Component {
     }
 
     render() {
-
+        console.log("fiiles", this.state.files)
         const tabs = [
             {
                 menuItem: 'Single File Upload',
@@ -147,8 +190,7 @@ class UploadFileModal extends Component {
                         <Form onSubmit={this.handleUploadImage}>
                             <Header>Select File</Header>
                             <input type="file" onChange={this.handleChange} ref={(ref) => { this.uploadInput = ref; }} />
-                            <Header>Preview:</Header>
-                            <Image size="large" src={this.state.file} />
+                            <UploadPreview uploadFiles={this.state.file}/>
                             <Divider />
                             <Container>
                                 <Tags id={'-2'} />
@@ -170,10 +212,7 @@ class UploadFileModal extends Component {
                         <Form onSubmit={this.handleUploadFolder}>
                             <Header>Select FOLDER</Header>
                             <input type="file" directory="" webkitdirectory="" onChange={this.handleChange} ref={(ref) => { this.uploadInput = ref; }} />
-                            <Header>Preview:</Header>
-                            <div className='previewImgs'>
-                                {this.state.files.length > 0 && this.state.files.map(file => <Image size="small" src={file} />)}
-                            </div>
+                            <UploadPreview uploadFiles={this.state.files} folders={this.state.folders} isBulk={true} />
                             <div className='previewImgs'>
                                 {this.state.livePhotos.length > 0 && this.state.livePhotos.map(obj => <LivePhoto vid={obj.vid} img={obj.img} />)}
                             </div>

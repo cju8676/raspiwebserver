@@ -73,6 +73,7 @@ function SearchBar(props) {
       onSearchChange={handleSearchChange}
       results={results}
       value={value}
+      onFocus={() => {console.log("focus")}}
     />
     //   </Grid.Column>
 

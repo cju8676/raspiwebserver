@@ -58,7 +58,6 @@ export default function Gallery(props) {
             for (const year of sortedPanes) {
                 sortedByMonth.push(sortByMonth(year))
             }
-            console.log(sortedByMonth);
             setYears(
                 [].concat(sortedPanes.map(obj => obj.year))
                     .sort((a, b) => a < b ? 1 : -1)
