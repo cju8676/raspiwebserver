@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from 'react'
-import { Divider, Header, Card } from 'semantic-ui-react'
+import { Divider, Header, Card, Message } from 'semantic-ui-react'
 import UploadFileModal from './UploadFileModal'
 import SearchBar from '../SearchBar'
 import { UserContext } from '../UserContext';
@@ -17,17 +17,30 @@ export default function Gallery(props) {
     const [cardGroups, setCardGroups] = useState([]);
     const prevScrollY = useRef(0);
     const [goingUp, setGoingUp] = useState(false);
+    const [noResults, setNoResultsMessage] = useState(false)
 
     //fixme maximum update depth exceeded
     function searchResults(val) {
+        console.log("val ", val)
+        console.log("img", img)
         setSearchInput(val);
     }
 
     useEffect(() => {
-        if (searchInput === "") setShownImg([])
+        if (searchInput === "") {
+            setShownImg([])
+            setNoResultsMessage(false)
+        }
         else {
             const filter = img.filter(pic => pic.props.filename.includes(searchInput))
-            setShownImg(filter);
+            if (filter.length > 0) {
+                setShownImg(filter)
+                setNoResultsMessage(false)
+            }
+            else {
+                setShownImg([])
+                setNoResultsMessage(true);
+            }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchInput])
@@ -48,12 +61,12 @@ export default function Gallery(props) {
             />
         }))
 
-        
+
     }, [files])
 
     useEffect(() => {
         if (img.length > 0) {
-            const sortedPanes = sortByYear(img);
+            const sortedPanes = sortByYear([...img]);
             var sortedByMonth = [];
             for (const year of sortedPanes) {
                 sortedByMonth.push(sortByMonth(year))
@@ -91,6 +104,10 @@ export default function Gallery(props) {
             <Divider />
             <div className='gallery-scroll' onScroll={onScroll}>
                 <div className='gallery'>
+                    {noResults &&
+                        <div style={{ padding: "10px 5px" }}>
+                            <Message negative floating compact content="No results found." />
+                        </div>}
                     <div>
                         <Card.Group stackable itemsPerRow={4}>
                             {shownImg.map(picture => picture)}

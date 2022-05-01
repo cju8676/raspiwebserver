@@ -1,91 +1,55 @@
-import React from 'react'
-import { Search, /*Grid, Header, Segment*/ } from 'semantic-ui-react'
-
-
-const initialState = {
-  loading: false,
-  results: [],
-  value: '',
-}
-
-function exampleReducer(state, action) {
-  switch (action.type) {
-    case 'CLEAN_QUERY':
-      return initialState
-    case 'START_SEARCH':
-      return { ...state, loading: true, value: action.query }
-    case 'FINISH_SEARCH':
-      return { ...state, loading: false, results: action.results }
-    case 'UPDATE_SELECTION':
-      return { ...state, value: action.selection }
-
-    default:
-      throw new Error()
-  }
-}
+import React, { useState, useCallback, useEffect, useRef } from 'react'
+import { Input, Dropdown } from 'semantic-ui-react'
 
 function SearchBar(props) {
-  const [state, dispatch] = React.useReducer(exampleReducer, initialState)
-  const { loading, results, value } = state
+  const [value, setValue] = useState('')
+  const [loading, setLoading] = useState(false);
   const { onChange, source } = props;
 
-  const timeoutRef = React.useRef()
-  const handleSearchChange = React.useCallback((e, data) => {
+  const timeoutRef = useRef()
+  const handleSearchChange = useCallback((e, data) => {
     clearTimeout(timeoutRef.current)
-    dispatch({ type: 'START_SEARCH', query: data.value })
+    setLoading(true);
+    setValue(data.value);
 
     timeoutRef.current = setTimeout(() => {
       if (data.value.length === 0) {
-        dispatch({ type: 'CLEAN_QUERY' })
+        setLoading(false)
+        setValue('')
         return
       }
 
-      const result = source.filter(src => src.props.filename.includes(data.value))
-      // const guy = source[0]
-      // console.log(guy)
-
-      dispatch({
-        type: 'FINISH_SEARCH',
-        results: result.map(res => {
-          return { "title": res.props.filename, "image": res.props.picture }
-        }
-        ),
-      })
+      //const result = source.filter(src => src.props.filename.includes(data.value))
+      setLoading(false)
     }, 300)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   onChange(value)
-  React.useEffect(() => {
+  useEffect(() => {
     return () => {
       clearTimeout(timeoutRef.current)
     }
   }, [])
 
-  return (
-    // <Grid>
-    //   <Grid.Column width={6}>
-    <Search
-      loading={loading}
-      placeholder='Search...'
-      onResultSelect={(e, data) =>
-        dispatch({ type: 'UPDATE_SELECTION', selection: data.result.title })
-      }
-      onSearchChange={handleSearchChange}
-      results={results}
-      value={value}
-      onFocus={() => {console.log("focus")}}
-    />
-    //   </Grid.Column>
+  const options = [
+    { key: 'filename', text: 'Filename', value: 'filename' },
+    { key: 'tag', text: 'Tag', value: 'tag' },
+    { key: 'person', text: 'Person', value: 'person' },
+    { key: 'type', text: 'Type', value: 'type' },
+  ]
 
-    //   <Grid.Column width={10}>
-    // <Segment>
-    //   <Header>State</Header>
-    //   <pre style={{ overflowX: 'auto' }}>
-    // {JSON.stringify({ loading, results, value }, null, 2)}
-    //   </pre>
-    // </Segment>
-    //   </Grid.Column>
-    // </Grid>
+  //TODO if tag or person or TYPE, multiple select
+
+  return (
+    <Input
+      icon='search'
+      iconPosition='left'
+      action={<Dropdown floating selection basic compact options={options} defaultValue='filename' />}
+      placeholder='Search...'
+      loading={loading}
+      size="small"
+      onChange={handleSearchChange}
+    />
   )
 }
 
