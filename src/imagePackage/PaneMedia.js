@@ -1,17 +1,17 @@
 import React, { useState } from 'react'
 import ReactPlayer from 'react-player'
 import handleViewport from 'react-in-viewport'
-import { Button, Icon, Card, Image, Modal, Divider, Confirm, Grid, Placeholder } from 'semantic-ui-react'
+import { Button, Image } from 'semantic-ui-react'
 
 // Our media that presents itself in the top left of our ImagePane
-const PaneMedia = (props) => {
+const PaneMedia = ({ isVideo, media, name}) => {
 
     /* Controls if the media is a video */
     const [displayVidControls, setControlsVisible] = useState(false);
     const [muted, setMuted] = useState(false);
     const [playing, setPlaying] = useState(true);
 
-    return props.isVideo ? (
+    return isVideo ? (
         <div
             onMouseEnter={() => setControlsVisible(true)}
             onMouseLeave={() => setControlsVisible(false)}
@@ -22,7 +22,7 @@ const PaneMedia = (props) => {
             >
                 <ReactPlayer
                     className='react-player'
-                    url={props.media}
+                    url={media}
                     playing={playing}
                     loop
                     width='100%'
@@ -39,7 +39,7 @@ const PaneMedia = (props) => {
             }
         </div>
     ) : (
-        <Image fluid src={props.media} alt={props.name} />)
+        <Image fluid src={media} alt={name} />)
 }
 
 const MyPaneMedia = handleViewport(PaneMedia, /*options: {}, config{} */);

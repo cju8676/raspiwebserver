@@ -2,14 +2,13 @@ import React from 'react'
 import { Header, Image, Segment } from 'semantic-ui-react'
 
 // Component to handle the preview section of the UploadFileModal
-export default function UploadPreview(props) {
-    const { uploadFiles, folders } = props;
+export default function UploadPreview({ uploadFiles, folders, isBulk }) {
 
     // todo save folder to album
     console.log(uploadFiles)
     console.log(folders)
 
-    return props.isBulk ? (
+    return isBulk ? (
         <>
             <Header>Preview:</Header>
             {folders.length > 0 &&
@@ -31,7 +30,7 @@ export default function UploadPreview(props) {
     ) : (
         <>
             <Header>Preview:</Header>
-            <Image size="large" src={props.uploadFiles} />
+            <Image size="large" src={uploadFiles} />
         </>
     )
 }

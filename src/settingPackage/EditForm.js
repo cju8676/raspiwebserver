@@ -2,27 +2,27 @@ import { React, useState, useContext } from "react"
 import { Button, Segment, Input, Label, Divider, Dropdown } from 'semantic-ui-react'
 import { UserContext } from "../UserContext";
 
-export default function EditForm(props) {
+export default function EditForm({ name, updateName, updateColor, update, toggle, visible, tagName, tagColor, errorMsg }) {
     const { user } = useContext(UserContext)
     const [blank, setBlank] = useState(false);
     const [colorBlank, setColorBlank] = useState(false)
     const [error, setError] = useState(false);
     const [updateInfo, setUpdateInfo] = useState("")
     // applicable to tags
-    const [updateColor, setUpdateColor] = useState("")
+    const [newColor, setNewColor] = useState("")
 
     function handleUpdate(e, output) {
         console.log(e, output)
         if (output) {
-            if (props.name === 'Tag') {
-                props.updateName(updateInfo);
-                props.updateColor(updateColor);
-                setUpdateColor("");
+            if (name === 'Tag') {
+                updateName(updateInfo);
+                updateColor(newColor);
+                setNewColor("");
             }
             else 
-                props.update(e, updateInfo);
+                update(e, updateInfo);
             setUpdateInfo("");
-            props.toggle();
+            toggle();
         }
         else {
             setBlank(true);
@@ -31,12 +31,12 @@ export default function EditForm(props) {
     }
 
     function submitUpdate() {
-        if (props.name === 'Tag' && ( updateInfo === "" || updateColor === "")) {
+        if (name === 'Tag' && ( updateInfo === "" || newColor === "")) {
             if (updateInfo === "") setBlank(true)
-            if (updateColor === "") setColorBlank(true);
+            if (newColor === "") setColorBlank(true);
             return;
         }
-        if (props.visible && updateInfo === "") {
+        if (visible && updateInfo === "") {
             setBlank(true);
             return;
         }
@@ -45,9 +45,9 @@ export default function EditForm(props) {
             new_name: updateInfo,
             
             // if tag
-            new_color: updateColor,
-            old_name: props.tagName,
-            old_color: props.tagColor
+            new_color: newColor,
+            old_name: tagName,
+            old_color: tagColor
         }
         console.log(data)
         const reqOptions = {
@@ -55,10 +55,10 @@ export default function EditForm(props) {
             headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         }
-        fetch(`/update${props.name}/`, reqOptions).then(res => res.json())
+        fetch(`/update${name}/`, reqOptions).then(res => res.json())
             .then(output => {
                 //todo handle success pop up
-                handleUpdate(props.name, output)
+                handleUpdate(name, output)
             }
             )
 
@@ -90,7 +90,7 @@ export default function EditForm(props) {
 
     function handleDrop(e, data) {
         if (data.id === 'enteredColor') {
-            setUpdateColor(data.value)
+            setNewColor(data.value)
             setColorBlank(false);
         }
     }
@@ -98,14 +98,14 @@ export default function EditForm(props) {
     return (
         <div>
             <Segment>
-                <h4>Edit {props.name}</h4>
-                <Input type='text' id={'entered' + props.name} placeholder={props.name} onChange={update} error={blank} />
-                {error && <Label pointing='left' color='red'>{props.errorMsg}</Label>}
-                {props.name === 'Tag' &&
+                <h4>Edit {name}</h4>
+                <Input type='text' id={'entered' + name} placeholder={name} onChange={update} error={blank} />
+                {error && <Label pointing='left' color='red'>{errorMsg}</Label>}
+                {name === 'Tag' &&
                     <Dropdown placeholder='Color' search selection options={options} id='enteredColor' onChange={handleDrop} error={colorBlank} />
                 }
                 <Divider />
-                <Button color='black' onClick={props.toggle}>Cancel</Button>
+                <Button color='black' onClick={toggle}>Cancel</Button>
                 <Button positive onClick={submitUpdate}>Confirm</Button>
             </Segment>
         </div>

@@ -3,8 +3,7 @@ import { Card } from 'semantic-ui-react'
 import { UserContext } from "./UserContext";
 import ImagePane from "./imagePackage/ImagePane";
 
-export default function Favorited(props) {
-    const { albums, onRefresh } = props;
+export default function Favorited({ albums, onRefresh }) {
     const { user, files } = useContext(UserContext)
     const [favs, setFavs] = useState([])
     const [favorited, setFavorited] = useState([])

@@ -2,12 +2,10 @@ import react, { useEffect, useState } from "react";
 import { Label, Icon, Button, Divider } from "semantic-ui-react";
 import EditForm from "./EditForm";
 
-export default function TagRow(props) {
-
-    const { name, color } = props
+export default function TagRow({ name, color, delTag }) {
     const [confirm, setConf] = useState(false);
-    const [labelName, setLabelName]= useState(props.name)
-    const [labelColor, setLabelColor] = useState(props.color)
+    const [labelName, setLabelName]= useState(name)
+    const [labelColor, setLabelColor] = useState(color)
     const [buttonColor, setColor] = useState('red');
     //todo fake loading for now
     const [loading, setLoading] = useState(false);
@@ -27,7 +25,7 @@ export default function TagRow(props) {
         if (loading) {
             const timer = setTimeout(() => {
                 console.log("simulate end loading")
-                props.delTag(name, color)
+                delTag(name, color)
                 setColor('red')
                 setConf(false)
                 setLoading(false)

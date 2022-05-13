@@ -5,8 +5,7 @@ import Tags from './Tags';
 import People from './People';
 
 // Right hand Grid column of our ImagePane's infoModal
-export default function PaneInfo(props) {
-    const { name, path, id } = props;
+export default function PaneInfo({ name, path, id, setFavorited, setMap, date }) {
     const { user } = useContext(UserContext)
     // todo verify this works then convert to object instead of array
     //{len, wid, make, modal, datetime, [lat, long]}
@@ -17,21 +16,21 @@ export default function PaneInfo(props) {
             .then(response => response.json())
             .then(output => {
                 setInfo(output);
-                props.setFavorited(Boolean(output.isFavorited))
+                setFavorited(Boolean(output.isFavorited))
                 if (output.gps) 
-                    props.setMap({
+                    setMap({
                         lat: output.gps.lat,
                         long: output.gps.long
                     })
             })
     }, []);
 
-    const date = () => {
+    const getDate = () => {
         if (info.date === '---') {
             return (
                 <>
                     <h2>Date Uploaded</h2>
-                    {new Date(props.date).toDateString()}
+                    {new Date(date).toDateString()}
                 </>
             )
         }
@@ -59,7 +58,7 @@ export default function PaneInfo(props) {
             {info.make}
             <h2>Model</h2>
             {info.model}
-            {date()}
+            {getDate}
             <Divider />
             ID: {id}
         </Grid.Column>

@@ -342,3 +342,13 @@ class UpdateTag(Resource):
         """
 
         return str(exec_commit(sql, (new_name, new_color, old_name, old_color)))
+
+class GetAllTags(Resource):
+    def get(self):
+        sql = """
+            SELECT name, id, color, people, owner
+            FROM tags
+            WHERE id <> -1
+        """
+        res = exec_get_all(sql, ())
+        return res

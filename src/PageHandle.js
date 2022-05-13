@@ -12,6 +12,8 @@ export default function PageHandle(props) {
     const [currentUser, setCurrentUser] = useState(JSON.parse(localStorage.getItem('user')) || null);
     const [currentName, setCurrentName] = useState(JSON.parse(localStorage.getItem('name')) || null);
     const [files, setFiles] = useState([]);
+    // contains array of: { name: "", color: "", isPerson: boolean, ids: [], owner: "" }
+    const [tags, setTags] = useState([]);
 
     function handleUserChange(output) {
         console.log(output)
@@ -45,7 +47,6 @@ export default function PageHandle(props) {
     }, [currentName])
 
     useEffect(async () => {
-        console.log("one time")
         var id_path = {};
         await fetch('/getAllImages/').then(response => response.json())
             .then(JSONresponse => {
@@ -77,9 +78,32 @@ export default function PageHandle(props) {
             })
     }, [])
 
+    useEffect(async() => {
+        var tagArray = []
+        await fetch('/getAllTags/').then(res => res.json())
+            .then(JSONresponse => {
+                console.log("json res ", JSONresponse)
+                // arr - [name, id, color, people, owner]
+                JSONresponse.forEach(arr => {
+                    const inTagArr = tagArray.find(t => t.name === arr[0])
+                    if (inTagArr)
+                        inTagArr.ids.push(arr[1])
+                    else
+                        tagArray.push({
+                            name: arr[0],
+                            color: arr[2],
+                            isPerson: Boolean(parseInt(arr[3])),
+                            owner: arr[4],
+                            ids: [arr[1]]
+                        })
+                })
+            })
+        setTags(tagArray)
+    }, [])
+
     return (
         <HashRouter>
-            <UserContext.Provider value={{ user: currentUser, name: currentName, files }}>
+            <UserContext.Provider value={{ user: currentUser, name: currentName, files, tags }}>
                 {currentUser ? <Redirect to="/home" /> : <Redirect to={redirect} />}
                 <Route path="/login" component={(props) => <LoginScreen newUser={currentUser} onChange={handleUserChange} />} />
                 <Route path="/home" component={(props) => <HomePage onChange={handleLogout} onRefresh={handleHomeRefresh} />} />

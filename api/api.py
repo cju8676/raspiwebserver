@@ -263,6 +263,7 @@ api.add_resource(DeletePersonOverall, '/deletePersonOverall/<string:name>/<strin
 api.add_resource(GetAvailableShareUsers, '/getAvailShareUsers/<string:album_name>')
 api.add_resource(AddUserToAlbum, '/shareAlbum/<string:album_name>/<string:new_user>')
 api.add_resource(GetSharedWith, '/getSharedWith/<string:album_name>/<string:user>')
+api.add_resource(GetAllTags, '/getAllTags/')
 
 if __name__ == '__main__':
     print("Starting Flask backend")

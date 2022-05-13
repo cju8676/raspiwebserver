@@ -4,9 +4,7 @@ import ReactPlayer from 'react-player';
 import { Image } from 'semantic-ui-react';
 
 
-const LivePhoto = (props) => {
-
-    const { vid, img } = props;
+const LivePhoto = ({ vid, img }) => {
     const [live, setLive] = useState(false)
 
     return (

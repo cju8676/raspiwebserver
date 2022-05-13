@@ -2,8 +2,7 @@ import React, { useState, useEffect, useContext } from 'react'
 import { Label, Icon, Dropdown, Segment, Input, Button } from 'semantic-ui-react'
 import { UserContext } from '../UserContext';
 
-export default function People(props) {
-    const { id, bulk } = props;
+export default function People({ id, bulk }) {
     const { user } = useContext(UserContext)
 
     const options = [
@@ -28,7 +27,7 @@ export default function People(props) {
     const [nameBlank, setNameBlank] = useState(false);
     const [colorBlank, setColorBlank] = useState(false);
     const [newTag, setNewTag] = useState({ name: "", color: "" });
-    
+
     useEffect(() => {
         fetch('/getPeople/' + id).then(response => response.json())
             .then(jsonOutput => {
@@ -36,7 +35,7 @@ export default function People(props) {
                     setPeople(jsonOutput)
                 else setPeople([])
             })
-            // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     useEffect(() => {
@@ -44,7 +43,7 @@ export default function People(props) {
             .then(jsonOutput => {
                 setAvailPeople(jsonOutput)
             })
-            // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     function delTag(per) {

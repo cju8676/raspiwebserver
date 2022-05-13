@@ -2,8 +2,7 @@ import { React, useState, useEffect, useContext } from 'react'
 import { Label, Segment, Dropdown, Divider, Button } from 'semantic-ui-react'
 import { UserContext } from './UserContext';
 
-export default function SharePane(props) {
-    const { albName, closeModal } = props;
+export default function SharePane({ albName, closeModal }) {
     const { user } = useContext(UserContext)
     const [availShareUsers, setAvailShareUsers] = useState([])
     const [sharedWith, setSharedWith] = useState([])

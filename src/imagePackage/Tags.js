@@ -2,8 +2,7 @@ import React, { useState, useEffect, useContext } from 'react'
 import { Label, Icon, Dropdown, Segment, Input, Button } from 'semantic-ui-react';
 import { UserContext } from '../UserContext';
 
-export default function Tags(props) {
-    const { id, bulk } = props;
+export default function Tags({ id, bulk }) {
     const { user } = useContext(UserContext)
 
     const options = [
@@ -37,7 +36,7 @@ export default function Tags(props) {
                 }
                 else setTags([]);
             })
-            // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     useEffect(() => {
@@ -45,7 +44,7 @@ export default function Tags(props) {
             .then(jsonOutput => {
                 setAvailTags(jsonOutput)
             })
-            // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
 
@@ -135,11 +134,6 @@ export default function Tags(props) {
                 setColorBlank(false)
             })
     }
-
-    // useEffect(() => {
-    //     console.log("rendered again");
-    //     console.log(tags)
-    // }, [tags])
 
     return (
         <div>

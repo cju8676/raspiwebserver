@@ -7,9 +7,8 @@ import { sortByYear, mapByYear, sortByMonth } from '../imageUtils'
 import ImagePane from '../imagePackage/ImagePane'
 
 
-export default function Gallery(props) {
-    const { onRefresh, albums } = props;
-    const { user, files } = useContext(UserContext)
+export default function Gallery({ onRefresh, albums }) {
+    const { user, files, tags } = useContext(UserContext)
     const [shownImg, setShownImg] = useState([])
     const [searchInput, setSearchInput] = useState("");
     const [img, setImg] = useState([]);
@@ -18,11 +17,13 @@ export default function Gallery(props) {
     const prevScrollY = useRef(0);
     const [goingUp, setGoingUp] = useState(false);
     const [noResults, setNoResultsMessage] = useState(false)
+    const [category, setCategory] = useState('filename')
 
     //fixme maximum update depth exceeded
-    function searchResults(val) {
+    function searchResults(val, category) {
         console.log("val ", val)
-        console.log("img", img)
+        console.log("img", img);
+        setCategory(category)
         setSearchInput(val);
     }
 
@@ -32,18 +33,59 @@ export default function Gallery(props) {
             setNoResultsMessage(false)
         }
         else {
-            const filter = img.filter(pic => pic.props.filename.includes(searchInput))
-            if (filter.length > 0) {
-                setShownImg(filter)
-                setNoResultsMessage(false)
-            }
-            else {
-                setShownImg([])
-                setNoResultsMessage(true);
+            switch (category) {
+                case 'filename':
+                    const filter = img.filter(pic => pic.props.filename.includes(searchInput))
+                    if (filter.length > 0) {
+                        setShownImg(filter)
+                        setNoResultsMessage(false)
+                    }
+                    else {
+                        setShownImg([])
+                        setNoResultsMessage(true);
+                    }
+                    return;
+                case 'tag':
+                    // get tags by name and ensure they are NOT people tags
+                    const shownTags = tags.filter(tag => tag.name.includes(searchInput) && !tag.isPerson)
+                    console.log("shown ", shownTags)
+                    // get ids from each tag, flatten into one array, filter out duplicates
+                    const ids = [...new Set(shownTags.map(tag => tag.ids).flat())]
+                    // filter images based on ids we have gathered
+                    const shownImgByTag = img.filter(pic => ids.includes(pic.props.id))
+                    setShownImg(shownImgByTag)
+                    if (shownImgByTag.length > 0) {
+                        setShownImg(shownImgByTag)
+                        setNoResultsMessage(false)
+                    }
+                    else {
+                        setShownImg([])
+                        setNoResultsMessage(true);
+                    }
+                    return;
+                case 'person':
+                    // get tags by name and ensure they ARE people tags
+                    const shownPeople = tags.filter(tag => tag.name.includes(searchInput) && tag.isPerson)
+                    // get ids from each tag, flatten into one array, filter out duplicates
+                    const peopleIds = [...new Set(shownPeople.map(tag => tag.ids).flat())]
+                    // filter images based on ids we have gathered
+                    const shownImgByPerson = img.filter(pic => peopleIds.includes(pic.props.id))
+                    setShownImg(shownImgByPerson)
+                    if (shownImgByPerson.length > 0) {
+                        setShownImg(shownImgByPerson)
+                        setNoResultsMessage(false)
+                    }
+                    else {
+                        setShownImg([])
+                        setNoResultsMessage(true);
+                    }
+                    return;
+                case 'type':
+                    setShownImg([])
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [searchInput])
+    }, [searchInput, category])
 
     useEffect(() => {
         setImg(files.map(picture => {

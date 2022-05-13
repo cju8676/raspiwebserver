@@ -1,10 +1,12 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react'
-import { Input, Dropdown } from 'semantic-ui-react'
+import React, { useState, useCallback, useEffect, useRef, useContext } from 'react'
+import { Input, Dropdown, Menu } from 'semantic-ui-react'
+import { UserContext } from './UserContext';
 
-function SearchBar(props) {
+function SearchBar({onChange, source}) {
   const [value, setValue] = useState('')
   const [loading, setLoading] = useState(false);
-  const { onChange, source } = props;
+  const [category, setCategory] = useState('filename')
+  const { files, tags } = useContext(UserContext);
 
   const timeoutRef = useRef()
   const handleSearchChange = useCallback((e, data) => {
@@ -24,7 +26,7 @@ function SearchBar(props) {
     }, 300)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-  onChange(value)
+  onChange(value, category)
   useEffect(() => {
     return () => {
       clearTimeout(timeoutRef.current)
@@ -40,16 +42,36 @@ function SearchBar(props) {
 
   //TODO if tag or person or TYPE, multiple select
 
+  // TODO a get all tags and get all people call and add to global state
+
+  useEffect(() => {
+    console.log("cat updated", category)
+  }, [category])
+
   return (
+    <>
     <Input
-      icon='search'
-      iconPosition='left'
-      action={<Dropdown floating selection basic compact options={options} defaultValue='filename' />}
-      placeholder='Search...'
-      loading={loading}
-      size="small"
-      onChange={handleSearchChange}
-    />
+        icon='search'
+        iconPosition='left'
+        action={<Dropdown floating selection basic compact options={options} defaultValue='filename' onChange={(e, { value }) => setCategory(value)} />}
+        placeholder='Search...'
+        loading={loading}
+        size="small"
+        onChange={handleSearchChange}
+      />
+      {category === 'tag' &&
+        <div>Showing files with Tag(s): </div>
+      }
+      {category === 'person' &&
+        <div>Showing files with Person Tag(s): </div>
+      }
+      {category === 'type' &&
+      <>
+        <h6 style={{margin: "1px"}}>Ex: 'photo', '.gif', 'live', etc.</h6>
+        <div>Showing files of Type: </div>
+      </>
+      }
+    </>
   )
 }
 
