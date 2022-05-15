@@ -109,3 +109,7 @@ h1 {
 .shared-with {
   display: flex
 }
+
+.search {
+  display: flex
+}

@@ -18,6 +18,7 @@ export default function Gallery({ onRefresh, albums }) {
     const [goingUp, setGoingUp] = useState(false);
     const [noResults, setNoResultsMessage] = useState(false)
     const [category, setCategory] = useState('filename')
+    const [shownTags, setShownTags] = useState([])
 
     //fixme maximum update depth exceeded
     function searchResults(val, category) {
@@ -30,6 +31,7 @@ export default function Gallery({ onRefresh, albums }) {
     useEffect(() => {
         if (searchInput === "") {
             setShownImg([])
+            setShownTags([])
             setNoResultsMessage(false)
         }
         else {
@@ -42,6 +44,7 @@ export default function Gallery({ onRefresh, albums }) {
                     }
                     else {
                         setShownImg([])
+                        setShownTags([])
                         setNoResultsMessage(true);
                     }
                     return;
@@ -49,6 +52,7 @@ export default function Gallery({ onRefresh, albums }) {
                     // get tags by name and ensure they are NOT people tags
                     const shownTags = tags.filter(tag => tag.name.includes(searchInput) && !tag.isPerson)
                     console.log("shown ", shownTags)
+                    setShownTags(shownTags)
                     // get ids from each tag, flatten into one array, filter out duplicates
                     const ids = [...new Set(shownTags.map(tag => tag.ids).flat())]
                     // filter images based on ids we have gathered
@@ -60,12 +64,14 @@ export default function Gallery({ onRefresh, albums }) {
                     }
                     else {
                         setShownImg([])
+                        setShownTags([])
                         setNoResultsMessage(true);
                     }
                     return;
                 case 'person':
                     // get tags by name and ensure they ARE people tags
                     const shownPeople = tags.filter(tag => tag.name.includes(searchInput) && tag.isPerson)
+                    setShownTags(shownPeople)
                     // get ids from each tag, flatten into one array, filter out duplicates
                     const peopleIds = [...new Set(shownPeople.map(tag => tag.ids).flat())]
                     // filter images based on ids we have gathered
@@ -77,6 +83,7 @@ export default function Gallery({ onRefresh, albums }) {
                     }
                     else {
                         setShownImg([])
+                        setShownTags([])
                         setNoResultsMessage(true);
                     }
                     return;
@@ -140,7 +147,7 @@ export default function Gallery({ onRefresh, albums }) {
             <div>
                 <Header as='h3'>
                     <UploadFileModal onRefresh={onRefresh} user={user} />
-                    <SearchBar onChange={searchResults} source={img} />
+                    <SearchBar onChange={searchResults} source={img} shownTags={shownTags}/>
                 </Header>
             </div>
             <Divider />

@@ -1,8 +1,8 @@
 import React, { useState, useCallback, useEffect, useRef, useContext } from 'react'
-import { Input, Dropdown, Menu } from 'semantic-ui-react'
+import { Input, Dropdown, Label, Grid } from 'semantic-ui-react'
 import { UserContext } from './UserContext';
 
-function SearchBar({onChange, source}) {
+function SearchBar({ onChange, source, shownTags }) {
   const [value, setValue] = useState('')
   const [loading, setLoading] = useState(false);
   const [category, setCategory] = useState('filename')
@@ -50,7 +50,7 @@ function SearchBar({onChange, source}) {
 
   return (
     <>
-    <Input
+      <Input
         icon='search'
         iconPosition='left'
         action={<Dropdown floating selection basic compact options={options} defaultValue='filename' onChange={(e, { value }) => setCategory(value)} />}
@@ -59,17 +59,21 @@ function SearchBar({onChange, source}) {
         size="small"
         onChange={handleSearchChange}
       />
-      {category === 'tag' &&
-        <div>Showing files with Tag(s): </div>
-      }
-      {category === 'person' &&
-        <div>Showing files with Person Tag(s): </div>
+      {(category === 'tag' || category === 'person') &&
+        <div className='search'>
+          <div>
+            {`Showing files with ${category === 'person' ? 'Person' : ''} Tag(s):`}
+          </div>
+          <div>
+            {shownTags.map(shown => <Label color={shown.color}>{shown.name}</Label>)}
+          </div>
+        </div>
       }
       {category === 'type' &&
-      <>
-        <h6 style={{margin: "1px"}}>Ex: 'photo', '.gif', 'live', etc.</h6>
-        <div>Showing files of Type: </div>
-      </>
+        <>
+          <h6 style={{ margin: "1px" }}>Ex: 'photo', '.gif', 'live', etc.</h6>
+          <div>Showing files of Type: </div>
+        </>
       }
     </>
   )
