@@ -6,7 +6,7 @@ import { UserContext } from './UserContext';
 //import {withRouter} from 'react-router-dom'
 
 export default function AlbumPage(props) {
-    const { user, files } = useContext(UserContext)
+    const { user, files, setActiveIndex } = useContext(UserContext)
     const albName = props.match.params.album;
     // is confirm dialog open
     const [confirmDelete, setConfirmDelete] = useState(false);
@@ -24,7 +24,7 @@ export default function AlbumPage(props) {
         fetch('/delAlbum/' + user + '/' + albName, reqOptions)
             .then(response => response.json())
             .then(JSONresponse =>
-                JSONresponse ? props.history.push('/home') : console.log("not del"))
+                JSONresponse ? handleBack() : console.log("not del"))
     }
 
     useEffect(async () => {
@@ -72,12 +72,17 @@ export default function AlbumPage(props) {
             setAlbIDs([...albIDs, id])
     }
 
+    const handleBack = (event) => {
+        props.history.push('/home')
+        setActiveIndex(2)
+    }
+
     // TODO if not owner then disable delete functionality
     return (
         <div>
             <Segment>
                 <Header>
-                    <Button color='orange' size='large' href='#home'>Back</Button>
+                    <Button color='orange' size='large' onClick={handleBack}>Back</Button>
                     {albName}
                     <Button color='red' size='large' floated='right' onClick={() => setConfirmDelete(!confirmDelete)}>Delete</Button>
                     <Button color='blue' size='large' floated='right' onClick={() => setShareModal(!shareModal)}><Icon name='share' />Share</Button>

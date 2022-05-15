@@ -14,6 +14,7 @@ export default function PageHandle(props) {
     const [files, setFiles] = useState([]);
     // contains array of: { name: "", color: "", isPerson: boolean, ids: [], owner: "" }
     const [tags, setTags] = useState([]);
+    const [activeIndex, setActiveIndex] = useState(0)
 
     function handleUserChange(output) {
         console.log(output)
@@ -103,7 +104,7 @@ export default function PageHandle(props) {
 
     return (
         <HashRouter>
-            <UserContext.Provider value={{ user: currentUser, name: currentName, files, tags }}>
+            <UserContext.Provider value={{ user: currentUser, name: currentName, files, tags, activeIndex, setActiveIndex }}>
                 {currentUser ? <Redirect to="/home" /> : <Redirect to={redirect} />}
                 <Route path="/login" component={(props) => <LoginScreen newUser={currentUser} onChange={handleUserChange} />} />
                 <Route path="/home" component={(props) => <HomePage onChange={handleLogout} onRefresh={handleHomeRefresh} />} />

@@ -26,6 +26,8 @@ class HomePage extends Component {
     //     }
     // }
 
+    handleTabChange = (e, { activeIndex }) => this.context.setActiveIndex(activeIndex)
+
     render() {
         const panes = [
             {
@@ -75,7 +77,7 @@ class HomePage extends Component {
                         </Button>
                     </div>
                 </Header>
-                <Tab menu={{ color: 'orange', tabular: false, attached: false, inverted: true }} panes={panes} /*renderActiveOnly={false}*/ />
+                <Tab menu={{ color: 'orange', tabular: false, attached: false, inverted: true }} panes={panes} activeIndex={this.context.activeIndex} onTabChange={this.handleTabChange}/*renderActiveOnly={false}*/ />
             </div>
         )
     }
