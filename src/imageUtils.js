@@ -107,7 +107,11 @@ export const mapByYear = (sorted) => {
                             <Card.Group>
                                 {subgroup.panes
                                     .sort((a, b) => new Date(a.props.date) < new Date(b.props.date) ? 1 : -1)
-                                    .map(pane => pane)}
+                                    .map(pane => 
+                                        <div className='pane-pad'>
+                                            {pane}
+                                        </div>
+                                    )}
                             </Card.Group>
                         </div>
                     })}

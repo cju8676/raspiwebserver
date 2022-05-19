@@ -155,9 +155,13 @@ export default function Gallery({ onRefresh, albums }) {
                         <div style={{ padding: "10px 5px" }}>
                             <Message negative floating compact content="No results found." />
                         </div>}
-                    <div>
+                    <div style={{padding: "5px"}}>
                         <Card.Group stackable itemsPerRow={4}>
-                            {shownImg.map(picture => picture)}
+                            {shownImg.map(picture => 
+                                <div className='pane-pad'>
+                                    {picture}
+                                </div>
+                            )}
                         </Card.Group>
                     </div>
                     <div>

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Header, Button, Divider, Confirm, Container } from 'semantic-ui-react'
+import { Header, Button, Divider, Confirm, Segment } from 'semantic-ui-react'
 import { UserContext } from '../UserContext'
 import EditForm from "./EditForm"
 import EditLabels from "./EditLabels"
@@ -95,12 +95,15 @@ class SettingsPage extends Component {
 
     render() {
         return (
-            <div>
-                <Header>
-                    <Button color='orange' size='large' href='#home'>Back</Button>
-                    Settings
-                </Header>
-                <Container className="settings">
+            <div className='segment-pad'>
+                <Segment>
+                    <Header>
+                        <Button color='orange' size='large' href='#home'>Back</Button>
+                        Settings
+                    </Header>
+                </Segment>
+                <Divider />
+                <Segment className="settings">
                     <h2>Name</h2>
                     {this.context.name} <Button basic compact icon='edit' color='black' onClick={this.toggleName} />
                     {this.state.nameModal && (
@@ -151,7 +154,7 @@ class SettingsPage extends Component {
                         confirmButton='DELETE ACCOUNT'
                         onConfirm={this.deleteAcc}
                     />
-                </Container>
+                </Segment>
             </div>
         )
     }

@@ -48,11 +48,13 @@ class GetAlbumPhotos(Resource):
     def get(self, username, album_name):
         
         sql = """
-            SELECT id
+            SELECT id, username
             FROM albums
-            WHERE album_name = %s;
+            WHERE album_name = %s
+            AND id <> -1;
         """
-        return exec_get_all(sql, [album_name])
+        res = exec_get_all(sql, [album_name])
+        return res
 
 class DeleteAlbum(Resource):
     def post(self, username, album_name):
@@ -82,9 +84,10 @@ class RemoveFromAlbum(Resource):
         """
         return exec_commit(sql, (username, album_name, id))
 
-class GetAvailableShareUsers(Resource):
-    def get(self, album_name):
-        sql = """
+class GetShareData(Resource):
+    def get(self, album_name, user):
+        
+        avail_sql = """
             SELECT username, name
             FROM users
             WHERE username NOT IN
@@ -94,21 +97,34 @@ class GetAvailableShareUsers(Resource):
                 WHERE album_name = %s
             );
         """
-        res = exec_get_all(sql, [album_name,])
-        print(res)
-        return res
+        avail_res = exec_get_all(avail_sql, [album_name,])
 
-class GetSharedWith(Resource):
-    def get(self, album_name, user):
-        sql = """
+        share_sql = """
             SELECT u.username, u.name
             FROM albums a, users u
             WHERE a.album_name = %s
             AND a.username <> %s
             AND a.username = u.username
+            AND a.id = -1
         """
-        res = exec_get_all(sql, [album_name, user])
-        return res
+        share_res = exec_get_all(share_sql, [album_name, user])
+
+        owner_sql = """
+            SELECT owner
+            FROM albums
+            WHERE album_name = %s
+            AND username = %s
+        """
+        owner_res = exec_get_one(owner_sql, [album_name, user])
+
+        
+        json = {
+            "availShareUsers" : avail_res,
+            "sharedWith" : share_res,
+            "owner" : owner_res[0]
+        }
+
+        return json
 
 class AddUserToAlbum(Resource):
     def post(self, album_name, new_user):
@@ -117,3 +133,12 @@ class AddUserToAlbum(Resource):
             VALUES (%s, %s, -1)
         """
         return exec_commit(sql, [new_user, album_name])
+
+class DeleteUserFromAlbum(Resource):
+    def post(self, album_name, del_user):
+        sql = """
+            DELETE FROM albums
+            WHERE username = %s
+            AND album_name = %s
+        """
+        return exec_commit(sql, [del_user, album_name])

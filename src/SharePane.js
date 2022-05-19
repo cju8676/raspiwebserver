@@ -1,23 +1,9 @@
 import { React, useState, useEffect, useContext } from 'react'
-import { Label, Segment, Dropdown, Divider, Button } from 'semantic-ui-react'
+import { Label, Segment, Dropdown, Divider, Button, Icon } from 'semantic-ui-react'
 import { UserContext } from './UserContext';
 
-export default function SharePane({ albName, closeModal }) {
+export default function SharePane({ albName, closeModal, availShareUsers, setAvailShareUsers, sharedWith, setSharedWith, owner }) {
     const { user, showSuccessNotification, showErrorNotification } = useContext(UserContext)
-    const [availShareUsers, setAvailShareUsers] = useState([])
-    const [sharedWith, setSharedWith] = useState([])
-
-    useEffect(() => {
-        //if it our first time opening shareModal then fetch availShareUsers
-        //todo this will happen every time because closing the modal re renders this comp
-        if (availShareUsers.length === 0) {
-            getAvailShareUsers();
-            getSharedWith();
-        }
-    }, [])
-
-    // TODO track which person is owner
-    // if signed in user is owner of this album, they can delete a person off of album
 
     // share this album to user
     async function addUser(user) {
@@ -28,28 +14,26 @@ export default function SharePane({ albName, closeModal }) {
         await fetch('/shareAlbum/' + albName + '/' + user, reqOptions)
             .then(response => response.json())
             .then(JSONresponse =>
-                JSONresponse ? 
-                    showSuccessNotification(`${albName} shared with ${user}`) : 
+                JSONresponse ?
+                    showSuccessNotification(`${albName} shared with ${user}`) :
                     showErrorNotification(`Unable to share ${albName} with ${user}. Please try again.`))
         setSharedWith([...sharedWith, availShareUsers.find(i => i.includes(user))])
         setAvailShareUsers(availShareUsers.filter(item => item[0] !== user))
     }
 
-    //TODO track which person is with owner and make only them have privileges to delete
-    // any other person just tell them who the owner is
-
-    // fetch a list of users who are not yet able to view this album
-    async function getAvailShareUsers() {
-        await fetch('/getAvailShareUsers/' + albName)
-            .then(res => res.json())
-            .then(JSONresponse => setAvailShareUsers(JSONresponse))
-    }
-
-    // excluding the user logged in, get list of users that are shared on this album
-    async function getSharedWith() {
-        await fetch('/getSharedWith/' + albName + '/' + user)
-            .then(res => res.json())
-            .then(JSONresponse => setSharedWith(JSONresponse))
+    async function deleteUser(user) {
+        const reqOptions = {
+            method: 'POST',
+            headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+        }
+        await fetch('/delUserFromAlbum/' + albName + '/' + user[0], reqOptions)
+            .then(response => response.json())
+            .then(JSONresponse =>
+                JSONresponse ?
+                    showSuccessNotification(`${user[1]} removed from ${albName}`) :
+                    showErrorNotification(`Unable to remove ${user[1]} with ${albName}. Please try again.`))
+        setSharedWith(sharedWith.filter(i => i !== user))
+        setAvailShareUsers([...availShareUsers, user])
     }
 
     return (
@@ -58,7 +42,12 @@ export default function SharePane({ albName, closeModal }) {
                 <div className='shared-with'>
                     <h4 style={{ padding: "10px 10px 10px 10px" }}>Shared With:</h4>
                     <Label.Group style={{ padding: "10px 10px 10px 0px" }}>
-                        {sharedWith && sharedWith.map(user => <Label>{`${user[1]} (${user[0]})`}</Label>)}
+                        {sharedWith && sharedWith.map(user => 
+                            <Label color="blue">
+                                {`${user[1]} (${user[0]})`}
+                                {owner && <Icon name='delete' onClick={() => deleteUser(user)} />}
+                            </Label>
+                        )}
                     </Label.Group>
                 </div>
                 <Dropdown

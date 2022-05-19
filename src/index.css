@@ -63,7 +63,6 @@ h1 {
   overflow-x: hidden;
   height: 80vh;
   min-height: auto;
-  display: flex;
 }
 
 .gallery {
@@ -112,4 +111,12 @@ h1 {
 
 .search {
   display: flex
+}
+
+.segment-pad {
+  padding: 25px;
+}
+
+.pane-pad {
+  padding: 10px;
 }

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Header, Tab, Icon, Button } from 'semantic-ui-react'
+import { Header, Tab, Icon, Button, Segment } from 'semantic-ui-react'
 import Gallery from './galleryPackage/Gallery'
 import Favorited from './Favorited'
 import AlbumsList from './AlbumsList'
@@ -63,22 +63,24 @@ class HomePage extends Component {
             },
         ]
         return (
-            <div>
-                <Notification/>
-                <Header as='h2'>
-                    <div>
-                        Welcome, {this.context.name}.
+            <div className='segment-pad'>
+                <Notification />
+                <Segment>
+                    <Header as='h2'>
+                        <div>
+                            Welcome, {this.context.name}.
 
-                        <Button href='#settings' floated='right' size='large'>
-                            <Icon name='setting' />
-                            Settings
-                        </Button>
-                        <Button onClick={this.state.logout} floated='right' size='large'>
-                            <Icon name='sign out' />
-                            Logout
-                        </Button>
-                    </div>
-                </Header>
+                            <Button href='#settings' floated='right' size='large'>
+                                <Icon name='setting' />
+                                Settings
+                            </Button>
+                            <Button onClick={this.state.logout} floated='right' size='large'>
+                                <Icon name='sign out' />
+                                Logout
+                            </Button>
+                        </div>
+                    </Header>
+                </Segment>
                 <Tab menu={{ color: 'orange', tabular: false, attached: false, inverted: true }} panes={panes} activeIndex={this.context.activeIndex} onTabChange={this.handleTabChange}/*renderActiveOnly={false}*/ />
             </div>
         )

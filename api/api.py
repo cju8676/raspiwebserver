@@ -260,10 +260,10 @@ api.add_resource(GetEditTags, '/getEditTags/<string:username>')
 api.add_resource(GetEditPeople, '/getEditPeople/<string:username>')
 api.add_resource(DeleteTagOverall, '/deleteTagOverall/<string:name>/<string:color>')
 api.add_resource(DeletePersonOverall, '/deletePersonOverall/<string:name>/<string:color>')
-api.add_resource(GetAvailableShareUsers, '/getAvailShareUsers/<string:album_name>')
 api.add_resource(AddUserToAlbum, '/shareAlbum/<string:album_name>/<string:new_user>')
-api.add_resource(GetSharedWith, '/getSharedWith/<string:album_name>/<string:user>')
+api.add_resource(DeleteUserFromAlbum, '/delUserFromAlbum/<string:album_name>/<string:del_user>')
 api.add_resource(GetAllTags, '/getAllTags/')
+api.add_resource(GetShareData, '/getShareData/<string:album_name>/<string:user>')
 
 if __name__ == '__main__':
     print("Starting Flask backend")
