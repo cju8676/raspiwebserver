@@ -143,19 +143,19 @@ export default function AlbumPage(props) {
             return (
                 <div className='gallery-scroll'>
                     <div style={{ padding: "5px" }}>
-                    <Card.Group itemsPerRow={4}>
-                        {img.map(pane =>
-                            <div className='pane-pad'>
-                                {pane}
-                            </div>
-                        )}
-                    </Card.Group>
+                        <Card.Group itemsPerRow={4}>
+                            {img.map(pane =>
+                                <div className='pane-pad'>
+                                    {pane}
+                                </div>
+                            )}
+                        </Card.Group>
                     </div>
                 </div>
             )
         else if (filter === 'addedBy')
             return (
-                <div className='gallery-scroll'>
+                <div className='noflex-scroll'>
                     {addedBy.map(obj =>
                         <div>
                             <Header style={{ padding: "10px" }}>{obj.user}</Header>

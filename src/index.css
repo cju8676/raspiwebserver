@@ -63,6 +63,14 @@ h1 {
   overflow-x: hidden;
   height: 80vh;
   min-height: auto;
+  display:flex
+}
+
+.noflex-scroll {
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 80vh;
+  min-height: auto;
 }
 
 .gallery {
