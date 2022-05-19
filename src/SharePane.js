@@ -3,7 +3,7 @@ import { Label, Segment, Dropdown, Divider, Button } from 'semantic-ui-react'
 import { UserContext } from './UserContext';
 
 export default function SharePane({ albName, closeModal }) {
-    const { user } = useContext(UserContext)
+    const { user, showSuccessNotification, showErrorNotification } = useContext(UserContext)
     const [availShareUsers, setAvailShareUsers] = useState([])
     const [sharedWith, setSharedWith] = useState([])
 
@@ -21,7 +21,6 @@ export default function SharePane({ albName, closeModal }) {
 
     // share this album to user
     async function addUser(user) {
-        console.log(user)
         const reqOptions = {
             method: 'POST',
             headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
@@ -29,7 +28,9 @@ export default function SharePane({ albName, closeModal }) {
         await fetch('/shareAlbum/' + albName + '/' + user, reqOptions)
             .then(response => response.json())
             .then(JSONresponse =>
-                JSONresponse ? console.log("ADDED") : console.log("not ADDED"))
+                JSONresponse ? 
+                    showSuccessNotification(`${albName} shared with ${user}`) : 
+                    showErrorNotification(`Unable to share ${albName} with ${user}. Please try again.`))
         setSharedWith([...sharedWith, availShareUsers.find(i => i.includes(user))])
         setAvailShareUsers(availShareUsers.filter(item => item[0] !== user))
     }

@@ -3,7 +3,7 @@ import { Button, Segment, Input, Label, Divider, Dropdown } from 'semantic-ui-re
 import { UserContext } from "../UserContext";
 
 export default function EditForm({ name, updateName, updateColor, update, toggle, visible, tagName, tagColor, errorMsg }) {
-    const { user } = useContext(UserContext)
+    const { user, showErrorNotification, showSuccessNotification } = useContext(UserContext)
     const [blank, setBlank] = useState(false);
     const [colorBlank, setColorBlank] = useState(false)
     const [error, setError] = useState(false);
@@ -14,6 +14,7 @@ export default function EditForm({ name, updateName, updateColor, update, toggle
     function handleUpdate(e, output) {
         console.log(e, output)
         if (output) {
+            showSuccessNotification("Update Success.")
             if (name === 'Tag') {
                 updateName(updateInfo);
                 updateColor(newColor);
@@ -25,6 +26,7 @@ export default function EditForm({ name, updateName, updateColor, update, toggle
             toggle();
         }
         else {
+            showErrorNotification("Unable to Update. Please try again.")
             setBlank(true);
             setError(true);
         }
@@ -49,7 +51,6 @@ export default function EditForm({ name, updateName, updateColor, update, toggle
             old_name: tagName,
             old_color: tagColor
         }
-        console.log(data)
         const reqOptions = {
             method: 'POST',
             headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
@@ -57,14 +58,13 @@ export default function EditForm({ name, updateName, updateColor, update, toggle
         }
         fetch(`/update${name}/`, reqOptions).then(res => res.json())
             .then(output => {
-                //todo handle success pop up
                 handleUpdate(name, output)
             }
             )
 
     }
 
-    function update(event) {
+    function updateInput(event) {
         setUpdateInfo(event.target.value);
         if (event.target.value !== "") {
             setBlank(false);
@@ -99,7 +99,7 @@ export default function EditForm({ name, updateName, updateColor, update, toggle
         <div>
             <Segment>
                 <h4>Edit {name}</h4>
-                <Input type='text' id={'entered' + name} placeholder={name} onChange={update} error={blank} />
+                <Input type='text' id={'entered' + name} placeholder={name} onChange={updateInput} error={blank} />
                 {error && <Label pointing='left' color='red'>{errorMsg}</Label>}
                 {name === 'Tag' &&
                     <Dropdown placeholder='Color' search selection options={options} id='enteredColor' onChange={handleDrop} error={colorBlank} />

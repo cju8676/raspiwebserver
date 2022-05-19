@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Modal, Button, Form, Container, Header, Divider, Image, Tab, Segment } from 'semantic-ui-react'
+import { Modal, Button, Form, Container, Header, Divider, Tab } from 'semantic-ui-react'
 import Tags from '../imagePackage/Tags';
 import People from '../imagePackage/People';
 import LivePhoto from '../LivePhoto';

@@ -66,7 +66,6 @@ class ImagePane extends Component {
     }
 
     handleRemove = () => {
-        console.log("handle remove")
         this.props.inAlbum && this.toggleRemoveModal();
         this.props.inAlbum && this.props.updateAlb(this.state.id);
         !this.props.inAlbum && this.toggleDelModal();
@@ -78,7 +77,6 @@ class ImagePane extends Component {
             album_name: this.props.inAlbum,
             id: this.state.id
         }
-        console.log(postData)
         const reqOptions = {
             method: 'POST',
             headers: { Accept: 'application/json', 'Content-Type': 'application/json' },

@@ -22,8 +22,6 @@ export default function Gallery({ onRefresh, albums }) {
 
     //fixme maximum update depth exceeded
     function searchResults(val, category) {
-        console.log("val ", val)
-        console.log("img", img);
         setCategory(category)
         setSearchInput(val);
     }
@@ -51,7 +49,6 @@ export default function Gallery({ onRefresh, albums }) {
                 case 'tag':
                     // get tags by name and ensure they are NOT people tags
                     const shownTags = tags.filter(tag => tag.name.includes(searchInput) && !tag.isPerson)
-                    console.log("shown ", shownTags)
                     setShownTags(shownTags)
                     // get ids from each tag, flatten into one array, filter out duplicates
                     const ids = [...new Set(shownTags.map(tag => tag.ids).flat())]
@@ -88,6 +85,7 @@ export default function Gallery({ onRefresh, albums }) {
                     }
                     return;
                 case 'type':
+                default:
                     setShownImg([])
             }
         }

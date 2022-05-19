@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { Header, Button, Card, Divider, Confirm, Segment, Icon } from 'semantic-ui-react'
 import ImagePane from './imagePackage/ImagePane';
+import Notification from './Notification';
 import SharePane from './SharePane';
 import { UserContext } from './UserContext';
 //import {withRouter} from 'react-router-dom'
 
 export default function AlbumPage(props) {
-    const { user, files, setActiveIndex } = useContext(UserContext)
+    const { user, files, setActiveIndex, showSuccessNotification, showErrorNotification } = useContext(UserContext)
     const albName = props.match.params.album;
     // is confirm dialog open
     const [confirmDelete, setConfirmDelete] = useState(false);
@@ -24,7 +25,7 @@ export default function AlbumPage(props) {
         fetch('/delAlbum/' + user + '/' + albName, reqOptions)
             .then(response => response.json())
             .then(JSONresponse =>
-                JSONresponse ? handleBack() : console.log("not del"))
+                JSONresponse ? handleDelete() : showErrorNotification(`Unable to delete ${albName}... Please try again.`))
     }
 
     useEffect(async () => {
@@ -72,6 +73,11 @@ export default function AlbumPage(props) {
             setAlbIDs([...albIDs, id])
     }
 
+    const handleDelete = (event) => {
+        handleBack(event)
+        showSuccessNotification(`Album '${albName}' successfully removed.`)
+    }
+
     const handleBack = (event) => {
         props.history.push('/home')
         setActiveIndex(2)
@@ -80,6 +86,7 @@ export default function AlbumPage(props) {
     // TODO if not owner then disable delete functionality
     return (
         <div>
+            <Notification />
             <Segment>
                 <Header>
                     <Button color='orange' size='large' onClick={handleBack}>Back</Button>

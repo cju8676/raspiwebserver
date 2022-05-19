@@ -5,8 +5,6 @@ import { Header, Image, Segment } from 'semantic-ui-react'
 export default function UploadPreview({ uploadFiles, folders, isBulk }) {
 
     // todo save folder to album
-    console.log(uploadFiles)
-    console.log(folders)
 
     return isBulk ? (
         <>

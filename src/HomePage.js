@@ -4,6 +4,7 @@ import Gallery from './galleryPackage/Gallery'
 import Favorited from './Favorited'
 import AlbumsList from './AlbumsList'
 import { UserContext } from './UserContext'
+import Notification from './Notification'
 
 class HomePage extends Component {
     static contextType = UserContext;
@@ -63,6 +64,7 @@ class HomePage extends Component {
         ]
         return (
             <div>
+                <Notification/>
                 <Header as='h2'>
                     <div>
                         Welcome, {this.context.name}.

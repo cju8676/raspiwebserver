@@ -1,12 +1,10 @@
-import React, { useState, useCallback, useEffect, useRef, useContext } from 'react'
-import { Input, Dropdown, Label, Grid } from 'semantic-ui-react'
-import { UserContext } from './UserContext';
+import React, { useState, useCallback, useEffect, useRef } from 'react'
+import { Input, Dropdown, Label } from 'semantic-ui-react'
 
 function SearchBar({ onChange, source, shownTags }) {
   const [value, setValue] = useState('')
   const [loading, setLoading] = useState(false);
   const [category, setCategory] = useState('filename')
-  const { files, tags } = useContext(UserContext);
 
   const timeoutRef = useRef()
   const handleSearchChange = useCallback((e, data) => {
@@ -39,14 +37,6 @@ function SearchBar({ onChange, source, shownTags }) {
     { key: 'person', text: 'Person', value: 'person' },
     { key: 'type', text: 'Type', value: 'type' },
   ]
-
-  //TODO if tag or person or TYPE, multiple select
-
-  // TODO a get all tags and get all people call and add to global state
-
-  useEffect(() => {
-    console.log("cat updated", category)
-  }, [category])
 
   return (
     <>

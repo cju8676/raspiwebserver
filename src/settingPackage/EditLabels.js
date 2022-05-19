@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Button, Divider, Icon, Label } from "semantic-ui-react";
+import { Divider } from "semantic-ui-react";
 import { UserContext } from "../UserContext";
 import TagRow from "./TagRow";
 

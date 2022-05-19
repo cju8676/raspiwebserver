@@ -1,5 +1,5 @@
-import react, { useEffect, useState } from "react";
-import { Label, Icon, Button, Divider } from "semantic-ui-react";
+import React, { useEffect, useState } from "react";
+import { Label, Icon, Button } from "semantic-ui-react";
 import EditForm from "./EditForm";
 
 export default function TagRow({ name, color, delTag }) {
@@ -24,7 +24,6 @@ export default function TagRow({ name, color, delTag }) {
     useEffect(() => {
         if (loading) {
             const timer = setTimeout(() => {
-                console.log("simulate end loading")
                 delTag(name, color)
                 setColor('red')
                 setConf(false)
@@ -39,7 +38,6 @@ export default function TagRow({ name, color, delTag }) {
     // red + click = green confirm
     // green confirm + click = loading for 1 second then remove myself all together
     function handleClick() {
-        console.log(confirm)
         if (confirm) {
             setLoading(true)
         }

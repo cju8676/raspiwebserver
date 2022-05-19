@@ -14,10 +14,11 @@ export default function PageHandle(props) {
     const [files, setFiles] = useState([]);
     // contains array of: { name: "", color: "", isPerson: boolean, ids: [], owner: "" }
     const [tags, setTags] = useState([]);
-    const [activeIndex, setActiveIndex] = useState(0)
+    const [activeIndex, setActiveIndex] = useState(0);
+    const [errorNotification, showErrorNotification] = useState(null)
+    const [successNotification, showSuccessNotification] = useState(null)
 
     function handleUserChange(output) {
-        console.log(output)
         setCurrentUser(output[0])
         setCurrentName(output[1])
         setRedirect("/home")
@@ -83,7 +84,6 @@ export default function PageHandle(props) {
         var tagArray = []
         await fetch('/getAllTags/').then(res => res.json())
             .then(JSONresponse => {
-                console.log("json res ", JSONresponse)
                 // arr - [name, id, color, people, owner]
                 JSONresponse.forEach(arr => {
                     const inTagArr = tagArray.find(t => t.name === arr[0])
@@ -104,7 +104,7 @@ export default function PageHandle(props) {
 
     return (
         <HashRouter>
-            <UserContext.Provider value={{ user: currentUser, name: currentName, files, tags, activeIndex, setActiveIndex }}>
+            <UserContext.Provider value={{ user: currentUser, name: currentName, files, tags, activeIndex, setActiveIndex, errorNotification, showErrorNotification, successNotification, showSuccessNotification }}>
                 {currentUser ? <Redirect to="/home" /> : <Redirect to={redirect} />}
                 <Route path="/login" component={(props) => <LoginScreen newUser={currentUser} onChange={handleUserChange} />} />
                 <Route path="/home" component={(props) => <HomePage onChange={handleLogout} onRefresh={handleHomeRefresh} />} />

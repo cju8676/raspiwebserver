@@ -25,7 +25,6 @@ class SettingsPage extends Component {
     close = () => this.setState({ open: false })
 
     deleteAcc = () => {
-        console.log("deleted everything");
         this.close();
         const reqOptions = {
             method: 'POST',
@@ -34,7 +33,7 @@ class SettingsPage extends Component {
         fetch('/delAcc/' + this.context.user, reqOptions)
             .then(response => response.json())
             .then(JSONresponse =>
-                JSONresponse ? this.state.logout() : console.log("not del"))
+                JSONresponse ? this.state.logout() : this.context.showErrorNotification('Unable to Delete account. Please try again.'))
     }
 
 
