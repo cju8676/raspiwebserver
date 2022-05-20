@@ -17,6 +17,7 @@ export default function AlbumsList(props) {
         fetch('/getAlbums/' + user)
             .then(response => response.json())
             .then(JSONresponse => setAlbums(JSONresponse))
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     function updateProp(event) {

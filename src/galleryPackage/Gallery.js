@@ -20,7 +20,6 @@ export default function Gallery({ onRefresh, albums }) {
     const [category, setCategory] = useState('filename')
     const [shownTags, setShownTags] = useState([])
 
-    //fixme maximum update depth exceeded
     function searchResults(val, category) {
         setCategory(category)
         setSearchInput(val);
@@ -107,8 +106,7 @@ export default function Gallery({ onRefresh, albums }) {
                 isVideo={picture.video}
             />
         }))
-
-
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [files])
 
     useEffect(() => {
@@ -158,7 +156,7 @@ export default function Gallery({ onRefresh, albums }) {
                     <div style={{padding: "5px"}}>
                         <Card.Group stackable itemsPerRow={4}>
                             {shownImg.map(picture => 
-                                <div className='pane-pad'>
+                                <div className='pane-pad' key={picture}>
                                     {picture}
                                 </div>
                             )}

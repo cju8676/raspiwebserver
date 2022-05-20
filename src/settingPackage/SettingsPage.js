@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Header, Button, Divider, Confirm, Segment } from 'semantic-ui-react'
+import Notification from '../Notification'
 import { UserContext } from '../UserContext'
 import EditForm from "./EditForm"
 import EditLabels from "./EditLabels"
@@ -96,6 +97,7 @@ class SettingsPage extends Component {
     render() {
         return (
             <div className='segment-pad'>
+                <Notification />
                 <Segment>
                     <Header>
                         <Button color='orange' size='large' href='#home'>Back</Button>

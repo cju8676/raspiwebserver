@@ -38,6 +38,7 @@ export default function AlbumPage(props) {
     useEffect(() => {
         getAlbumPhotos();
         getShareData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
 
@@ -48,7 +49,7 @@ export default function AlbumPage(props) {
             .then(JSONresponse => {
                 setAlbIDs(JSONresponse.map(arr => arr[0]))
                 var addedBy = []
-                for (var i = 0; i < JSONresponse.length; i++) {
+                for (let i = 0; i < JSONresponse.length; i++) {
                     if (addedBy.some(obj => obj.user === JSONresponse[i][1]))
                         addedBy.find(obj => obj.user === JSONresponse[i][1]).ids.push(JSONresponse[i][0])
                     else addedBy.push({ user: JSONresponse[i][1], ids: [JSONresponse[i][0]] })
@@ -90,6 +91,7 @@ export default function AlbumPage(props) {
                     />
                 })
         )
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [files, albIDs])
 
     // id was either added or removed from favs, update AlbumPage accordingly

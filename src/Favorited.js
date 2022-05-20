@@ -13,6 +13,7 @@ export default function Favorited({ albums, onRefresh }) {
         // returns the IDs of the image panes we need to extract
         fetch('/getFavoriteIDs/' + user).then(res => res.json())
             .then(JSONresponse => setFavorited(JSONresponse.flat()))
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     useEffect(() => {
@@ -33,11 +34,12 @@ export default function Favorited({ albums, onRefresh }) {
                     isVideo={picture.video}
                 />
             }))
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [files, favorited])
 
     useEffect(() => {
         if (favs) setLoading(false)
-    })
+    }, [favs])
 
     // fav was either added or removed from favs, update Favorited page accordingly
     const updateFav = (fav) => {

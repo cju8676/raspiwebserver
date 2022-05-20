@@ -26,12 +26,6 @@ export default function Notification(props) {
 
     return (
         <Transition visible={visible} animation="slide down" duration={500}>
-        {/* {successNotification &&
-            <Message positive content={successNotification} />
-        }
-        {errorNotification &&
-            <Message negative content={errorNotification} />
-        } */}
             <Message positive={successNotification} negative={errorNotification} content={successNotification ?? errorNotification} />
         </Transition>
     )

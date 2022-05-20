@@ -7,7 +7,6 @@ import People from './People';
 // Right hand Grid column of our ImagePane's infoModal
 export default function PaneInfo({ name, path, id, setFavorited, setMap, date }) {
     const { user } = useContext(UserContext)
-    // todo verify this works then convert to object instead of array
     //{len, wid, make, modal, datetime, [lat, long]}
     const [info, setInfo] = useState(null)
     const [loading, setLoading] = useState(true)
@@ -24,6 +23,7 @@ export default function PaneInfo({ name, path, id, setFavorited, setMap, date })
                         long: output.gps.long
                     })
             })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {

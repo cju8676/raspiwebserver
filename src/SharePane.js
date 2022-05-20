@@ -1,9 +1,9 @@
-import { React, useState, useEffect, useContext } from 'react'
+import { React, useContext } from 'react'
 import { Label, Segment, Dropdown, Divider, Button, Icon } from 'semantic-ui-react'
 import { UserContext } from './UserContext';
 
 export default function SharePane({ albName, closeModal, availShareUsers, setAvailShareUsers, sharedWith, setSharedWith, owner }) {
-    const { user, showSuccessNotification, showErrorNotification } = useContext(UserContext)
+    const { showSuccessNotification, showErrorNotification } = useContext(UserContext)
 
     // share this album to user
     async function addUser(user) {

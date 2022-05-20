@@ -48,58 +48,64 @@ export default function PageHandle(props) {
     useEffect(() => {
     }, [currentName])
 
-    useEffect(async () => {
+    useEffect(() => {
         var id_path = {};
-        await fetch('/getAllImages/').then(response => response.json())
-            .then(JSONresponse => {
-                var files = JSON.parse(JSONresponse)
-                // this.setState({ filesLen: files.length })
-                for (let i = 0; i < files.length; i++) {
-                    var path = (files[i].path).replace('/', '%2F');
-                    id_path[files[i].id] = path
+        async function fetchImg() {
+            await fetch('/getAllImages/').then(response => response.json())
+                .then(JSONresponse => {
+                    var files = JSON.parse(JSONresponse)
+                    // this.setState({ filesLen: files.length })
+                    for (let i = 0; i < files.length; i++) {
+                        var path = (files[i].path).replace('/', '%2F');
+                        id_path[files[i].id] = path
 
-                    fetch('/files/' + files[i].id)
-                        .then(response => response.blob())
-                        .then(imageBlob => {
-                            const imageURL = URL.createObjectURL(imageBlob);
-                            const isVideo = imageBlob.type === 'video/mp4' ? true : false
-                            setFiles(prevState => {
-                                return [...prevState,
-                                {
-                                    link: imageURL,
-                                    name: files[i].name,
-                                    id: files[i].id,
-                                    info: id_path[files[i].id],
-                                    date: files[i].date,
-                                    video: isVideo
-                                }
-                                ]
+                        fetch('/files/' + files[i].id)
+                            .then(response => response.blob())
+                            .then(imageBlob => {
+                                const imageURL = URL.createObjectURL(imageBlob);
+                                const isVideo = imageBlob.type === 'video/mp4' ? true : false
+                                setFiles(prevState => {
+                                    return [...prevState,
+                                    {
+                                        link: imageURL,
+                                        name: files[i].name,
+                                        id: files[i].id,
+                                        info: id_path[files[i].id],
+                                        date: files[i].date,
+                                        video: isVideo
+                                    }
+                                    ]
+                                })
                             })
-                        })
-                }
-            })
+                    }
+                })
+        }
+        fetchImg()
     }, [])
 
-    useEffect(async() => {
+    useEffect(() => {
         var tagArray = []
-        await fetch('/getAllTags/').then(res => res.json())
-            .then(JSONresponse => {
-                // arr - [name, id, color, people, owner]
-                JSONresponse.forEach(arr => {
-                    const inTagArr = tagArray.find(t => t.name === arr[0])
-                    if (inTagArr)
-                        inTagArr.ids.push(arr[1])
-                    else
-                        tagArray.push({
-                            name: arr[0],
-                            color: arr[2],
-                            isPerson: Boolean(parseInt(arr[3])),
-                            owner: arr[4],
-                            ids: [arr[1]]
-                        })
+        async function fetchTags() {
+            await fetch('/getAllTags/').then(res => res.json())
+                .then(JSONresponse => {
+                    // arr - [name, id, color, people, owner]
+                    JSONresponse.forEach(arr => {
+                        const inTagArr = tagArray.find(t => t.name === arr[0])
+                        if (inTagArr)
+                            inTagArr.ids.push(arr[1])
+                        else
+                            tagArray.push({
+                                name: arr[0],
+                                color: arr[2],
+                                isPerson: Boolean(parseInt(arr[3])),
+                                owner: arr[4],
+                                ids: [arr[1]]
+                            })
+                    })
                 })
-            })
-        setTags(tagArray)
+            setTags(tagArray)
+        }
+        fetchTags()
     }, [])
 
     return (

@@ -31,6 +31,7 @@ export default function TagRow({ name, color, delTag }) {
             }, 1000)
             return () => clearTimeout(timer);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [loading])
 
     // assess whether we are in normal red state, green 3 second confirm state, or loading state,

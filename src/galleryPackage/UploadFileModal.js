@@ -153,7 +153,7 @@ class UploadFileModal extends Component {
         const dupFileNames = duplicates(count(filenames))
 
         if (dupFileNames.length) {
-            for (var i = 0; i < dupFileNames.length; i++) {
+            for (let i = 0; i < dupFileNames.length; i++) {
                 const movFile = filesArray.find(item => item.name === `${dupFileNames[i]}.mov`)
                 console.log("MOV ", movFile)
                 const jpgFile = filesArray.find(item => item.name === `${dupFileNames[i]}.jpg`)
@@ -195,7 +195,6 @@ class UploadFileModal extends Component {
     }
 
     render() {
-        console.log("fiiles", this.state.files)
         const tabs = [
             {
                 menuItem: 'Single File Upload',

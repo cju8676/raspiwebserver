@@ -9,12 +9,13 @@ export default function EditLabels(props) {
     // tags if true, people if false...
     const { isTags } = props;
     const [tags, setTags] = useState([])
-    const { user } = useContext(UserContext)
+    const { user, showSuccessNotification, showErrorNotification } = useContext(UserContext)
 
     useEffect(() => {
         fetch(`/getEdit${isTags ? 'Tags' : 'People'}/` + user)
             .then(res => res.json())
             .then(data => setTags(data))
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     function delTag(name, color) {
@@ -23,7 +24,12 @@ export default function EditLabels(props) {
             method: 'POST'
         })
             .then(res => res.text())
-            .then(data => data/*todo success msg if true failure msg if false*/);
+            .then(data => {
+                if (data)
+                    showSuccessNotification("Tag deleted successfully...")
+                else
+                    showErrorNotification("Unable to delete tag... Please try again.")
+            });
     }
 
     return (
