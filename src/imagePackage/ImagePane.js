@@ -7,6 +7,7 @@ import { UserContext } from '../UserContext'
 import handleViewport from 'react-in-viewport'
 import PaneMedia from './PaneMedia'
 import PaneInfo from './PaneInfo'
+import Timer from '../Timer'
 
 class ImagePane extends Component {
     static contextType = UserContext;
@@ -27,6 +28,8 @@ class ImagePane extends Component {
             map: null,
             vidPreview: false,
             loading: true,
+
+            deleted: false
         }
     }
 
@@ -71,6 +74,11 @@ class ImagePane extends Component {
         !this.props.inAlbum && this.toggleDelModal();
     }
 
+    handleConfirmClick = () => {
+        this.setState({ deleted : true })
+        this.toggleDelModal();
+    }
+
     removeFromAlbum = () => {
         const postData = {
             username: this.context.user,
@@ -99,7 +107,7 @@ class ImagePane extends Component {
             .then(response => response.json())
             .then(jsonOutput => {
                 //todo provide pop up that says it was deleted
-                this.handleRemove()
+                // this.handleRemove()
             })
     }
 
@@ -190,11 +198,14 @@ class ImagePane extends Component {
                                 <Button color='black' onClick={this.toggleInfoModal}>Close</Button>
                             </Modal.Actions>
                         </Modal>
-                        <Button negative icon='trash' onClick={this.toggleDelModal} disabled={this.state.loading}></Button>
+                        {this.state.deleted ?
+                            <Button negative onClick={() => this.setState({deleted: false})}>Undo - <Timer duration={10} handleAtZero={this.delete}/></Button>
+                            : <Button negative icon='trash' onClick={this.toggleDelModal} disabled={this.state.loading}></Button>
+                        }
                         <Confirm
                             open={this.state.delModal}
                             onCancel={this.toggleDelModal}
-                            onConfirm={this.delete}
+                            onConfirm={this.handleConfirmClick}
                             header='Delete File?'
                             content='This will delete this file for EVERYONE! Are you sure you want to proceed?'
                         />

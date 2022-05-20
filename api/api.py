@@ -111,7 +111,10 @@ def getinfo(path, filename, username):
             })
         else:
             #print(datetime.strptime(exifdata[306], '%Y:%m:%d %H:%M:%S').strftime("%B %d, %Y -- %I:%M:%S %p"))
-            formatted = datetime.strptime(exifdata.get(306, "---"), '%Y:%m:%d %H:%M:%S').strftime("%B %d, %Y -- %I:%M:%S %p")
+            if exifdata.get(306, "---") == "---":
+                formatted = "---"
+            else:
+                formatted = datetime.strptime(exifdata.get(306, "---"), '%Y:%m:%d %H:%M:%S').strftime("%B %d, %Y -- %I:%M:%S %p")
             make = exifdata.get(271, "---")
             model = exifdata.get(272, "---")
 
