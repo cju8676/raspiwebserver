@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react'
-import { Label, Icon, Dropdown, Segment, Input, Button } from 'semantic-ui-react';
+import { Label, Icon, Dropdown, Segment, Input, Button, Loader, Dimmer, Container } from 'semantic-ui-react';
 import { UserContext } from '../UserContext';
 
 export default function Tags({ id, bulk }) {
@@ -21,12 +21,13 @@ export default function Tags({ id, bulk }) {
         { label: { color: 'black' }, text: 'Black', value: 'black' },
     ]
 
-    const [tags, setTags] = useState([]);
+    const [tags, setTags] = useState(null);
     const [availTags, setAvailTags] = useState([]);
     const [tagModal, setTagModal] = useState(false);
     const [nameBlank, setNameBlank] = useState(false);
     const [colorBlank, setColorBlank] = useState(false);
     const [newTag, setNewTag] = useState({ name: "", color: "" })
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         fetch('/getTags/' + id).then(response => response.json())
@@ -46,6 +47,10 @@ export default function Tags({ id, bulk }) {
             })
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
+
+    useEffect(() => {
+        if (tags) setLoading(false)
+    }, [tags])
 
 
     function addTag(name, color) {
@@ -136,8 +141,11 @@ export default function Tags({ id, bulk }) {
     }
 
     return (
-        <div>
+        <Dimmer.Dimmable as={Container} active={loading}>
             <h2>Tags {bulk && " for each file"}</h2>
+            <Dimmer active={loading} inverted>
+                <Loader />
+            </Dimmer>
             <Label.Group>
                 {tags && tags.map(tag => {
                     return (
@@ -165,6 +173,6 @@ export default function Tags({ id, bulk }) {
                         <Button positive onClick={createTag}>Submit</Button>
                     </Segment>)}
             </Label.Group>
-        </div>
+        </Dimmer.Dimmable>
     )
 }

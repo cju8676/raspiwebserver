@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react'
-import { Label, Icon, Dropdown, Segment, Input, Button } from 'semantic-ui-react'
+import { Label, Icon, Dropdown, Segment, Input, Button, Dimmer, Loader } from 'semantic-ui-react'
 import { UserContext } from '../UserContext';
 
 export default function People({ id, bulk }) {
@@ -21,12 +21,13 @@ export default function People({ id, bulk }) {
         { label: { color: 'black' }, text: 'Black', value: 'black' },
     ]
 
-    const [people, setPeople] = useState([]);
+    const [people, setPeople] = useState(null);
     const [availPeople, setAvailPeople] = useState([]);
     const [tagModal, setTagModal] = useState(false);
     const [nameBlank, setNameBlank] = useState(false);
     const [colorBlank, setColorBlank] = useState(false);
     const [newTag, setNewTag] = useState({ name: "", color: "" });
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         fetch('/getPeople/' + id).then(response => response.json())
@@ -45,6 +46,10 @@ export default function People({ id, bulk }) {
             })
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
+
+    useEffect(() => {
+        if (people) setLoading(false)
+    }, [people])
 
     function delTag(per) {
         const data = {
@@ -134,8 +139,11 @@ export default function People({ id, bulk }) {
     }
 
     return (
-        <div>
+        <Dimmer.Dimmable active={loading}>
             <h2>People {bulk && " for each file"}</h2>
+            <Dimmer active={loading} inverted>
+                <Loader />
+            </Dimmer>
             <Label.Group>
                 {people && people.map(per => {
                     return (
@@ -163,6 +171,6 @@ export default function People({ id, bulk }) {
                         <Button positive onClick={createTag}>Submit</Button>
                     </Segment>)}
             </Label.Group>
-        </div>
+        </Dimmer.Dimmable>
     )
 }

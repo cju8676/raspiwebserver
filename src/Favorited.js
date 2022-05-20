@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Card } from 'semantic-ui-react'
+import { Card, Dimmer, Loader } from 'semantic-ui-react'
 import { UserContext } from "./UserContext";
 import ImagePane from "./imagePackage/ImagePane";
 
@@ -7,6 +7,7 @@ export default function Favorited({ albums, onRefresh }) {
     const { user, files } = useContext(UserContext)
     const [favs, setFavs] = useState([])
     const [favorited, setFavorited] = useState([])
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         // returns the IDs of the image panes we need to extract
@@ -34,6 +35,10 @@ export default function Favorited({ albums, onRefresh }) {
             }))
     }, [files, favorited])
 
+    useEffect(() => {
+        if (favs) setLoading(false)
+    })
+
     // fav was either added or removed from favs, update Favorited page accordingly
     const updateFav = (fav) => {
         // removed case
@@ -45,10 +50,17 @@ export default function Favorited({ albums, onRefresh }) {
     }
 
     return (
-        <div>
+        <Dimmer.Dimmable active={loading}>
+            <Dimmer active={loading} inverted>
+                <Loader />
+            </Dimmer>
             <Card.Group itemsPerRow={4}>
-                {favs.map(fav => fav)}
+                {favs.map(fav => 
+                    <div className="pane-pad">
+                        {fav}
+                    </div>
+                )}
             </Card.Group>
-        </div>
+        </Dimmer.Dimmable>
     )
 }
