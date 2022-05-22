@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import { Header, Button, Divider, Confirm, Segment } from 'semantic-ui-react'
-import Notification from '../Notification'
 import { UserContext } from '../UserContext'
 import EditForm from "./EditForm"
 import EditLabels from "./EditLabels"
+import { showErrorNotification } from '../notificationUtils'
 //import { withRouter } from 'react-router-dom'
 
 class SettingsPage extends Component {
@@ -34,7 +34,7 @@ class SettingsPage extends Component {
         fetch('/delAcc/' + this.context.user, reqOptions)
             .then(response => response.json())
             .then(JSONresponse =>
-                JSONresponse ? this.state.logout() : this.context.showErrorNotification('Unable to Delete account. Please try again.'))
+                JSONresponse ? this.state.logout() : showErrorNotification('Unable to Delete account. Please try again.'))
     }
 
 
@@ -97,7 +97,6 @@ class SettingsPage extends Component {
     render() {
         return (
             <div className='segment-pad'>
-                <Notification />
                 <Segment>
                     <Header>
                         <Button color='orange' size='large' href='#home'>Back</Button>

@@ -128,3 +128,15 @@ h1 {
 .pane-pad {
   padding: 10px;
 }
+
+.snackbar-centered {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#snackbar-fixed-container {
+  position: fixed;
+  bottom: 4rem;
+}

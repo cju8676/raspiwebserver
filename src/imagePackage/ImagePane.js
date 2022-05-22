@@ -8,6 +8,7 @@ import handleViewport from 'react-in-viewport'
 import PaneMedia from './PaneMedia'
 import PaneInfo from './PaneInfo'
 import Timer from '../Timer'
+import { showErrorNotification, showSuccessNotification } from '../notificationUtils'
 
 class ImagePane extends Component {
     static contextType = UserContext;
@@ -107,9 +108,9 @@ class ImagePane extends Component {
             .then(response => response.json())
             .then(jsonOutput => {
                 if (jsonOutput)
-                    this.context.showSuccessNotification(this.state.name + " deleted successfully")
+                    showSuccessNotification(this.state.name + " deleted successfully")
                 else
-                    this.context.showErrorNotification("Unable to delete " + this.state.name + "... Please try again.");
+                    showErrorNotification("Unable to delete " + this.state.name + "... Please try again.");
             })
     }
 

@@ -2,13 +2,13 @@ import React, { useState, useEffect, useContext } from 'react'
 import { Header, Button, Card, Divider, Confirm, Segment, Icon, Dropdown } from 'semantic-ui-react'
 import ImagePane from './imagePackage/ImagePane';
 import { mapByYear, sortByYear, sortByMonth } from './imageUtils';
-import Notification from './Notification';
+import { showErrorNotification } from './notificationUtils';
 import SharePane from './SharePane';
 import { UserContext } from './UserContext';
 //import {withRouter} from 'react-router-dom'
 
 export default function AlbumPage(props) {
-    const { user, files, setActiveIndex, showSuccessNotification, showErrorNotification } = useContext(UserContext)
+    const { user, files, setActiveIndex } = useContext(UserContext)
     const albName = props.match.params.album;
     // is confirm dialog open
     const [confirmDelete, setConfirmDelete] = useState(false);
@@ -106,7 +106,7 @@ export default function AlbumPage(props) {
 
     const handleDelete = (event) => {
         handleBack(event)
-        showSuccessNotification(`Album '${albName}' successfully removed.`)
+        showErrorNotification(`Album '${albName}' successfully removed.`)
     }
 
     const handleBack = (event) => {
@@ -193,7 +193,6 @@ export default function AlbumPage(props) {
 
     return (
         <div>
-            <Notification />
             <div className='segment-pad'>
                 <Segment>
                     <Header>

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { Divider } from "semantic-ui-react";
 import { UserContext } from "../UserContext";
 import TagRow from "./TagRow";
+import { showErrorNotification, showSuccessNotification } from "../notificationUtils";
 
 
 export default function EditLabels(props) {
@@ -9,7 +10,7 @@ export default function EditLabels(props) {
     // tags if true, people if false...
     const { isTags } = props;
     const [tags, setTags] = useState([])
-    const { user, showSuccessNotification, showErrorNotification } = useContext(UserContext)
+    const { user } = useContext(UserContext)
 
     useEffect(() => {
         fetch(`/getEdit${isTags ? 'Tags' : 'People'}/` + user)

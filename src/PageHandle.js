@@ -15,8 +15,6 @@ export default function PageHandle(props) {
     // contains array of: { name: "", color: "", isPerson: boolean, ids: [], owner: "" }
     const [tags, setTags] = useState([]);
     const [activeIndex, setActiveIndex] = useState(0);
-    const [errorNotification, showErrorNotification] = useState(null)
-    const [successNotification, showSuccessNotification] = useState(null)
 
     function handleUserChange(output) {
         setCurrentUser(output[0])
@@ -110,7 +108,7 @@ export default function PageHandle(props) {
 
     return (
         <HashRouter>
-            <UserContext.Provider value={{ user: currentUser, name: currentName, files, tags, activeIndex, setActiveIndex, errorNotification, showErrorNotification, successNotification, showSuccessNotification }}>
+            <UserContext.Provider value={{ user: currentUser, name: currentName, files, tags, activeIndex, setActiveIndex }}>
                 {currentUser ? <Redirect to="/home" /> : <Redirect to={redirect} />}
                 <Route path="/login" component={(props) => <LoginScreen newUser={currentUser} onChange={handleUserChange} />} />
                 <Route path="/home" component={(props) => <HomePage onChange={handleLogout} onRefresh={handleHomeRefresh} />} />

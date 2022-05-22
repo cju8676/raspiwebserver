@@ -1,9 +1,10 @@
 import { React, useState, useContext } from "react"
 import { Button, Segment, Input, Label, Divider, Dropdown } from 'semantic-ui-react'
 import { UserContext } from "../UserContext";
+import { showErrorNotification, showSuccessNotification  } from "../notificationUtils";
 
 export default function EditForm({ name, updateName, updateColor, update, toggle, visible, tagName, tagColor, errorMsg }) {
-    const { user, showErrorNotification, showSuccessNotification } = useContext(UserContext)
+    const { user } = useContext(UserContext)
     const [blank, setBlank] = useState(false);
     const [colorBlank, setColorBlank] = useState(false)
     const [error, setError] = useState(false);
