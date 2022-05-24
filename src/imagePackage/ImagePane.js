@@ -107,8 +107,11 @@ class ImagePane extends Component {
         fetch('/deleteImage/' + this.state.id + '/' + encodeURIComponent(this.props.path) + '/' + encodeURIComponent(this.state.name), reqOptions)
             .then(response => response.json())
             .then(jsonOutput => {
-                if (jsonOutput)
+                if (jsonOutput) {
                     showSuccessNotification(this.state.name + " deleted successfully")
+                    // this.context.setFiles([...this.context.files.filter(obj => obj.id !== this.state.id)])
+                    this.context.setRefresh(true)
+                }
                 else
                     showErrorNotification("Unable to delete " + this.state.name + "... Please try again.");
             })

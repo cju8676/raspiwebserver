@@ -15,6 +15,7 @@ export default function PageHandle(props) {
     // contains array of: { name: "", color: "", isPerson: boolean, ids: [], owner: "" }
     const [tags, setTags] = useState([]);
     const [activeIndex, setActiveIndex] = useState(0);
+    const [refresh, setRefresh] = useState(true)
 
     function handleUserChange(output) {
         setCurrentUser(output[0])
@@ -49,6 +50,7 @@ export default function PageHandle(props) {
     useEffect(() => {
         var id_path = {};
         async function fetchImg() {
+            setFiles([])
             await fetch('/getAllImages/').then(response => response.json())
                 .then(JSONresponse => {
                     var files = JSON.parse(JSONresponse)
@@ -78,8 +80,9 @@ export default function PageHandle(props) {
                     }
                 })
         }
-        fetchImg()
-    }, [])
+        if (refresh) fetchImg()
+        setRefresh(false)
+    }, [refresh])
 
     useEffect(() => {
         var tagArray = []
@@ -108,7 +111,7 @@ export default function PageHandle(props) {
 
     return (
         <HashRouter>
-            <UserContext.Provider value={{ user: currentUser, name: currentName, files, tags, activeIndex, setActiveIndex }}>
+            <UserContext.Provider value={{ user: currentUser, name: currentName, files, setFiles, tags, activeIndex, setActiveIndex, setRefresh }}>
                 {currentUser ? <Redirect to="/home" /> : <Redirect to={redirect} />}
                 <Route path="/login" component={(props) => <LoginScreen newUser={currentUser} onChange={handleUserChange} />} />
                 <Route path="/home" component={(props) => <HomePage onChange={handleLogout} onRefresh={handleHomeRefresh} />} />

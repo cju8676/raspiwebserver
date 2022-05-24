@@ -4,8 +4,10 @@ import Tags from '../imagePackage/Tags';
 import People from '../imagePackage/People';
 import LivePhoto from '../LivePhoto';
 import UploadPreview from './UploadPreview';
+import { UserContext } from '../UserContext'
 
 class UploadFileModal extends Component {
+    static contextType = UserContext
     constructor(props) {
         super(props);
         this.state = {
@@ -53,6 +55,7 @@ class UploadFileModal extends Component {
         }
         this.setState({ uploadFile: !this.state.uploadFile })
         this.state.refresh()
+        this.context.setRefresh(true)
     }
 
     handleUploadImage = (e) => {
@@ -69,6 +72,7 @@ class UploadFileModal extends Component {
                 console.log(data)
                 this.setState({ uploadFile: !this.state.uploadFile });
                 this.state.refresh();
+                this.context.setRefresh(true)
             })
     }
 

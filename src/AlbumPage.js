@@ -58,8 +58,6 @@ export default function AlbumPage(props) {
             })
     }
 
-    console.log(addedBy)
-
     async function getShareData() {
         await fetch('/getShareData/' + albName + '/' + user)
             .then(res => res.json())
