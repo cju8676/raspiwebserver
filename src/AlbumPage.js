@@ -85,7 +85,9 @@ export default function AlbumPage(props) {
                         inAlbum={albName}
                         updateAlb={updateAlb}
                         date={picture.date}
-                        isVideo={picture.video}
+                        type={picture.type}
+                        mp4Data={picture.mp4Data}
+                        movData={picture.movData}
                     />
                 })
         )

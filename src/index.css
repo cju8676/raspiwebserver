@@ -61,7 +61,7 @@ h1 {
 .gallery-scroll {
   overflow-y: auto;
   overflow-x: hidden;
-  height: 80vh;
+  height: 75vh;
   min-height: auto;
   display:flex
 }
@@ -69,7 +69,7 @@ h1 {
 .noflex-scroll {
   overflow-y: auto;
   overflow-x: hidden;
-  height: 80vh;
+  height: 75vh;
   min-height: auto;
 }
 
@@ -139,4 +139,33 @@ h1 {
 #snackbar-fixed-container {
   position: fixed;
   bottom: 4rem;
+}
+
+.folder-container {
+  width: 100%;
+  height: 25vh;
+}
+
+.live-photo-container {
+  height: -webkit-fill-available;
+}
+
+.upload-parent {
+  display: grid;
+  overflow: hidden;
+  height: 25vh;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
+.live-photo-child {
+  max-height: 100%;
+  margin: auto;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  position: relative;
+  color: white;
+  /* using the below to center the text, optional */
+  display: flex;
 }

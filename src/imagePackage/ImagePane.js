@@ -9,6 +9,9 @@ import PaneMedia from './PaneMedia'
 import PaneInfo from './PaneInfo'
 import Timer from '../Timer'
 import { showErrorNotification, showSuccessNotification } from '../notificationUtils'
+import MyLivePhoto from '../LivePhoto'
+import JSZip from 'jszip'
+import FileSaver from 'file-saver'
 
 class ImagePane extends Component {
     static contextType = UserContext;
@@ -20,7 +23,7 @@ class ImagePane extends Component {
             picture: props.picture,
             favorited: props.favorited,
             id: props.id,
-            
+
             // modals
             infoModal: false,   // info panel
             removeModal: false, // confirm remove from album
@@ -36,7 +39,7 @@ class ImagePane extends Component {
 
     toggleRemoveModal = () => this.setState({ removeModal: !this.state.removeModal })
 
-    toggleDelModal = () => this.setState({ delModal : !this.state.delModal })
+    toggleDelModal = () => this.setState({ delModal: !this.state.delModal })
 
     toggleInfoModal = () => this.setState({ infoModal: !this.state.infoModal })
 
@@ -76,7 +79,7 @@ class ImagePane extends Component {
     }
 
     handleConfirmClick = () => {
-        this.setState({ deleted : true })
+        this.setState({ deleted: true })
         this.toggleDelModal();
     }
 
@@ -99,22 +102,45 @@ class ImagePane extends Component {
             })
     }
 
+    // deletes 1/3 of a live photo component - called 3 times
+    deleteLive = (id, path, name, reqOptions) => {
+        fetch('/deleteImage/' + id + '/' + encodeURIComponent(path) + '/' + encodeURIComponent(name), reqOptions)
+            .catch(err => {
+                showErrorNotification('Unexpected error occured in deleting portion of live photo')
+            })
+    }
+
     delete = () => {
         const reqOptions = {
             method: 'POST',
             headers: { Accept: 'application/json', 'Content-Type': 'application/json' }
         }
-        fetch('/deleteImage/' + this.state.id + '/' + encodeURIComponent(this.props.path) + '/' + encodeURIComponent(this.state.name), reqOptions)
-            .then(response => response.json())
-            .then(jsonOutput => {
-                if (jsonOutput) {
+        // if live, we want to delete all 3 parts
+        if (this.props.type === 'live') {
+            // delete all 3 parts
+            const imgPromise = this.deleteLive(this.state.id, this.props.path, this.state.name, reqOptions);
+            const mp4Promise = this.deleteLive(this.props.mp4Data.id, this.props.mp4Data.info, this.props.mp4Data.name, reqOptions)
+            const movPromise = this.deleteLive(this.props.movData.id, this.props.movData.info, this.props.movData.name, reqOptions)
+            Promise.all([imgPromise, mp4Promise, movPromise])
+                .then(() => {
                     showSuccessNotification(this.state.name + " deleted successfully")
-                    // this.context.setFiles([...this.context.files.filter(obj => obj.id !== this.state.id)])
                     this.context.setRefresh(true)
-                }
-                else
-                    showErrorNotification("Unable to delete " + this.state.name + "... Please try again.");
-            })
+                })
+        }
+        else {
+            // otherwise we could just delete the one part normally
+            fetch('/deleteImage/' + this.state.id + '/' + encodeURIComponent(this.props.path) + '/' + encodeURIComponent(this.state.name), reqOptions)
+                .then(response => response.json())
+                .then(jsonOutput => {
+                    if (jsonOutput) {
+                        showSuccessNotification(this.state.name + " deleted successfully")
+                        // this.context.setFiles([...this.context.files.filter(obj => obj.id !== this.state.id)])
+                        this.context.setRefresh(true)
+                    }
+                    else
+                        showErrorNotification("Unable to delete " + this.state.name + "... Please try again.");
+                })
+        }
     }
 
     // update favorited state from PaneInfo child
@@ -122,6 +148,80 @@ class ImagePane extends Component {
 
     // update map state from PaneInfo child
     setMap = (mapObj) => this.setState({ map: mapObj })
+
+    loadingSquare = () => <Placeholder><Placeholder.Image square /></Placeholder>
+
+    // returns either placeholder or display depending on type of file
+    getCardDisplay = () => {
+        switch (this.props.type) {
+            case "live":
+                return (
+                    <>
+                        {this.state.loading ? (this.loadingSquare()) :
+                            (
+                                <div>
+                                    <MyLivePhoto vid={this.props.mp4Data.link} img={this.props.picture} />
+                                </div>
+                            )}
+                    </>
+                )
+            case "video":
+                return (
+                    <>
+                        {this.state.loading ? (this.loadingSquare()) :
+                            (
+                                <div
+                                    onMouseEnter={() => this.setState({ vidPreview: true })}
+                                    onMouseLeave={() => this.setState({ vidPreview: false })}>
+                                    <ReactPlayer
+                                        url={this.state.picture}
+                                        playing={this.state.vidPreview}
+                                        loop muted width='100%' /*height='100%'*/ />
+                                </div>
+                            )}
+                    </>
+                )
+            case "photo":
+            default:
+                return (
+                    <>
+                        {this.state.loading ? (this.loadingSquare()) :
+                            (
+                                <Image src={this.state.picture} alt="pic" />
+                            )}
+                    </>
+                )
+
+        }
+    }
+
+    // either render normal download or
+    // ensure logic for downloading live photo zip
+    getDownload = () => {
+        if (this.props.type === 'live') {
+            // zip up MOV and JPG
+            const exportZip = () => {
+                const zip = JSZip();
+                zip.file(this.props.movData.name, this.props.movData.link)
+                zip.file(this.state.name, this.props.link)
+                zip.generateAsync({ type: 'blob' })
+                    .then(zipFile => {
+                        FileSaver.saveAs(zipFile, 'LivePhoto.zip')    
+                })
+            }
+            // render download button
+            return <Button onClick={exportZip}><Icon name='download' />Save</Button>
+
+        }
+        else {
+            // render normal download button
+            return (
+                <a href={this.state.picture} download={this.state.name}>
+                    <Button type="submit"><Icon name='download' />Save</Button>
+                </a>
+            )
+        }
+    }
 
     componentDidMount() {
         // use this code to test loading
@@ -134,25 +234,7 @@ class ImagePane extends Component {
         return (
             <div ref={this.props.forwardedRef}> {(this.props.inViewport || this.props.enterCount > 1) ? (
                 <Card>
-                    {this.props.isVideo ? (
-                        <>
-                            {this.state.loading ? (
-                                <Placeholder><Placeholder.Image square /></Placeholder>
-                            ) : (
-                                <div onMouseEnter={() => this.setState({ vidPreview: true })} onMouseLeave={() => this.setState({ vidPreview: false })}>
-                                    <ReactPlayer url={this.state.picture} playing={this.state.vidPreview} loop muted width='100%' /*height='100%'*/ />
-                                </div>
-                            )}
-                        </>
-                    ) : (
-                        <>
-                            {this.state.loading ? (
-                                <Placeholder><Placeholder.Image square /></Placeholder>
-                            ) : (
-                                <Image src={this.state.picture} alt="pic" />
-                            )}
-                        </>
-                    )}
+                    {this.getCardDisplay()}
                     <Card.Content>
                         <Modal
                             open={this.state.infoModal}
@@ -160,11 +242,9 @@ class ImagePane extends Component {
                             <Modal.Content>
                                 <Grid columns={2} divided>
                                     <Grid.Column>
-                                        <PaneMedia media={this.state.picture} name={this.state.name} isVideo={this.props.isVideo} />
+                                        <PaneMedia media={this.state.picture} name={this.state.name} type={this.props.type} mp4={this.props.mp4Data && this.props.mp4Data.link} />
                                         <Divider />
-                                        <a href={this.state.picture} download={this.state.name}>
-                                            <Button type="submit"><Icon name='download' />Save</Button>
-                                        </a>
+                                        {this.getDownload()}
                                         <Button onClick={this.favorite}>
                                             {!this.state.favorited && <Icon name='favorite' />}
                                             {this.state.favorited && <Icon name='favorite' color='yellow' />}
@@ -205,7 +285,7 @@ class ImagePane extends Component {
                             </Modal.Actions>
                         </Modal>
                         {this.state.deleted ?
-                            <Button negative onClick={() => this.setState({deleted: false})}>Undo - <Timer duration={10} handleAtZero={this.delete}/></Button>
+                            <Button negative onClick={() => this.setState({ deleted: false })}>Undo - <Timer duration={5} handleAtZero={this.delete} /></Button>
                             : <Button negative icon='trash' onClick={this.toggleDelModal} disabled={this.state.loading}></Button>
                         }
                         <Confirm

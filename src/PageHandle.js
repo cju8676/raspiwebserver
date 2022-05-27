@@ -5,6 +5,8 @@ import HomePage from './HomePage'
 import AlbumPage from './AlbumPage'
 import SettingsPage from './settingPackage/SettingsPage'
 import { UserContext } from './UserContext'
+import Upload from './galleryPackage/Upload'
+import { duplicates, count, getFilenames } from './galleryPackage/uploadUtils'
 
 export default function PageHandle(props) {
 
@@ -44,17 +46,100 @@ export default function PageHandle(props) {
             setCurrentUser(val);
     }
 
-    useEffect(() => {
-    }, [currentName])
+    // get our blobs associated with this live photo
+    async function getLiveBlobs(movFile, jpgFile, mp4File) {
+        const mov = fetch('/files/' + movFile.id) // fetch movFile
+            .then(res => res.blob())
+        const jpg = fetch('/files/' + jpgFile.id) // fetch jpgFile
+            .then(res => res.blob())
+        const mp4 = fetch('/files/' + mp4File.id) // fetch mp4File
+            .then(res => res.blob())
+
+        // does not return until all fetches return
+        return {
+            mov: await mov.then(blob => blob),
+            jpg: await jpg.then(blob => blob),
+            mp4: await mp4.then(blob => blob),
+        }
+    }
+
+    async function getLivePhotos(files) {
+
+        //todo we should be allowed to have same filename from separate folders - should parse
+        // for that once sample size gets bigger
+
+        // get duplicate file names and ensure there is three files of that name
+        // mov, jpg, and mp4 files
+        const dupFileNames = duplicates(count(getFilenames([...files])))
+        if (dupFileNames.length) {
+            var getLive = [...files]
+            for (let i = 0; i < dupFileNames.length; i++) {
+                const movFile = files.find(item => item.name === `${dupFileNames[i]}.mov`)
+                const jpgFile = files.find(item => item.name === `${dupFileNames[i]}.jpg`)
+                const mp4File = files.find(item => item.name === `${dupFileNames[i]}.mp4`)
+                // await all of these and then update our files state
+                var liveLinks;
+                await getLiveBlobs(movFile, jpgFile, mp4File)
+                    .then(obj => {
+                        liveLinks = {
+                            mov: URL.createObjectURL(obj.mov),
+                            jpg: URL.createObjectURL(obj.jpg),
+                            mp4: URL.createObjectURL(obj.mp4),
+                        };
+                    })
+                console.log("live links", liveLinks)
+                // use info of photo
+                setFiles(prevState => {
+                    return [...prevState,
+                    {
+                        link: liveLinks.jpg,
+                        name: jpgFile.name,
+                        id: jpgFile.id,
+                        info: jpgFile.path.replace('/', '%2F'),
+                        date: jpgFile.date,
+                        type: "live",
+                        movData:{
+                            link: liveLinks.mov,
+                            name: movFile.name,
+                            id: movFile.id,
+                            info: movFile.path.replace('/', '%$2F'), 
+                            date: movFile.date
+                        }, 
+                        mp4Data:{
+                            link: liveLinks.mp4,
+                            name: mp4File.name,
+                            id: mp4File.id,
+                            info: mp4File.path.replace('/', '%$2F'),
+                            date: mp4File.date
+                        },
+                    }
+                    ]
+                })
+                // and then filter out from files array
+                getLive = [...getLive].filter(file => {
+                    return file !== movFile && file !== jpgFile && file !== mp4File
+                })
+            }
+            return getLive
+        }
+        else return files
+
+        // return files without live
+    }
 
     useEffect(() => {
         var id_path = {};
         async function fetchImg() {
             setFiles([])
             await fetch('/getAllImages/').then(response => response.json())
-                .then(JSONresponse => {
+                .then(async JSONresponse => {
                     var files = JSON.parse(JSONresponse)
-                    // this.setState({ filesLen: files.length })
+                    console.log("files", files)
+
+                    // extract live photos and then proceed with normal files
+                    files = await getLivePhotos(files)
+                    console.log("files after getting live", files)
+
                     for (let i = 0; i < files.length; i++) {
                         var path = (files[i].path).replace('/', '%2F');
                         id_path[files[i].id] = path
@@ -72,7 +157,9 @@ export default function PageHandle(props) {
                                         id: files[i].id,
                                         info: id_path[files[i].id],
                                         date: files[i].date,
-                                        video: isVideo
+                                        type: isVideo ? "video" : "photo", 
+                                        movData: null,
+                                        mp4Data: null
                                     }
                                     ]
                                 })
@@ -117,6 +204,7 @@ export default function PageHandle(props) {
                 <Route path="/home" component={(props) => <HomePage onChange={handleLogout} onRefresh={handleHomeRefresh} />} />
                 <Route path="/album/:album" component={(props) => <AlbumPage {...props} />} />
                 <Route path="/settings" component={(props) => <SettingsPage {...props} onChange={handleLogout} setPage={setPage} />} />
+                <Route path="/upload" component={(props) => <Upload {...props} />} />
             </UserContext.Provider>
         </HashRouter>
     )

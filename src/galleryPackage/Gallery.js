@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from 'react'
-import { Divider, Header, Card, Message } from 'semantic-ui-react'
+import { Divider, Header, Card, Message, Button } from 'semantic-ui-react'
 import UploadFileModal from './UploadFileModal'
 import SearchBar from '../SearchBar'
 import { UserContext } from '../UserContext';
@@ -92,6 +92,7 @@ export default function Gallery({ onRefresh, albums }) {
     }, [searchInput, category])
 
     useEffect(() => {
+        console.log("all files in gallery", files)
         setImg(files.map(picture => {
             return <ImagePane
                 picture={picture.link}
@@ -103,7 +104,9 @@ export default function Gallery({ onRefresh, albums }) {
                 inAlbum={false}
                 refresh={onRefresh}
                 date={picture.date}
-                isVideo={picture.video}
+                type={picture.type}
+                mp4Data={picture.mp4Data}
+                movData={picture.movData}
             />
         }))
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -142,6 +145,7 @@ export default function Gallery({ onRefresh, albums }) {
         <div>
             <div>
                 <Header as='h3'>
+                    <Button color="orange" href="#upload" />
                     <UploadFileModal onRefresh={onRefresh} user={user} />
                     <SearchBar onChange={searchResults} source={img} shownTags={shownTags}/>
                 </Header>

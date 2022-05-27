@@ -14,8 +14,15 @@ from album_api import *
 from imagepane_api import *
 from utils import *
 import json
+import subprocess
 
+#todo change for raspi integration
 UPLOAD_FOLDER='C:/Users/corey/Pictures/dbtest'
+CONVERSIONS_FOLDER='C:/Users/corey/Pictures/dbconversions'
+ROOT_DIR = 'C://Users/corey/'
+# assumes we are in ROOT_DIR
+FFMPEG_DIR = '../../FFmpeg/bin/ffmpeg'
+
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg'}
 
 app = Flask(__name__)
@@ -226,7 +233,25 @@ def fileUpload():
         WHERE id = -2;
     """
     return str(exec_commit(sql_tags, (id)))
-    
+
+@app.route('/convertToMP4/<movPath>/<filename>', methods=['GET'])
+def convert(movPath, filename):
+    print(movPath)
+    print(filename)
+    #DBCONVERSIONS SAVE TO AND THEN PULL FROM WHEN WE GETALLIMAGES
+
+    # insert into files db conversions
+    sql = """
+        INSERT INTO files (name, filepath)
+        VALUES (%s, %s)
+    """
+    exec_commit(sql, (filename + '.mp4', "Pictures/dbconversions"))
+
+    os.chdir(ROOT_DIR)
+    subprocess.call([FFMPEG_DIR, '-y', '-i', 'Downloads/'+ movPath +'/'+filename + '.mov', '-vcodec', 'h264', '-acodec', 'mp2', 'Pictures/dbconversions/' + filename + '.mp4'])
+    # return the file to use in place of the original MOV
+    return send_from_directory(ROOT_DIR + "Pictures/dbconversions", filename  + ".mp4")
+
 api.add_resource(CreateUser, '/createUser/')
 api.add_resource(LoginUser, '/login/<string:username>/<string:password>')
 api.add_resource(GetImage, '/getImage/<string:filename>')

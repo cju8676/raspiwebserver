@@ -76,57 +76,52 @@ class UploadFileModal extends Component {
             })
     }
 
-    handleSubmit = () => {
-        this.setState({ uploadFile: !this.state.uploadFile })
-        this.state.refresh();
-    }
+    // // parse webkitRelativePath up to
+    // // the last forward slash and return that
+    // getFolder = (path) => {
+    //     return path.substring(0, path.lastIndexOf('/'))
+    // }
 
-    // parse webkitRelativePath up to
-    // the last forward slash and return that
-    getFolder = (path) => {
-        return path.substring(0, path.lastIndexOf('/'))
-    }
+    // // takes in Array of Files
+    // // returns folders will include
+    // // array of objects containing Files sorted by folder
+    // // { name: "", files: [File, File, ..., File] }
+    // sortBulkUpload = (filesArray) => {
+    //     if (filesArray.length === 0) return;
+    //     var sorted = [];
+    //     var files = [...filesArray];
+    //     // iterate through files adding each of its respective object's array
+    //     while (files.length !== 0) {
+    //         const f = files.pop()
+    //         // get folder name
+    //         const folder = this.getFolder(f.webkitRelativePath)
+    //         // we have not seen this folder name yet, add it and push
+    //         if (!sorted.some(f => f.name === folder)) {
+    //             sorted.push({ name: folder, files: [f] })
+    //         }
+    //         // we have seen this folder name - add it to its respective object's array
+    //         else {
+    //             sorted.find(f => f.name === folder).files.push(f)
+    //         }
+    //     }
+    //     console.log("SORTED", sorted)
+    //     // this.setState({ folders: sorted })
+    //     return sorted
+    // }
 
-    // takes in Array of Files
-    // returns folders will include
-    // array of objects containing Files sorted by folder
-    // { name: "", files: [File, File, ..., File] }
-    sortBulkUpload = (filesArray) => {
-        if (filesArray.length === 0) return;
-        var sorted = [];
-        var files = [...filesArray];
-        // iterate through files adding each of its respective object's array
-        while (files.length !== 0) {
-            const f = files.pop()
-            // get folder name
-            const folder = this.getFolder(f.webkitRelativePath)
-            // we have not seen this folder name yet, add it and push
-            if (!sorted.some(f => f.name === folder)) {
-                sorted.push({ name: folder, files: [f] })
-            }
-            // we have seen this folder name - add it to its respective object's array
-            else {
-                sorted.find(f => f.name === folder).files.push(f)
-            }
-        }
-        console.log("SORTED", sorted)
-        // this.setState({ folders: sorted })
-        return sorted
-    }
-
-    // takes in Array of Files
-    // returns Array of Files
-    // that are supported by the application
-    filterUnsupportedFiles = (filesArray) => {
-        const supported = ["jpeg", "jpg", "jfif", "gif", "mp4"]
-        return filesArray.filter(file => 
-            supported.includes(
-                file.name
-                    .split('.')
-                    .pop()
-                    .toLowerCase())
-            )
-    }
+    // // takes in Array of Files
+    // // returns Array of Files
+    // // that are supported by the application
+    // filterUnsupportedFiles = (filesArray) => {
+    //     const supported = ["jpeg", "jpg", "jfif", "gif", "mp4", "mov"]
+    //     return filesArray.filter(file => 
+    //         supported.includes(
+    //             file.name
+    //                 .split('.')
+    //                 .pop()
+    //                 .toLowerCase())
+    //         )
+    // }
 
     handleChange(event) {
 
@@ -231,7 +226,7 @@ class UploadFileModal extends Component {
                             <input type="file" directory="" webkitdirectory="" onChange={this.handleChange} ref={(ref) => { this.uploadInput = ref; }} />
                             <UploadPreview uploadFiles={this.state.files} folders={this.state.folders} isBulk={true} />
                             <div className='previewImgs'>
-                                {this.state.livePhotos.length > 0 && this.state.livePhotos.map(obj => <LivePhoto vid={obj.vid} img={obj.img} />)}
+                                {this.state.livePhotos.length > 0 && this.state.livePhotos.map(obj => <LivePhoto {...obj} />)}
                             </div>
                             <Divider />
                             <Container>

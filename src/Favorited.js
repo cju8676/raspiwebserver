@@ -31,7 +31,9 @@ export default function Favorited({ albums, onRefresh }) {
                     inFavs={updateFav}
                     refresh={onRefresh}
                     date={picture.date}
-                    isVideo={picture.video}
+                    type={picture.type}
+                    mp4Data={picture.mp4Data}
+                    movData={picture.movData}
                 />
             }))
         // eslint-disable-next-line react-hooks/exhaustive-deps
