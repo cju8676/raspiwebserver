@@ -25,7 +25,9 @@ h1 {
 }
 
 .map {
-  padding: 0px 10px 0px
+  padding: 0px 1vh 0px;
+  height: 22.5vh;
+  max-height: 100%
 }
 
 .year {
@@ -166,6 +168,5 @@ h1 {
   overflow: hidden;
   position: relative;
   color: white;
-  /* using the below to center the text, optional */
   display: flex;
 }

@@ -30,7 +30,6 @@ function LivePhoto({ vid, img }) {
                 >
                     <Container className='live-photo-container'>
                         <ReactPlayer
-                            onMouseEnter={() => console.log("entering...")}
                             ref={playerRef}
                             url={vid}
                             playing={playing}

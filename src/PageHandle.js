@@ -78,7 +78,7 @@ export default function PageHandle(props) {
                 const jpgFile = files.find(item => item.name === `${dupFileNames[i]}.jpg`)
                 const mp4File = files.find(item => item.name === `${dupFileNames[i]}.mp4`)
                 // await all of these and then update our files state
-                var liveLinks;
+                let liveLinks = {};
                 await getLiveBlobs(movFile, jpgFile, mp4File)
                     .then(obj => {
                         liveLinks = {
@@ -87,7 +87,6 @@ export default function PageHandle(props) {
                             mp4: URL.createObjectURL(obj.mp4),
                         };
                     })
-                console.log("live links", liveLinks)
                 // use info of photo
                 setFiles(prevState => {
                     return [...prevState,
@@ -134,11 +133,8 @@ export default function PageHandle(props) {
             await fetch('/getAllImages/').then(response => response.json())
                 .then(async JSONresponse => {
                     var files = JSON.parse(JSONresponse)
-                    console.log("files", files)
-
                     // extract live photos and then proceed with normal files
                     files = await getLivePhotos(files)
-                    console.log("files after getting live", files)
 
                     for (let i = 0; i < files.length; i++) {
                         var path = (files[i].path).replace('/', '%2F');

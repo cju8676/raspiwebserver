@@ -1,10 +1,57 @@
 import React from 'react'
-import { Header, Image, Segment, Dimmer, Loader } from 'semantic-ui-react'
+import ReactPlayer from 'react-player'
+import { Header, Image, Segment, Dimmer, Loader, Card } from 'semantic-ui-react'
 import MyLivePhoto from '../LivePhoto'
 
 // Component to handle the preview section of the UploadFileModal
 export default function UploadPreview({ uploadFiles, folders, isBulk, loading }) {
+    console.log("upload files", uploadFiles)
+    console.log("folders", folders)
     // todo save folder to album
+
+    const getFileExtension = (filename) => {
+        return filename
+            .split('.')
+            .pop()
+            .toLowerCase()
+    }
+
+    // maps based on if file is a photo/video
+    // file obj contains {name: "", url: "blob://"}
+    const mapFile = (fileObj) => {
+        const supportedPhotoFormats = ['jpg', 'jpeg', 'gif', 'jfif', 'png']
+        const supportedVideoFormats = ['mp4']
+        const fileExtension = getFileExtension(fileObj.name)
+        const isSupportedPhoto = supportedPhotoFormats.includes(fileExtension)
+        const isSupportedVideo = supportedVideoFormats.includes(fileExtension)
+
+        if (isSupportedPhoto)
+            return (
+                <Image size="large" src={fileObj.url} />
+            )
+        else if (isSupportedVideo)
+            return (
+                <ReactPlayer
+                    url={uploadFiles[0].url}
+                    muted
+                    loop
+                    playing
+                />
+            )
+        else
+            return (
+                <Card content={`Warning - ${fileObj.name} - Unsupported File type`}></Card>
+            )
+    }
+
+    // if in bulk we are given File
+    // this converts File to obj containing {name: "", url: "blob://"}
+    const convertFileToObj = (file) => {
+        return {
+            name: file.name,
+            url: URL.createObjectURL(file)
+        }
+    }
 
     return isBulk ? (
         <Dimmer.Dimmable>
@@ -19,13 +66,9 @@ export default function UploadPreview({ uploadFiles, folders, isBulk, loading })
                             <>
                                 <Segment color='orange'>
                                     <Header as='h4'>{folder.name}</Header>
-                                    {/* <div className='previewImgs'>
-                                        {folder.files.map(file => <Image size="small" src={uploadFiles.find(i => i.name === file["name"]).url} />)}
-                                    </div> */}
-                                    {/* If source is an obj we know it is a live photo */}
                                     <div className='upload-parent'>
                                         {folder.files.map(file => {
-                                            return typeof(file) === "object" ? <MyLivePhoto {...file} /> : <Image size="small" src={file} />
+                                            return file instanceof File ? mapFile(convertFileToObj(file)) : <MyLivePhoto {...file} />
                                         })}
                                     </div>
                                 </Segment>
@@ -33,12 +76,11 @@ export default function UploadPreview({ uploadFiles, folders, isBulk, loading })
                     })}
                 </div>
             }
-            {/* {livePhotos.length ? livePhotos.map(obj => <MyLivePhoto {...obj} />) : <></>} */}
         </Dimmer.Dimmable>
     ) : (
         <>
             <Header>Preview:</Header>
-            {uploadFiles.length ? <Image size="large" src={uploadFiles[0].url} /> : <></>}
+            {uploadFiles.length ? (mapFile(uploadFiles[0])) : (<></>)}
         </>
     )
 }

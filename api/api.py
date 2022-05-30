@@ -236,10 +236,6 @@ def fileUpload():
 
 @app.route('/convertToMP4/<movPath>/<filename>', methods=['GET'])
 def convert(movPath, filename):
-    print(movPath)
-    print(filename)
-    #DBCONVERSIONS SAVE TO AND THEN PULL FROM WHEN WE GETALLIMAGES
-
     # insert into files db conversions
     sql = """
         INSERT INTO files (name, filepath)

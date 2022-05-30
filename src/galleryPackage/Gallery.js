@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from 'react'
 import { Divider, Header, Card, Message, Button } from 'semantic-ui-react'
-import UploadFileModal from './UploadFileModal'
 import SearchBar from '../SearchBar'
 import { UserContext } from '../UserContext';
 import { sortByYear, mapByYear, sortByMonth } from '../imageUtils'
@@ -84,6 +83,24 @@ export default function Gallery({ onRefresh, albums }) {
                     }
                     return;
                 case 'type':
+                    const shownByType = img.filter(pic => pic.props.type.includes(searchInput))
+                    const shownByFileExtension = img.filter(pic =>
+                        pic.props.filename
+                            .split('.')
+                            .pop()
+                            .toLowerCase()
+                            .includes(searchInput)
+                    )
+                    const shown = [...new Set(shownByType.concat(shownByFileExtension))]
+                    if (shown.length > 0) {
+                        setShownImg(shown)
+                        setNoResultsMessage(false)
+                    }
+                    else {
+                        setShownImg([])
+                        setNoResultsMessage(true)
+                    }
+                    return;
                 default:
                     setShownImg([])
             }
@@ -92,7 +109,6 @@ export default function Gallery({ onRefresh, albums }) {
     }, [searchInput, category])
 
     useEffect(() => {
-        console.log("all files in gallery", files)
         setImg(files.map(picture => {
             return <ImagePane
                 picture={picture.link}
@@ -145,9 +161,8 @@ export default function Gallery({ onRefresh, albums }) {
         <div>
             <div>
                 <Header as='h3'>
-                    <Button color="orange" href="#upload" />
-                    <UploadFileModal onRefresh={onRefresh} user={user} />
-                    <SearchBar onChange={searchResults} source={img} shownTags={shownTags}/>
+                    <Button className='rightButton' color="orange" href="#upload" size='large' content='Upload'/>
+                    <SearchBar onChange={searchResults} source={img} shownTags={shownTags} />
                 </Header>
             </div>
             <Divider />
@@ -157,9 +172,9 @@ export default function Gallery({ onRefresh, albums }) {
                         <div style={{ padding: "10px 5px" }}>
                             <Message negative floating compact content="No results found." />
                         </div>}
-                    <div style={{padding: "5px"}}>
+                    <div style={{ padding: "5px" }}>
                         <Card.Group stackable itemsPerRow={4}>
-                            {shownImg.map(picture => 
+                            {shownImg.map(picture =>
                                 <div className='pane-pad' key={picture}>
                                     {picture}
                                 </div>

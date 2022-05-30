@@ -79,7 +79,12 @@ class HomePage extends Component {
                         </div>
                     </Header>
                 </Segment>
-                <Tab menu={{ color: 'orange', tabular: false, attached: false, inverted: true }} panes={panes} activeIndex={this.context.activeIndex} onTabChange={this.handleTabChange}/*renderActiveOnly={false}*/ />
+                <Tab 
+                    menu={{ color: 'orange', tabular: false, attached: false, inverted: true }} 
+                    panes={panes} 
+                    activeIndex={this.context.activeIndex} 
+                    onTabChange={this.handleTabChange}/*renderActiveOnly={false}*/ 
+                />
             </div>
         )
     }

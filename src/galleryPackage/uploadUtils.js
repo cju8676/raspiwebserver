@@ -38,15 +38,14 @@ export async function extractLivePhotos(sorted) {
     // go through each object's files array
     while (folders.length !== 0) {
         const o = folders.pop()
-        console.log("o here", o)
-        var newFiles = [];
+        let newFiles = [];
         const dupFileNames = duplicates(count(getFilenames([...o.files])))
         // for each duplicate filename, create live photo obj and push to newFiles
         if (dupFileNames.length) {
             for (let i = 0; i < dupFileNames.length; i++) {
                 const movFile = o.files.find(item => item.name === `${dupFileNames[i]}.mov`)
                 const jpgFile = o.files.find(item => item.name === `${dupFileNames[i]}.jpg`)
-                var vidURL;
+                let vidURL = "";
                 await convertToMP4(o.name, dupFileNames[i]).then((data) => {
                     vidURL = URL.createObjectURL(data)
                 });
@@ -94,7 +93,6 @@ export const sortBulkUpload = (filesArray) => {
             sorted.find(f => f.name === folder).files.push(f)
         }
     }
-    console.log("SORTED", sorted)
     return sorted
 }
 

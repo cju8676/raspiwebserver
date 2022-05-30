@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { Button, Divider, Dropdown, Header, Segment, Form } from 'semantic-ui-react'
-import { count, duplicates, extractLivePhotos, filterUnsupportedFiles, getFilenames, MOVtoMP4, sortBulkUpload } from './uploadUtils'
+import { extractLivePhotos, filterUnsupportedFiles, sortBulkUpload } from './uploadUtils'
 import { UserContext } from '../UserContext'
 import { showSuccessNotification } from '../notificationUtils'
 import UploadPreview from './UploadPreview'
@@ -34,15 +34,9 @@ export default function Upload(props) {
             <Header>Select Folder</Header>
             <input type="file" onChange={handleChange} ref={(ref) => { setUploadInput(ref) }} directory="" webkitdirectory="" />
         </>)
-    
-    useEffect(() => {
-        if (uploadInput) console.log("whats upload input look like", uploadInput.files)
-    }, [uploadInput])
 
     async function handleUpload(e) {
         e.preventDefault();
-        console.log("handling upload")
-        console.log(uploadInput.files)
         for (var i = 0; i < uploadInput.files.length; i++) {
             const data = new FormData();
             data.append("file", uploadInput.files[i])
@@ -52,10 +46,9 @@ export default function Upload(props) {
             })
                 .then(res => res.text())
                 .then(data => {
-                    console.log("upload", data)
+                    // console.log("upload", data)
                 })
         }
-        console.log("upload finished")
         props.history.push('/home')
         setRefresh(true)
         showSuccessNotification("Successfully uploaded media. Refreshing...")
@@ -68,9 +61,7 @@ export default function Upload(props) {
         setLoading(true)
         const sortedFolders = sortBulkUpload(filterUnsupportedFiles(filesArray))
         const extracted = await extractLivePhotos(sortedFolders)
-        console.log("extracted", extracted)
         setFolders(extracted)
-        console.log("files array now here", filesArray)
         for (var i = 0; i < filesArray.length; i++) {
             const name = filesArray[i]["name"]
             const url = URL.createObjectURL(filesArray[i])
@@ -82,7 +73,6 @@ export default function Upload(props) {
     }
 
     useEffect(() => {
-        console.log("FOLDERS", folders)
         if (folders) setLoading(false)
     }, [folders])
 

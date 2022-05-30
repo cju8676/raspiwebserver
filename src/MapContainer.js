@@ -6,7 +6,7 @@ export class MapContainer extends Component {
     render() {
         const style = {
             width: '90%',
-            height: '30%'
+            height: '22.5vh'
         }
 
         return (
