@@ -234,19 +234,39 @@ def fileUpload():
     """
     return str(exec_commit(sql_tags, (id)))
 
-@app.route('/convertToMP4/<movPath>/<filename>', methods=['GET'])
-def convert(movPath, filename):
+@app.route('/convertToMP4/', methods=['POST'])
+def convert():
+    # save mov file
+    target=os.path.join(UPLOAD_FOLDER, datetime.today().strftime("%m-%d-%Y"))
+    if not os.path.isdir(target):
+        os.mkdir(target)
+    file = request.files['file']
+    if "/" in file.filename:
+        idx = file.filename.find('/')
+        target=os.path.join(target, file.filename[0:idx])
+        if not os.path.isdir(target):
+            os.mkdir(target)
+        filename = secure_filename(file.filename[idx:])
+    else:
+        filename = secure_filename(file.filename)
+    destination="/".join([target, filename])
+    file.save(destination)
+
+    extension_idx = filename.find('.')
+    filename_wo_ext = filename[0:extension_idx]
+
     # insert into files db conversions
     sql = """
         INSERT INTO files (name, filepath)
         VALUES (%s, %s)
     """
-    exec_commit(sql, (filename + '.mp4', "Pictures/dbconversions"))
+    exec_commit(sql, (filename_wo_ext + '.mp4', "Pictures/dbconversions"))
 
+    # convert saved mov to mp4
     os.chdir(ROOT_DIR)
-    subprocess.call([FFMPEG_DIR, '-y', '-i', 'Downloads/'+ movPath +'/'+filename + '.mov', '-vcodec', 'h264', '-acodec', 'mp2', 'Pictures/dbconversions/' + filename + '.mp4'])
+    subprocess.call([FFMPEG_DIR, '-y', '-i', destination, '-vcodec', 'h264', '-acodec', 'mp2', 'Pictures/dbconversions/' + filename_wo_ext + '.mp4'])
     # return the file to use in place of the original MOV
-    return send_from_directory(ROOT_DIR + "Pictures/dbconversions", filename  + ".mp4")
+    return send_from_directory(ROOT_DIR + "Pictures/dbconversions", filename_wo_ext + '.mp4')
 
 api.add_resource(CreateUser, '/createUser/')
 api.add_resource(LoginUser, '/login/<string:username>/<string:password>')

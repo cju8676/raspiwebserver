@@ -20,11 +20,20 @@ const getFolder = (path) => {
     return path.substring(0, path.lastIndexOf('/'))
 }
 
-function convertToMP4(movPath, filename) {
-    return fetch('/convertToMP4/' + movPath + '/' + filename)
+function convertToMP4(movFile) {
+    const data = new FormData()
+    data.append("file", movFile)
+    const reqOptions = {
+        method: 'POST',
+        body: data
+    }
+    return fetch('/convertToMP4/', reqOptions)
         .then(response => {
             const data = response.blob()
             return data
+        })
+        .catch(err => {
+            console.log("ERROR", err)
         })
 }
 
@@ -46,7 +55,7 @@ export async function extractLivePhotos(sorted) {
                 const movFile = o.files.find(item => item.name === `${dupFileNames[i]}.mov`)
                 const jpgFile = o.files.find(item => item.name === `${dupFileNames[i]}.jpg`)
                 let vidURL = "";
-                await convertToMP4(o.name, dupFileNames[i]).then((data) => {
+                await convertToMP4(movFile).then((data) => {
                     vidURL = URL.createObjectURL(data)
                 });
                 newFiles.push({
