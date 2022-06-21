@@ -6,9 +6,11 @@ import { showErrorNotification } from './notificationUtils';
 import SharePane from './SharePane';
 import { UserContext } from './UserContext';
 //import {withRouter} from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 
 export default function AlbumPage(props) {
     const { user, files, setActiveIndex } = useContext(UserContext)
+    const history = useHistory();
     const albName = props.match.params.album;
     // is confirm dialog open
     const [confirmDelete, setConfirmDelete] = useState(false);
@@ -55,6 +57,9 @@ export default function AlbumPage(props) {
                     else addedBy.push({ user: JSONresponse[i][1], ids: [JSONresponse[i][0]] })
                 }
                 setAddedBy(addedBy)
+            })
+            .catch(err => {
+                history.push('/error')
             })
     }
 

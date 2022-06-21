@@ -42,10 +42,18 @@ const PaneMedia = ({ type, media, name, mp4 = null }) => {
                             />
                         </div>
                         {displayVidControls &&
-                            <>
-                                <Button onClick={() => setMuted(!muted)}>Mute</Button>
-                                <Button onClick={() => setPlaying(!playing)}>Play/Pause</Button>
-                            </>
+                            <Button.Group basic size='small'>
+                                {muted ? (
+                                    <Button icon='mute' onClick={() => setMuted(false)} />
+                                ) : (
+                                    <Button icon='unmute' onClick={() => setMuted(true)} />
+                                )}
+                                {playing ? (
+                                    <Button icon='pause' onClick={() => setPlaying(false)} />
+                                ) : ( 
+                                    <Button icon='play' onClick={() => setPlaying(true)} />
+                                )}
+                            </Button.Group>
                         }
                     </div>
                 )

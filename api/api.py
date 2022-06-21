@@ -69,6 +69,8 @@ def getinfo(path, filename, username):
             exifdata = {}
         else: 
             exif = image._getexif()
+            print("----EXIF----")
+            print(exif)
         if exif is not None:
             exifdata = dict(exif)
         else:
@@ -213,7 +215,13 @@ def fileUpload():
         date = datetime.today()
     else:
         dict_exif = dict(exifdata)
-        date = datetime.strptime(dict_exif.get(306, datetime.today().strftime('%Y:%m:%d %H:%M:%S')), '%Y:%m:%d %H:%M:%S')
+        print("dict exif----------")
+        print(dict_exif)
+        date = datetime.strptime( \
+            dict_exif.get(306,  \
+            dict_exif.get(36867, \
+            dict_exif.get(36868, \
+            datetime.today().strftime('%Y:%m:%d %H:%M:%S')))), '%Y:%m:%d %H:%M:%S')
     # Save file to db
     sql = """
         INSERT INTO files (name, filepath, date)

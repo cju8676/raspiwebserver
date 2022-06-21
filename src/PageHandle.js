@@ -7,6 +7,7 @@ import SettingsPage from './settingPackage/SettingsPage'
 import { UserContext } from './UserContext'
 import Upload from './galleryPackage/Upload'
 import { duplicates, count, getFilenames } from './galleryPackage/uploadUtils'
+import ErrorReport from './ErrorReport'
 
 export default function PageHandle(props) {
 
@@ -201,6 +202,7 @@ export default function PageHandle(props) {
                 <Route path="/album/:album" component={(props) => <AlbumPage {...props} />} />
                 <Route path="/settings" component={(props) => <SettingsPage {...props} onChange={handleLogout} setPage={setPage} />} />
                 <Route path="/upload" component={(props) => <Upload {...props} />} />
+                <Route path="/error" component={() => <ErrorReport />} />
             </UserContext.Provider>
         </HashRouter>
     )

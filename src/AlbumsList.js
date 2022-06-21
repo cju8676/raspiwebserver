@@ -1,11 +1,13 @@
 import React, { useEffect, useState, useContext } from "react";
 import { Card, Icon, Button, Modal, Input, Message } from 'semantic-ui-react'
 import { UserContext } from "./UserContext";
+import { useHistory } from 'react-router-dom'
 
 
 
 export default function AlbumsList(props) {
     const { user } = useContext(UserContext);
+    const history = useHistory();
     const [albums, setAlbums] = useState([]);
     const [modal, toggleModal] = useState(false);
     const [duplicate, toggleDuplicate] = useState(false);
@@ -17,6 +19,7 @@ export default function AlbumsList(props) {
         fetch('/getAlbums/' + user)
             .then(response => response.json())
             .then(JSONresponse => setAlbums(JSONresponse))
+            .catch(err => history.push('/error'))
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
