@@ -176,9 +176,7 @@ def fileUploadProfPic():
     file.save(destination)
     return send_from_directory(target, filename, as_attachment=True)
 
-#FIXME combine with prof pic upload
-@app.route('/uploadPic', methods=['POST'])
-def fileUpload():
+def save_file(request, ):
     target=os.path.join(UPLOAD_FOLDER, datetime.today().strftime("%m-%d-%Y"))
     if not os.path.isdir(target):
         os.mkdir(target)
@@ -193,9 +191,15 @@ def fileUpload():
     else:
         filename = secure_filename(file.filename)
     destination="/".join([target, filename])
-    # print(target)
-    # print(filename)
     file.save(destination)
+    return target, filename, destination
+
+#FIXME combine with prof pic upload
+@app.route('/uploadPic', methods=['POST'])
+def fileUpload():
+    file = request.files['file']
+    target, filename, destination = save_file(request)
+
     file_location = target + '/' + filename
     if(file.content_type[0:5] == 'image'):
         exif = Image.open(file_location)
@@ -215,8 +219,6 @@ def fileUpload():
         date = datetime.today()
     else:
         dict_exif = dict(exifdata)
-        print("dict exif----------")
-        print(dict_exif)
         date = datetime.strptime( \
             dict_exif.get(306,  \
             dict_exif.get(36867, \
@@ -244,21 +246,7 @@ def fileUpload():
 
 @app.route('/convertToMP4/', methods=['POST'])
 def convert():
-    # save mov file
-    target=os.path.join(UPLOAD_FOLDER, datetime.today().strftime("%m-%d-%Y"))
-    if not os.path.isdir(target):
-        os.mkdir(target)
-    file = request.files['file']
-    if "/" in file.filename:
-        idx = file.filename.find('/')
-        target=os.path.join(target, file.filename[0:idx])
-        if not os.path.isdir(target):
-            os.mkdir(target)
-        filename = secure_filename(file.filename[idx:])
-    else:
-        filename = secure_filename(file.filename)
-    destination="/".join([target, filename])
-    file.save(destination)
+    target, filename, destination = save_file(request)
 
     extension_idx = filename.find('.')
     filename_wo_ext = filename[0:extension_idx]

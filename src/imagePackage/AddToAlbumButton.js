@@ -1,5 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import { Dropdown } from "semantic-ui-react";
+import { showErrorNotification, showSuccessNotification } from "../notificationUtils";
 import { UserContext } from "../UserContext";
 
 
@@ -46,8 +47,9 @@ export default function AddToAlbumButton({ id }) {
     }
 
     function handleAlbumAdd(output) {
-        //TODO handle response - success or failed to add to album
-        // quick success pop up
+        output ?
+            showSuccessNotification('Added to album!') :
+            showErrorNotification('Failed to Add. Please Try again.')
     }
 
     return (

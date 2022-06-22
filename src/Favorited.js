@@ -58,13 +58,18 @@ export default function Favorited({ albums, onRefresh }) {
             <Dimmer active={loading} inverted>
                 <Loader />
             </Dimmer>
-            <Card.Group itemsPerRow={4}>
-                {favs.map(fav => 
-                    <div className="pane-pad">
-                        {fav}
-                    </div>
-                )}
-            </Card.Group>
+            <div className="gallery-scroll">
+                <div style={{ padding: "5px" }}>
+                    <Card.Group itemsPerRow={4}>
+                        {favs.map(fav =>
+                            <div className="pane-pad">
+                                {fav}
+                            </div>
+                        )}
+                    </Card.Group>
+                </div>
+            </div>
+
         </Dimmer.Dimmable>
     )
 }

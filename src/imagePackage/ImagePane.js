@@ -97,9 +97,11 @@ class ImagePane extends Component {
         fetch('/removeFromAlbum/', reqOptions)
             .then(response => response.json())
             .then(jsonOutput => {
-                //TODO handle response - success or failed to remove from album
+                jsonOutput ? showSuccessNotification(`Removed ${this.state.name} from album.`) :
+                    showErrorNotification('Failed to remove. Please try again.')
                 this.handleRemove()
             })
+            .catch(err => showErrorNotification('Failed to remove. Please try again.'))
     }
 
     // deletes 1/3 of a live photo component - called 3 times
