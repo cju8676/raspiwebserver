@@ -142,8 +142,14 @@ export default function PageHandle(props) {
                         id_path[files[i].id] = path
 
                         fetch('/files/' + files[i].id)
-                            .then(response => response.blob())
+                            .then(response => { 
+                                // console.log("res", response)
+                                if (response.status === 404)
+                                    return null;
+                                else return response.blob()
+                            })
                             .then(imageBlob => {
+                                if (!imageBlob) return;
                                 const imageURL = URL.createObjectURL(imageBlob);
                                 const isVideo = imageBlob.type === 'video/mp4' ? true : false
                                 setFiles(prevState => {

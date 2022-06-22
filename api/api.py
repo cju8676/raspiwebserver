@@ -1,3 +1,4 @@
+from genericpath import exists
 from flask import Flask, request, jsonify, redirect, url_for
 from flask_restful import Resource, Api
 import urllib.parse
@@ -59,9 +60,11 @@ def getinfo(path, filename, username):
     directory = 'C:/Users/corey/' + urllib.parse.unquote(path) + '/'
     path_str = 'C:/Users/corey/' + urllib.parse.unquote(path) + '/' + file_name
     print(file_name[file_name.find('.'):])
-
+    if (exists(path_str) is False):
+        print("WARNING: ", path_str, " does not exist!")
+        return "False"
     # if the file is a photo, gather photo info
-    if(imghdr.what(path_str) is not None):
+    elif(imghdr.what(path_str) is not None):
 
         image = Image.open(path_str)
         exif = None
