@@ -45,7 +45,7 @@ h1 {
 }
 
 .tagRow {
-  display:flex;
+  display: flex;
   height: 50px;
 }
 
@@ -65,7 +65,7 @@ h1 {
   overflow-x: hidden;
   height: 75vh;
   min-height: auto;
-  display:flex
+  display: flex
 }
 
 .noflex-scroll {
@@ -106,7 +106,8 @@ h1 {
 
 .player-wrapper {
   position: relative;
-  padding-top: 56.25%; /* 720 / 1280 = 0.5625 */
+  padding-top: 56.25%;
+  /* 720 / 1280 = 0.5625 */
 }
 
 .react-player {
@@ -169,4 +170,15 @@ h1 {
   position: relative;
   color: white;
   display: flex;
+}
+
+.live-photo-preview {
+  max-height: 100%;
+  margin: auto;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  position: relative;
+  color: white;
+  display: flex;
+  height: 25vh;
 }

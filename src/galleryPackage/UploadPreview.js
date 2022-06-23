@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactPlayer from 'react-player'
-import { Header, Image, Segment, Dimmer, Loader, Card } from 'semantic-ui-react'
+import { Header, Image, Segment, Dimmer, Loader, Card, Grid } from 'semantic-ui-react'
 import MyLivePhoto from '../LivePhoto'
 
 // Component to handle the preview section of the UploadFileModal
@@ -27,16 +27,20 @@ export default function UploadPreview({ uploadFiles, folders, isBulk, loading })
 
         if (isSupportedPhoto)
             return (
-                <Image size="large" src={fileObj.url} />
+                <Image size="small" src={fileObj.url} />
             )
         else if (isSupportedVideo)
             return (
-                <ReactPlayer
-                    url={uploadFiles[0].url}
-                    muted
-                    loop
-                    playing
-                />
+                <div className='live-photo-preview'>
+                    <ReactPlayer
+                        url={uploadFiles[0].url}
+                        muted
+                        loop
+                        playing
+                        width='100%'
+                        height='100%'
+                    />
+                </div>
             )
         else
             return (
@@ -66,10 +70,12 @@ export default function UploadPreview({ uploadFiles, folders, isBulk, loading })
                             <>
                                 <Segment color='orange'>
                                     <Header as='h4'>{folder.name}</Header>
-                                    <div className='upload-parent'>
-                                        {folder.files.map(file => {
-                                            return file instanceof File ? mapFile(convertFileToObj(file)) : <MyLivePhoto {...file} />
-                                        })}
+                                    <div style={{ padding: "25px" }}>
+                                        <Grid stackable columns={5}>
+                                            {folder.files.map(file => {
+                                                return file instanceof File ? mapFile(convertFileToObj(file)) : <div className='live-photo-preview'><MyLivePhoto {...file} /></div>
+                                            })}
+                                        </Grid>
                                     </div>
                                 </Segment>
                             </>)
