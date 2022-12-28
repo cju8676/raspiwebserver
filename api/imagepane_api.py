@@ -352,3 +352,12 @@ class GetAllTags(Resource):
         """
         res = exec_get_all(sql, ())
         return res
+
+class DeleteUploadTag(Resource):
+    def post(self, tag):
+        print("TAG----", tag)
+        sql = """
+            DELETE FROM tags
+            WHERE id = %s;
+        """
+        return str(exec_commit(sql, (tag,)))

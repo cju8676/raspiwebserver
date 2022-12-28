@@ -47,22 +47,7 @@ export default function PageHandle(props) {
             setCurrentUser(val);
     }
 
-    // get our blobs associated with this live photo
-    async function getLiveBlobs(movFile, jpgFile, mp4File) {
-        const mov = fetch('/files/' + movFile.id) // fetch movFile
-            .then(res => res.blob())
-        const jpg = fetch('/files/' + jpgFile.id) // fetch jpgFile
-            .then(res => res.blob())
-        const mp4 = fetch('/files/' + mp4File.id) // fetch mp4File
-            .then(res => res.blob())
-
-        // does not return until all fetches return
-        return {
-            mov: await mov.then(blob => blob),
-            jpg: await jpg.then(blob => blob),
-            mp4: await mp4.then(blob => blob),
-        }
-    }
+    
 
     async function getLivePhotos(files) {
 
@@ -72,44 +57,39 @@ export default function PageHandle(props) {
         // get duplicate file names and ensure there is three files of that name
         // mov, jpg, and mp4 files
         const dupFileNames = duplicates(count(getFilenames([...files])))
+        console.log("DUP", dupFileNames)
         if (dupFileNames.length) {
             var getLive = [...files]
             for (let i = 0; i < dupFileNames.length; i++) {
                 const movFile = files.find(item => item.name === `${dupFileNames[i]}.mov`)
                 const jpgFile = files.find(item => item.name === `${dupFileNames[i]}.jpg`)
                 const mp4File = files.find(item => item.name === `${dupFileNames[i]}.mp4`)
-                // await all of these and then update our files state
-                let liveLinks = {};
-                await getLiveBlobs(movFile, jpgFile, mp4File)
-                    .then(obj => {
-                        liveLinks = {
-                            mov: URL.createObjectURL(obj.mov),
-                            jpg: URL.createObjectURL(obj.jpg),
-                            mp4: URL.createObjectURL(obj.mp4),
-                        };
-                    })
+                
                 // use info of photo
                 setFiles(prevState => {
                     return [...prevState,
                     {
-                        link: liveLinks.jpg,
+                        // link: liveLinks.jpg,
+                        link: null,
                         name: jpgFile.name,
                         id: jpgFile.id,
                         info: jpgFile.path.replace('/', '%2F'),
                         date: jpgFile.date,
                         type: "live",
                         movData:{
-                            link: liveLinks.mov,
+                            // link: liveLinks.mov,
+                            link: null,
                             name: movFile.name,
                             id: movFile.id,
-                            info: movFile.path.replace('/', '%$2F'), 
+                            info: movFile.path,//.replace('/', '%$2F'), 
                             date: movFile.date
                         }, 
                         mp4Data:{
-                            link: liveLinks.mp4,
+                            // link: liveLinks.mp4,
+                            link: null,
                             name: mp4File.name,
                             id: mp4File.id,
-                            info: mp4File.path.replace('/', '%$2F'),
+                            info: mp4File.path,//.replace('/', '%$2F'),
                             date: mp4File.date
                         },
                     }
@@ -135,38 +115,31 @@ export default function PageHandle(props) {
                 .then(async JSONresponse => {
                     var files = JSON.parse(JSONresponse)
                     // extract live photos and then proceed with normal files
+                    //todo bring back live photos after fix
                     files = await getLivePhotos(files)
 
                     for (let i = 0; i < files.length; i++) {
+                        var name = files[i].name
                         var path = (files[i].path).replace('/', '%2F');
-                        id_path[files[i].id] = path
-
-                        fetch('/files/' + files[i].id)
-                            .then(response => { 
-                                // console.log("res", response)
-                                if (response.status === 404)
-                                    return null;
-                                else return response.blob()
-                            })
-                            .then(imageBlob => {
-                                if (!imageBlob) return;
-                                const imageURL = URL.createObjectURL(imageBlob);
-                                const isVideo = imageBlob.type === 'video/mp4' ? true : false
-                                setFiles(prevState => {
-                                    return [...prevState,
-                                    {
-                                        link: imageURL,
-                                        name: files[i].name,
-                                        id: files[i].id,
-                                        info: id_path[files[i].id],
-                                        date: files[i].date,
-                                        type: isVideo ? "video" : "photo", 
-                                        movData: null,
-                                        mp4Data: null
-                                    }
-                                    ]
-                                })
-                            })
+                        id_path[files[i].id] = path        
+                        // const isVideo = imageBlob.type === 'video/mp4' ? true : false
+                        const isVideo = false;
+                        setFiles(prevState => {
+                            return [...prevState,
+                            {
+                                // link: imageURL,
+                                link: null,
+                                name: files[i].name,
+                                path: files[i].path,
+                                id: files[i].id,
+                                info: id_path[files[i].id],
+                                date: files[i].date,
+                                type: isVideo ? "video" : "photo", 
+                                movData: null,
+                                mp4Data: null
+                            }
+                            ]
+                        })
                     }
                 })
         }

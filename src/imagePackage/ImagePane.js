@@ -23,6 +23,10 @@ class ImagePane extends Component {
             picture: props.picture,
             favorited: props.favorited,
             id: props.id,
+            type: props.type,
+            path: props.path,
+            movData: props.movData,
+            mp4Data: props.mp4Data,
 
             // modals
             infoModal: false,   // info panel
@@ -118,11 +122,11 @@ class ImagePane extends Component {
             headers: { Accept: 'application/json', 'Content-Type': 'application/json' }
         }
         // if live, we want to delete all 3 parts
-        if (this.props.type === 'live') {
+        if (this.state.type === 'live') {
             // delete all 3 parts
-            const imgPromise = this.deleteLive(this.state.id, this.props.path, this.state.name, reqOptions);
-            const mp4Promise = this.deleteLive(this.props.mp4Data.id, this.props.mp4Data.info, this.props.mp4Data.name, reqOptions)
-            const movPromise = this.deleteLive(this.props.movData.id, this.props.movData.info, this.props.movData.name, reqOptions)
+            const imgPromise = this.deleteLive(this.state.id, this.state.path, this.state.name, reqOptions);
+            const mp4Promise = this.deleteLive(this.state.mp4Data.id, this.state.mp4Data.info, this.state.mp4Data.name, reqOptions)
+            const movPromise = this.deleteLive(this.state.movData.id, this.state.movData.info, this.state.movData.name, reqOptions)
             Promise.all([imgPromise, mp4Promise, movPromise])
                 .then(() => {
                     showSuccessNotification(this.state.name + " deleted successfully")
@@ -155,14 +159,14 @@ class ImagePane extends Component {
 
     // returns either placeholder or display depending on type of file
     getCardDisplay = () => {
-        switch (this.props.type) {
+        switch (this.state.type) {
             case "live":
                 return (
                     <>
                         {this.state.loading ? (this.loadingSquare()) :
                             (
                                 <div>
-                                    <MyLivePhoto vid={this.props.mp4Data.link} img={this.props.picture} />
+                                    <MyLivePhoto vid={this.state.mp4Data.link} img={this.state.picture} />
                                 </div>
                             )}
                     </>
@@ -200,11 +204,11 @@ class ImagePane extends Component {
     // either render normal download or
     // ensure logic for downloading live photo zip
     getDownload = () => {
-        if (this.props.type === 'live') {
+        if (this.state.type === 'live') {
             // zip up MOV and JPG
             const exportZip = () => {
                 const zip = JSZip();
-                zip.file(this.props.movData.name, this.props.movData.link)
+                zip.file(this.state.movData.name, this.state.movData.link)
                 zip.file(this.state.name, this.props.link)
                 zip.generateAsync({ type: 'blob' })
                     .then(zipFile => {
@@ -225,14 +229,50 @@ class ImagePane extends Component {
         }
     }
 
-    componentDidMount() {
-        // use this code to test loading
-        //setTimeout(() => {
-        this.setState({ loading: false })
-        //}, 3000)
+    loadFile = () => {
+        if (this.state.type === "live") {
+            // await all of these and then update our files state
+            fetch('/files/' + encodeURIComponent(this.state.movData.info) + '/' + encodeURIComponent(this.state.movData.name)) // fetch movFile
+                .then(res => res.blob())
+                .then(b => this.setState({ movData: {...this.state.movData, link: URL.createObjectURL(b)}}))
+            fetch('/files/' + encodeURIComponent(this.state.path) + '/' + encodeURIComponent(this.state.name)) // fetch jpgFile
+                .then(res => res.blob())
+                .then(b => this.setState({ picture: URL.createObjectURL(b)}))
+            fetch('/files/' + encodeURIComponent(this.state.mp4Data.info) + '/' + encodeURIComponent(this.state.mp4Data.name)) // fetch mp4File
+                .then(res => res.blob())
+                .then(b => this.setState({ mp4Data: {...this.state.mp4Data, link: URL.createObjectURL(b)}}))
+        }
+        else {
+            fetch('/files/' + encodeURIComponent(this.props.path) + '/' + encodeURIComponent(this.props.filename))
+            .then(response => { 
+                // console.log("res", response)
+                if (response.status === 404)
+                    return null;
+                else return response.blob()
+            })
+            .then(imageBlob => {
+                if (!imageBlob) return;
+                const imageURL = URL.createObjectURL(imageBlob);
+                const isVideo = imageBlob.type === 'video/mp4' ? true : false
+                this.setState(
+                    {
+                        picture: imageURL,
+                        type: isVideo ? "video" : "photo", 
+                    })
+            })
+        }
     }
 
     render() {
+        
+        if (this.state.picture === null && this.props.enterCount === 1 && this.props.inViewport) {
+            this.loadFile();
+        }
+        // if we have loaded but still have loading state
+        else if (this.state.picture !== null && this.state.loading) {
+            this.setState({ loading : false })
+        }
+
         return (
             <div ref={this.props.forwardedRef}> {(this.props.inViewport || this.props.enterCount > 1) ? (
                 <Card>
@@ -244,7 +284,7 @@ class ImagePane extends Component {
                             <Modal.Content>
                                 <Grid columns={2} divided>
                                     <Grid.Column>
-                                        <PaneMedia media={this.state.picture} name={this.state.name} type={this.props.type} mp4={this.props.mp4Data && this.props.mp4Data.link} />
+                                        <PaneMedia media={this.state.picture} name={this.state.name} type={this.state.type} mp4={this.state.mp4Data && this.state.mp4Data.link} />
                                         <Divider />
                                         {this.getDownload()}
                                         <Button onClick={this.favorite}>
@@ -275,9 +315,9 @@ class ImagePane extends Component {
                                     <PaneInfo
                                         setFavorited={this.setFavorited}
                                         setMap={this.setMap}
-                                        path={this.props.path}
+                                        path={this.state.path}
                                         name={this.state.name}
-                                        date={this.props.date}
+                                        date={this.state.date}
                                         id={this.state.id}
                                     />
                                 </Grid>

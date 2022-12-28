@@ -34,17 +34,20 @@ api = Api(app)
 def home():
     return "<html><body><h1>Flask backend. Visit port 3000 to view front end</h1></body></html>"
 
-@app.route('/files/<id>', methods=['GET'])
-def getpic(id):
+@app.route('/files/<path:path>/<name>', methods=['GET'])
+def getpic(path, name):
+    name_str = urllib.parse.unquote(name)
+    path_str = urllib.parse.unquote(path)
     #decode UTF-8
-    sql = """
-        SELECT name, filepath
-        FROM files
-        WHERE id = %s;
-    """
-    res = exec_get_one(sql, (id, ))
-    filename_str = res[0]
-    path_str = res[1]
+    # sql = """
+    #     SELECT name, filepath
+    #     FROM files
+    #     WHERE id = %s;
+    # """
+    # res = exec_get_one(sql, (id, ))
+    # filename_str = res[0]
+    # path_str = res[1]
+
     # path_str = urllib.parse.unquote(path)
     # filename_str = urllib.parse.unquote(filename)
 
@@ -52,14 +55,14 @@ def getpic(id):
     # For windows, assume we know everything is in C:/Users/corey/...
     path_str = 'C:/Users/corey/' + path_str
     # print(image.info)
-    return send_from_directory(path_str, filename_str)
+    return send_from_directory(path_str, name_str)
 
 @app.route('/info/<path>/<filename>/<username>', methods=['GET'])
 def getinfo(path, filename, username):
     file_name = urllib.parse.unquote(filename)
     directory = 'C:/Users/corey/' + urllib.parse.unquote(path) + '/'
     path_str = 'C:/Users/corey/' + urllib.parse.unquote(path) + '/' + file_name
-    print(file_name[file_name.find('.'):])
+    # print(file_name[file_name.find('.'):])
     if (exists(path_str) is False):
         print("WARNING: ", path_str, " does not exist!")
         return "False"
@@ -72,8 +75,8 @@ def getinfo(path, filename, username):
             exifdata = {}
         else: 
             exif = image._getexif()
-            print("----EXIF----")
-            print(exif)
+            # print("----EXIF----")
+            # print(exif)
         if exif is not None:
             exifdata = dict(exif)
         else:
@@ -198,9 +201,10 @@ def save_file(request, ):
     return target, filename, destination
 
 #FIXME combine with prof pic upload
-@app.route('/uploadPic', methods=['POST'])
-def fileUpload():
+@app.route('/uploadPic/<tag>', methods=['POST'])
+def fileUpload(tag):
     file = request.files['file']
+    print("tag ", tag)
     target, filename, destination = save_file(request)
 
     file_location = target + '/' + filename
@@ -243,9 +247,9 @@ def fileUpload():
         INSERT INTO tags (name, id, color, people)
         SELECT name, %s, color, people
         FROM tags
-        WHERE id = -2;
+        WHERE id = %s;
     """
-    return str(exec_commit(sql_tags, (id)))
+    return str(exec_commit(sql_tags, (id, tag)))
 
 @app.route('/convertToMP4/', methods=['POST'])
 def convert():
@@ -307,6 +311,7 @@ api.add_resource(AddUserToAlbum, '/shareAlbum/<string:album_name>/<string:new_us
 api.add_resource(DeleteUserFromAlbum, '/delUserFromAlbum/<string:album_name>/<string:del_user>')
 api.add_resource(GetAllTags, '/getAllTags/')
 api.add_resource(GetShareData, '/getShareData/<string:album_name>/<string:user>')
+api.add_resource(DeleteUploadTag, '/deleteUploadTag/<string:tag>')
 
 if __name__ == '__main__':
     print("Starting Flask backend")

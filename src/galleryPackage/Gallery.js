@@ -18,6 +18,7 @@ export default function Gallery({ onRefresh, albums }) {
     const [noResults, setNoResultsMessage] = useState(false)
     const [category, setCategory] = useState('filename')
     const [shownTags, setShownTags] = useState([])
+    const [quickButtons, setQuickButtons] = useState([])
 
     function searchResults(val, category) {
         setCategory(category)
@@ -129,6 +130,7 @@ export default function Gallery({ onRefresh, albums }) {
     }, [files])
 
     useEffect(() => {
+        console.log(document.getElementById('2022'));
         if (img.length > 0) {
             const sortedPanes = sortByYear([...img]);
             var sortedByMonth = [];
@@ -138,11 +140,23 @@ export default function Gallery({ onRefresh, albums }) {
             setYears(
                 [].concat(sortedPanes.map(obj => obj.year))
                     .sort((a, b) => a < b ? 1 : -1)
-                    .map((yr, i) => <h4 key={i}>{yr}</h4>)
+                    //.map((yr, i) => <h4 key={i}>{yr}</h4>)
             )
             setCardGroups(mapByYear(sortedByMonth));
         }
     }, [img])
+
+    useEffect(() => {
+        console.log(cardGroups)
+        if (cardGroups.length && years.length) {
+            console.log("cards and years", cardGroups, years)
+            setQuickButtons(years.map(year => 
+                <Button basic
+                    onClick={() => document.getElementById(year).scrollIntoView()}
+                >{year}</Button>
+                ))
+        }
+    }, [cardGroups, years])
 
 
     const onScroll = (e) => {
@@ -186,7 +200,8 @@ export default function Gallery({ onRefresh, albums }) {
                     </div>
                 </div>
                 <div className='scrollbar'>
-                    {years}
+                    <Header as='h4' textAlign="center">Jump to</Header>
+                    {quickButtons.map(b => b)}
                 </div>
             </div>
         </div>

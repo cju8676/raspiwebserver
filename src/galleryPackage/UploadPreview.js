@@ -1,13 +1,14 @@
-import React from 'react'
+import React, { useState } from 'react'
 import ReactPlayer from 'react-player'
-import { Header, Image, Segment, Dimmer, Loader, Card, Grid } from 'semantic-ui-react'
+import { Header, Image, Segment, Dimmer, Loader, Card, Grid, Button } from 'semantic-ui-react'
+import Tags from '../imagePackage/Tags'
+import People from '../imagePackage/People'
 import MyLivePhoto from '../LivePhoto'
 
 // Component to handle the preview section of the UploadFileModal
-export default function UploadPreview({ uploadFiles, folders, isBulk, loading }) {
-    console.log("upload files", uploadFiles)
-    console.log("folders", folders)
+export default function UploadPreview({ uploadFiles, folders, isBulk, loading, addAlbum, removeAlbum }) {
     // todo save folder to album
+    const [albumEnable, setAlbumEnable] = useState([]);
 
     const getFileExtension = (filename) => {
         return filename
@@ -57,6 +58,23 @@ export default function UploadPreview({ uploadFiles, folders, isBulk, loading })
         }
     }
 
+    function addToAlbumToggle(tagId) {
+        // if enabled:
+        // remove from enabled save to album buttons array
+        // and reset back to default false
+        if (albumEnable.includes(tagId)) {
+            removeAlbum(tagId);
+            setAlbumEnable(prev => [...prev.filter(id => id !== tagId)]);
+        }
+        // if disabled:
+        // add to albums parent
+        // add to enabled button array
+        else {
+            addAlbum(tagId);
+            setAlbumEnable(prev => [...prev, tagId]);
+        }
+    }
+
     return isBulk ? (
         <Dimmer.Dimmable>
             <Dimmer active={loading} inverted>
@@ -65,7 +83,9 @@ export default function UploadPreview({ uploadFiles, folders, isBulk, loading })
             <Header>Preview:</Header>
             {folders && folders.length > 0 &&
                 <div>
-                    {folders.map(folder => {
+                    {folders.map((folder, idx) => {
+                        // -5 and below will be for each successive folder
+                        const tagId = -5 - idx;
                         return (
                             <>
                                 <Segment color='orange'>
@@ -77,6 +97,16 @@ export default function UploadPreview({ uploadFiles, folders, isBulk, loading })
                                             })}
                                         </Grid>
                                     </div>
+                                    <Tags id={tagId} bulk={true} />
+                                    <People id={tagId} bulk={true} />
+                                    {/* todo css later */}
+                                    <Button 
+                                        type="button" 
+                                        onClick={() => addToAlbumToggle(tagId)}
+                                        color={albumEnable.includes(tagId) ? 'green' : ''}
+                                    >
+                                        Save as Album?
+                                    </Button>
                                 </Segment>
                             </>)
                     })}

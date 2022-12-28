@@ -80,7 +80,7 @@ h1 {
 }
 
 .scrollbar {
-  width: 50px;
+  width: 100px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;

@@ -96,7 +96,7 @@ export const sortByMonth = (img) => {
 // map object to Card.Group with Header
 export const mapByYear = (sorted) => {
     return sorted.sort((a, b) => (a.year < b.year) ? 1 : -1).map(group => {
-        return <div className='year'>
+        return <div className='year' id={group.year}>
             <Header as='h2'>{group.year}</Header>
             <>
                 {group.months

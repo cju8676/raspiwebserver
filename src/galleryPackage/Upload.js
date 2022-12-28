@@ -11,7 +11,10 @@ export default function Upload(props) {
     const [folders, setFolders] = useState(null)
     const [files, setFiles] = useState([])
     const { setRefresh } = useContext(UserContext)
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false) 
+    const [uploading, setUploading] = useState(false);
+    const [foldersToAlbums, setFoldersToAlbums] = useState([]);
+
     const options =
         [
             {
@@ -34,13 +37,37 @@ export default function Upload(props) {
             <Header>Select Folder</Header>
             <input type="file" onChange={handleChange} ref={(ref) => { setUploadInput(ref) }} directory="" webkitdirectory="" />
         </>)
+    
+    useEffect(() => {
+        console.log("upload input", uploadInput)
+        if (uploadInput && uploadInput.files) {
+            console.log("up in", uploadInput.files)
+            for (var i = 0 ; i < uploadInput.files.length ; i++) {
+                console.log("file", uploadInput.files[i]);
+                console.log("folder index", getFolderIndex(uploadInput.files[i].webkitRelativePath))
+            }
+        }
+    }, [uploadInput])
+
+    // get folder index for file, returns -1 on error
+    const getFolderIndex = (directory) => {
+        if (!directory) return -1;
+        for (var i = 0; i < folders.length; i++) {
+            if (directory.includes(folders[i].name)) return i;
+        }
+        return -1;
+    }
 
     async function handleUpload(e) {
         e.preventDefault();
+        setUploading(true);
+        // upload all files
         for (var i = 0; i < uploadInput.files.length; i++) {
             const data = new FormData();
             data.append("file", uploadInput.files[i])
-            await fetch('/uploadPic', {
+            const tag = getFolderIndex(uploadInput.files[i].webkitRelativePath)
+            console.log("data", data)
+            await fetch('/uploadPic/' + (-5 - tag), {
                 method: 'POST',
                 body: data
             })
@@ -49,7 +76,22 @@ export default function Upload(props) {
                     // console.log("upload", data)
                 })
         }
+        // delete all negative indexes corresponding to upload preview folders
+        for (var j = 0 ; j < folders.length ; j++) {
+            await fetch('/deleteUploadTag/' + (-5 - j),{
+                method: 'POST'
+            })
+            .then(res => res.text())
+            .then(data => {
+                // successful deletion of this tag
+            })
+        }
+        // add all uploaded folders to respective selected albums
+        for (var k = 0; k < foldersToAlbums.length ; k++) {
+            console.log("K ", foldersToAlbums[k])
+        }
         props.history.push('/home')
+        setUploading(false);
         setRefresh(true)
         showSuccessNotification("Successfully uploaded media. Refreshing...")
     }
@@ -102,10 +144,13 @@ export default function Upload(props) {
                         isBulk={uploadType === 'bulk'}
                         uploadFiles={files}
                         folders={folders}
-                        loading={loading}/>
+                        loading={loading}
+                        addAlbum={(newId) => setFoldersToAlbums(prev => [...prev, newId])} 
+                        removeAlbum={(newId) => setFoldersToAlbums(prev => [...prev.filter(id => id !== newId)])}    
+                    />
                     <Divider />
                     <Button as='a' onClick={handleCancel}>Cancel</Button>
-                    <Button type='submit' color='orange' disabled={loading}>Submit</Button>
+                    <Button type='submit' color='orange' loading={uploading} disabled={loading}>Submit</Button>
                 </Form>
             </Segment>
         </div>
