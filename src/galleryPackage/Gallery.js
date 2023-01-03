@@ -130,7 +130,6 @@ export default function Gallery({ onRefresh, albums }) {
     }, [files])
 
     useEffect(() => {
-        console.log(document.getElementById('2022'));
         if (img.length > 0) {
             const sortedPanes = sortByYear([...img]);
             var sortedByMonth = [];
@@ -147,9 +146,7 @@ export default function Gallery({ onRefresh, albums }) {
     }, [img])
 
     useEffect(() => {
-        console.log(cardGroups)
         if (cardGroups.length && years.length) {
-            console.log("cards and years", cardGroups, years)
             setQuickButtons(years.map(year => 
                 <Button basic
                     onClick={() => document.getElementById(year).scrollIntoView()}

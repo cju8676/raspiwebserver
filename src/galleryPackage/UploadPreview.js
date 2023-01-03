@@ -21,7 +21,7 @@ export default function UploadPreview({ uploadFiles, folders, isBulk, loading, a
     // file obj contains {name: "", url: "blob://"}
     const mapFile = (fileObj) => {
         const supportedPhotoFormats = ['jpg', 'jpeg', 'gif', 'jfif', 'png']
-        const supportedVideoFormats = ['mp4']
+        const supportedVideoFormats = ['mp4', 'mov']
         const fileExtension = getFileExtension(fileObj.name)
         const isSupportedPhoto = supportedPhotoFormats.includes(fileExtension)
         const isSupportedVideo = supportedVideoFormats.includes(fileExtension)
@@ -30,19 +30,24 @@ export default function UploadPreview({ uploadFiles, folders, isBulk, loading, a
             return (
                 <Image size="small" src={fileObj.url} />
             )
-        else if (isSupportedVideo)
-            return (
-                <div className='live-photo-preview'>
-                    <ReactPlayer
-                        url={uploadFiles[0].url}
-                        muted
-                        loop
-                        playing
-                        width='100%'
-                        height='100%'
-                    />
-                </div>
-            )
+        else if (isSupportedVideo) {
+            if (fileExtension === 'mp4')
+                return (
+                    <div className='live-photo-preview'>
+                        <ReactPlayer
+                            url={uploadFiles[0].url}
+                            muted
+                            loop
+                            playing
+                            width='100%'
+                            height='100%'
+                        />
+                    </div>
+                )
+            else return (<video muted controls autoPlay loop className='live-photo-preview'>
+                <source src={uploadFiles[0].url} type="video/mp4"></source>
+            </video>)
+        }
         else
             return (
                 <Card content={`Warning - ${fileObj.name} - Unsupported File type`}></Card>
@@ -100,8 +105,8 @@ export default function UploadPreview({ uploadFiles, folders, isBulk, loading, a
                                     <Tags id={tagId} bulk={true} />
                                     <People id={tagId} bulk={true} />
                                     {/* todo css later */}
-                                    <Button 
-                                        type="button" 
+                                    <Button
+                                        type="button"
                                         onClick={() => addToAlbumToggle(tagId)}
                                         color={albumEnable.includes(tagId) ? 'green' : ''}
                                     >

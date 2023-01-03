@@ -9,8 +9,10 @@ def get_coords(exif):
     for key in exif['GPSInfo'].keys():
         name = ExifTags.GPSTAGS.get(key,key)
         gps[name] = exif['GPSInfo'][key]
+    
+    if 'GPSLatitude' not in gps or 'GPSLongitude' not in gps:
+        return []
     # GPSLat and GPSLong is formatted as (degrees, minutes, seconds)
-
     # Decimal Degrees = degrees + (minutes/60) + (seconds/3600)
     decimal_lat =float( gps['GPSLatitude'][0] + ((gps['GPSLatitude'][1])/60) + ((gps['GPSLatitude'][2])/3600))
 

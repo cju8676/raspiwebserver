@@ -57,7 +57,6 @@ export default function PageHandle(props) {
         // get duplicate file names and ensure there is three files of that name
         // mov, jpg, and mp4 files
         const dupFileNames = duplicates(count(getFilenames([...files])))
-        console.log("DUP", dupFileNames)
         if (dupFileNames.length) {
             var getLive = [...files]
             for (let i = 0; i < dupFileNames.length; i++) {
@@ -115,7 +114,7 @@ export default function PageHandle(props) {
                 .then(async JSONresponse => {
                     var files = JSON.parse(JSONresponse)
                     // extract live photos and then proceed with normal files
-                    //todo bring back live photos after fix
+
                     files = await getLivePhotos(files)
 
                     for (let i = 0; i < files.length; i++) {

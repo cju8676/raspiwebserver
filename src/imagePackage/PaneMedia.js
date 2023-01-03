@@ -50,12 +50,18 @@ const PaneMedia = ({ type, media, name, mp4 = null }) => {
                                 )}
                                 {playing ? (
                                     <Button icon='pause' onClick={() => setPlaying(false)} />
-                                ) : ( 
+                                ) : (
                                     <Button icon='play' onClick={() => setPlaying(true)} />
                                 )}
                             </Button.Group>
                         }
                     </div>
+                )
+            case "altvideo":
+                return (
+                    <video muted controls autoPlay loop className='pane-media'>
+                        <source src={media} type="video/mp4"></source>
+                    </video>
                 )
             case "photo":
             default:

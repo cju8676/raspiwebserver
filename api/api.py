@@ -16,6 +16,7 @@ from imagepane_api import *
 from utils import *
 import json
 import subprocess
+import ffmpeg
 
 #todo change for raspi integration
 UPLOAD_FOLDER='C:/Users/corey/Pictures/dbtest'
@@ -148,18 +149,32 @@ def getinfo(path, filename, username):
     
     # otherwise gather video info
     else:
+        data = ffmpeg.probe(path_str)
+        # print("this is data", data)
+        streams = data['streams'][0]
+        vid_len = streams['height']
+        vid_wid = streams['width']
+        format_tags = data['format']['tags']
+        tag_keys = dict(format_tags).keys()
+        make_key = ''
+        model_key = ''
+        for key in tag_keys:
+            if 'make' in key:
+                make_key = key
+            elif 'model' in key:
+                model_key = key
         # video = TinyTag.get(path_str)
         # print(video)
         # print(video.year)
-        print(os.stat(path_str))
-        print(datetime.fromtimestamp(os.path.getatime(path_str)).strftime('%Y-%m-%d %H:%M:%S'))
+        # print(os.stat(path_str))
+        # print(datetime.fromtimestamp(os.path.getatime(path_str)).strftime('%Y-%m-%d %H:%M:%S'))
         # return jsonify(["---", "---", "---", "---", "---", None, []])
         return json.dumps({
-                "len" : "---",
-                "wid" :  "---",
-                "make" : "---",
-                "model" : "---",
-                "date" : "---",
+                "len" : vid_len,
+                "wid" :  vid_wid,
+                "make" : format_tags[make_key],
+                "model" : format_tags[model_key],
+                "date" : streams['tags']['creation_time'],
                 "isFavorited" : None,
                 "gps" : None
             })
@@ -215,14 +230,19 @@ def fileUpload(tag):
         else:
             exifdata = exif._getexif()
     elif(file.content_type[0:5] == 'video'):
-        #todo extract date info from vid
         exifdata = None
+        vid = ffmpeg.probe(file_location)
+        dicts = vid['streams'][0]
+        creation_time = dicts['tags']['creation_time']
+
     else:
         print("Unrecognized file type : " + file.content_type)
         print("File was still saved.")
         exifdata = None
 
-    if exifdata is None:
+    if creation_time is not None:
+        date = datetime.strptime(creation_time, '%Y-%m-%dT%H:%M:%S.%fZ')
+    elif exifdata is None:
         date = datetime.today()
     else:
         dict_exif = dict(exifdata)

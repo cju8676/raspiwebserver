@@ -182,3 +182,9 @@ h1 {
   display: flex;
   height: 25vh;
 }
+
+.pane-media {
+  height: 25vh;
+  width: 100%;
+  object-fit: cover;
+}

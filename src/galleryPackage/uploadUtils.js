@@ -4,7 +4,7 @@
 // returns Array of Files
 // that are supported by the application
 export const filterUnsupportedFiles = (filesArray) => {
-    const supported = ["jpeg", "jpg", "jfif", "gif", "mp4", "mov"]
+    const supported = ["jpeg", "jpg", "jfif", "gif", "mp4", "mov", "3gp"]
     return filesArray.filter(file =>
         supported.includes(
             file.name
@@ -85,7 +85,7 @@ export async function extractLivePhotos(sorted) {
 // and Live photos sorted by folder
 // { name: "", files: [File, {LivePhoto}, ..., File] }
 export const sortBulkUpload = (filesArray) => {
-    if (filesArray.length === 0) return;
+    if (filesArray.length === 0) return [];
     var sorted = [];
     var files = [...filesArray];
     // iterate through files adding each of its respective object's array

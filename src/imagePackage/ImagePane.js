@@ -162,40 +162,66 @@ class ImagePane extends Component {
         switch (this.state.type) {
             case "live":
                 return (
-                    <>
+                    <div >
                         {this.state.loading ? (this.loadingSquare()) :
                             (
-                                <div>
+                                <div className='pane-media'>
                                     <MyLivePhoto vid={this.state.mp4Data.link} img={this.state.picture} />
                                 </div>
                             )}
-                    </>
+                    </div>
                 )
             case "video":
                 return (
-                    <>
+                    <div >
                         {this.state.loading ? (this.loadingSquare()) :
                             (
-                                <div
+                                <div className='pane-media'
                                     onMouseEnter={() => this.setState({ vidPreview: true })}
                                     onMouseLeave={() => this.setState({ vidPreview: false })}>
                                     <ReactPlayer
                                         url={this.state.picture}
                                         playing={this.state.vidPreview}
-                                        loop muted width='100%' /*height='100%'*/ />
+                                        loop muted
+                                        style={{
+                                            "max-width": "100%",
+                                            "max-height": "100%"
+                                        }}
+                                    />
                                 </div>
                             )}
-                    </>
+                    </div>
+                )
+            case "altvideo":
+                return (
+                    <div>
+                        {this.state.loading ? (this.loadingSquare()) :
+                            (
+                                <video muted className='pane-media'>
+                                    <source src={this.state.picture} type="video/mp4"></source>
+                                </video>
+                            )}
+                    </div>
                 )
             case "photo":
             default:
                 return (
-                    <>
+                    <div className='pane-media'>
+
                         {this.state.loading ? (this.loadingSquare()) :
                             (
-                                <Image src={this.state.picture} alt="pic" />
+                                <Image
+                                    style={{
+                                        "max-width": "100%",
+                                        "max-height": "100%",
+                                        "margin-left": 'auto',
+                                        "margin-right": "auto"
+                                    }}
+                                    src={this.state.picture}
+                                    alt="pic"
+                                />
                             )}
-                    </>
+                    </div>
                 )
 
         }
@@ -212,8 +238,8 @@ class ImagePane extends Component {
                 zip.file(this.state.name, this.props.link)
                 zip.generateAsync({ type: 'blob' })
                     .then(zipFile => {
-                        FileSaver.saveAs(zipFile, 'LivePhoto.zip')    
-                })
+                        FileSaver.saveAs(zipFile, 'LivePhoto.zip')
+                    })
             }
             // render download button
             return <Button onClick={exportZip}><Icon name='download' />Save</Button>
@@ -234,43 +260,45 @@ class ImagePane extends Component {
             // await all of these and then update our files state
             fetch('/files/' + encodeURIComponent(this.state.movData.info) + '/' + encodeURIComponent(this.state.movData.name)) // fetch movFile
                 .then(res => res.blob())
-                .then(b => this.setState({ movData: {...this.state.movData, link: URL.createObjectURL(b)}}))
+                .then(b => this.setState({ movData: { ...this.state.movData, link: URL.createObjectURL(b) } }))
             fetch('/files/' + encodeURIComponent(this.state.path) + '/' + encodeURIComponent(this.state.name)) // fetch jpgFile
                 .then(res => res.blob())
-                .then(b => this.setState({ picture: URL.createObjectURL(b)}))
+                .then(b => this.setState({ picture: URL.createObjectURL(b) }))
             fetch('/files/' + encodeURIComponent(this.state.mp4Data.info) + '/' + encodeURIComponent(this.state.mp4Data.name)) // fetch mp4File
                 .then(res => res.blob())
-                .then(b => this.setState({ mp4Data: {...this.state.mp4Data, link: URL.createObjectURL(b)}}))
+                .then(b => this.setState({ mp4Data: { ...this.state.mp4Data, link: URL.createObjectURL(b) } }))
         }
         else {
             fetch('/files/' + encodeURIComponent(this.props.path) + '/' + encodeURIComponent(this.props.filename))
-            .then(response => { 
-                // console.log("res", response)
-                if (response.status === 404)
-                    return null;
-                else return response.blob()
-            })
-            .then(imageBlob => {
-                if (!imageBlob) return;
-                const imageURL = URL.createObjectURL(imageBlob);
-                const isVideo = imageBlob.type === 'video/mp4' ? true : false
-                this.setState(
-                    {
-                        picture: imageURL,
-                        type: isVideo ? "video" : "photo", 
-                    })
-            })
+                .then(response => {
+                    // console.log("res", response)
+                    if (response.status === 404)
+                        return null;
+                    else return response.blob()
+                })
+                .then(imageBlob => {
+                    if (!imageBlob) return;
+                    const imageURL = URL.createObjectURL(imageBlob);
+                    console.log("my name and type", this.state.name, imageBlob.type)
+                    const isVideo = imageBlob.type === 'video/mp4'
+                    const isAltVideo = imageBlob.type === 'video/quicktime'
+                    this.setState(
+                        {
+                            picture: imageURL,
+                            type: isVideo ? "video" : isAltVideo ? "altvideo" : "photo",
+                        })
+                })
         }
     }
 
     render() {
-        
+
         if (this.state.picture === null && this.props.enterCount === 1 && this.props.inViewport) {
             this.loadFile();
         }
         // if we have loaded but still have loading state
         else if (this.state.picture !== null && this.state.loading) {
-            this.setState({ loading : false })
+            this.setState({ loading: false })
         }
 
         return (
