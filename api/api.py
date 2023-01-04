@@ -17,11 +17,14 @@ from utils import *
 import json
 import subprocess
 import ffmpeg
+from iso6709 import Location
+import re
 
 #todo change for raspi integration
 UPLOAD_FOLDER='C:/Users/corey/Pictures/dbtest'
 CONVERSIONS_FOLDER='C:/Users/corey/Pictures/dbconversions'
-ROOT_DIR = 'C://Users/corey/'
+# ROOT_DIR = 'C:/Users/corey/'
+ROOT_DIR = 'E:/'
 # assumes we are in ROOT_DIR
 FFMPEG_DIR = '../../FFmpeg/bin/ffmpeg'
 
@@ -54,15 +57,15 @@ def getpic(path, name):
 
     # FIXME ADD for RASPI
     # For windows, assume we know everything is in C:/Users/corey/...
-    path_str = 'C:/Users/corey/' + path_str
+    path_str = ROOT_DIR + path_str
     # print(image.info)
     return send_from_directory(path_str, name_str)
 
 @app.route('/info/<path>/<filename>/<username>', methods=['GET'])
 def getinfo(path, filename, username):
     file_name = urllib.parse.unquote(filename)
-    directory = 'C:/Users/corey/' + urllib.parse.unquote(path) + '/'
-    path_str = 'C:/Users/corey/' + urllib.parse.unquote(path) + '/' + file_name
+    directory = ROOT_DIR + urllib.parse.unquote(path) + '/'
+    path_str = ROOT_DIR + urllib.parse.unquote(path) + '/' + file_name
     # print(file_name[file_name.find('.'):])
     if (exists(path_str) is False):
         print("WARNING: ", path_str, " does not exist!")
@@ -112,7 +115,7 @@ def getinfo(path, filename, username):
                     "lat" : gps_coords[0],
                     "long" : gps_coords[1]
                 }
-
+        print("gps json", gps_json)
         if len(exifdata) == 0:
             # len wid --- --- --- tags
             # return jsonify([image.size[0], image.size[1], "---", "---", "---", is_favorited, gps_coords])
@@ -150,7 +153,6 @@ def getinfo(path, filename, username):
     # otherwise gather video info
     else:
         data = ffmpeg.probe(path_str)
-        # print("this is data", data)
         streams = data['streams'][0]
         vid_len = streams['height']
         vid_wid = streams['width']
@@ -158,11 +160,28 @@ def getinfo(path, filename, username):
         tag_keys = dict(format_tags).keys()
         make_key = ''
         model_key = ''
+        loc_key = ''
         for key in tag_keys:
             if 'make' in key:
                 make_key = key
             elif 'model' in key:
                 model_key = key
+            elif 'location' in key:
+                loc_key = key
+        
+        gps_json = None
+        if loc_key != '':
+            loc_string = format_tags[loc_key]
+            loc = Location(loc_string)
+            # don't think this parses longitude negative correctly
+            # whichever format we will see a +/- for lat and long
+            lat_long_signs = re.findall(r"[+-]", loc_string)
+            lat_sign = 1 if lat_long_signs[0] == '+' else -1 
+            long_sign = 1 if lat_long_signs[1] == '+' else -1 
+            gps_json = {
+                "lat" : str(loc.lat.degrees * lat_sign),
+                "long": str(loc.lng.degrees * long_sign)
+            }
         # video = TinyTag.get(path_str)
         # print(video)
         # print(video.year)
@@ -176,7 +195,7 @@ def getinfo(path, filename, username):
                 "model" : format_tags[model_key],
                 "date" : streams['tags']['creation_time'],
                 "isFavorited" : None,
-                "gps" : None
+                "gps" : gps_json
             })
 
 
@@ -215,7 +234,6 @@ def save_file(request, ):
     file.save(destination)
     return target, filename, destination
 
-#FIXME combine with prof pic upload
 @app.route('/uploadPic/<tag>', methods=['POST'])
 def fileUpload(tag):
     file = request.files['file']
@@ -270,6 +288,48 @@ def fileUpload(tag):
         WHERE id = %s;
     """
     return str(exec_commit(sql_tags, (id, tag)))
+
+
+
+# add database instances for files in folders already locally stored
+# how to use:
+# - path = copy encodeURIComponent(path after E:/)
+# - navigate to 192.168.0.208:5000/filesToDB/path
+# - first test it does not break with specified folder
+# - then uncomment and do SQL calls
+@app.route('/filesToDB/<path:path>', methods=['GET', 'POST'])
+def post_files(path):
+    print("getting here", path)
+    # get all files to path
+    files = os.listdir(path)
+    print(files)
+    for file in files:
+        path_str = path + '/' + file
+        # skip directories
+        if os.path.isdir(path_str):
+            continue
+        # if its photo get date the photo way
+        if (imghdr.what(path_str) is not None):
+            date = Image.open(path_str)._getexif()[36867]
+            date = datetime.strptime(date, '%Y:%m:%d %H:%M:%S')
+        # otherwise get the video way
+        else:
+            data = ffmpeg.probe(path_str)
+            streams = data['streams'][0]
+            date = streams['tags']['creation_time']
+            date = datetime.strptime(date, '%Y-%m-%dT%H:%M:%S.%fZ')
+        
+        print("date for", file, " is ", date)
+        # Save file to db
+        sql = """
+            INSERT INTO files (name, filepath, date)
+            VALUES (%s, %s, %s)
+        """
+        exec_commit(sql, (file, path, date))
+
+    # if video get video the video way
+
+    return ""
 
 @app.route('/convertToMP4/', methods=['POST'])
 def convert():

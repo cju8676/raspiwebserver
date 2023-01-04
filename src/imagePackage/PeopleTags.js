@@ -228,7 +228,7 @@ class PeopleTags extends Component {
                     })}
                     {/* <Label picture color='blue'>
                         Juice */}
-                        {/*FIXME MAKE SURE IMAGE IS SQUARE WHEN CREATING PERSON*/}
+                        {/* MAKE SURE IMAGE IS SQUARE WHEN CREATING PERSON*/}
                         {/* <img src={this.props.picture} alt='Profile pic' /> */}
                     {/* </Label> */}
                     <Label>
