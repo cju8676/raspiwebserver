@@ -19,12 +19,15 @@ import subprocess
 import ffmpeg
 from iso6709 import Location
 import re
+import os
+import time
 
 #todo change for raspi integration
 UPLOAD_FOLDER='C:/Users/corey/Pictures/dbtest'
 CONVERSIONS_FOLDER='C:/Users/corey/Pictures/dbconversions'
 # ROOT_DIR = 'C:/Users/corey/'
-ROOT_DIR = 'E:/'
+# ROOT_DIR = 'E:/'
+ROOT_DIR = '/media/pi/Elements SE/'
 # assumes we are in ROOT_DIR
 FFMPEG_DIR = '../../FFmpeg/bin/ffmpeg'
 
@@ -301,35 +304,54 @@ def fileUpload(tag):
 def post_files(path):
     print("getting here", path)
     # get all files to path
-    files = os.listdir(path)
+    files = os.listdir(ROOT_DIR + path)
     print(files)
+    # list of tuples that will be ran through and added to
+    files_info = []
     for file in files:
-        path_str = path + '/' + file
+        path_str = ROOT_DIR + path + '/' + file
         # skip directories
         if os.path.isdir(path_str):
             continue
         # if its photo get date the photo way
         if (imghdr.what(path_str) is not None):
-            date = Image.open(path_str)._getexif()[36867]
-            date = datetime.strptime(date, '%Y:%m:%d %H:%M:%S')
+            exif = Image.open(path_str)._getexif()
+            if exif:
+                dict_exif = dict(exif)
+                date = dict_exif.get(306, \
+                    dict_exif.get(36867, \
+                    dict_exif.get(36868, \
+                    datetime.fromtimestamp(os.path.getmtime(path_str)))))
+                #date = Image.open(path_str)._getexif()[36867]
+                if isinstance(date, str):
+                    date = datetime.strptime(date, '%Y:%m:%d %H:%M:%S')
+            # if no exif data use getmtime()
+            else:
+                date = time.ctime(os.path.getmtime(path_str))
         # otherwise get the video way
         else:
+            ext = file.split('.')
+            supported = ['mov', 'mp4']
+            if ext[1].lower() not in supported:
+                continue
             data = ffmpeg.probe(path_str)
             streams = data['streams'][0]
             date = streams['tags']['creation_time']
             date = datetime.strptime(date, '%Y-%m-%dT%H:%M:%S.%fZ')
         
         print("date for", file, " is ", date)
-        # Save file to db
+        files_info.append((file, date))
+    
+    #print(files_info)
+    for tup in files_info:
+        # for all valid files, save file to db
         sql = """
             INSERT INTO files (name, filepath, date)
             VALUES (%s, %s, %s)
         """
-        exec_commit(sql, (file, path, date))
+        exec_commit(sql, (tup[0], path, tup[1]))
 
-    # if video get video the video way
-
-    return ""
+    return "Success"
 
 @app.route('/convertToMP4/', methods=['POST'])
 def convert():
