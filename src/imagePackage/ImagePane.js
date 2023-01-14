@@ -37,7 +37,10 @@ class ImagePane extends Component {
             vidPreview: false,
             loading: true,
 
-            deleted: false
+            deleted: false,
+
+            isThumbnail: false, // type is jpeg but file extension is video
+            loadingFullVideo: false // show loading icon in load full video button before rendering
         }
     }
 
@@ -279,16 +282,49 @@ class ImagePane extends Component {
                 .then(imageBlob => {
                     if (!imageBlob) return;
                     const imageURL = URL.createObjectURL(imageBlob);
-                    console.log("my name and type", this.state.name, imageBlob.type)
                     const isVideo = imageBlob.type === 'video/mp4'
                     const isAltVideo = imageBlob.type === 'video/quicktime'
+                    const type = isVideo ? "video" : isAltVideo ? "altvideo" : "photo"
+                    const extension = this.props.filename.split(".")[1]
+                    const validVids = ['mov', 'mp4']
+                    const thumb = validVids.includes(extension.toLowerCase()) && (type === 'photo')
                     this.setState(
                         {
                             picture: imageURL,
-                            type: isVideo ? "video" : isAltVideo ? "altvideo" : "photo",
+                            type: type,
+                            isThumbnail: thumb
                         })
                 })
         }
+    }
+
+    // replaces thumbnail with actual video
+    loadFullVideo = () => {
+        this.setState({ loadingFullVideo: true })
+        fetch('/videofile/' + encodeURIComponent(this.props.path) + '/' + encodeURIComponent(this.props.filename))
+                .then(response => {
+                    // console.log("res", response)
+                    if (response.status === 404)
+                        return null;
+                    else return response.blob()
+                })
+                .then(imageBlob => {
+                    if (!imageBlob) return;
+                    const imageURL = URL.createObjectURL(imageBlob);
+                    const isVideo = imageBlob.type === 'video/mp4'
+                    const isAltVideo = imageBlob.type === 'video/quicktime'
+                    const type = isVideo ? "video" : isAltVideo ? "altvideo" : "photo"
+                    const extension = this.props.filename.split(".")[1]
+                    const validVids = ['mov', 'mp4']
+                    const thumb = validVids.includes(extension.toLowerCase()) && (type === 'photo')
+                    this.setState(
+                        {
+                            picture: imageURL,
+                            type: type,
+                            isThumbnail: thumb,
+                            loadingFullVideo: false
+                        })
+                })
     }
 
     render() {
@@ -314,6 +350,13 @@ class ImagePane extends Component {
                                     <Grid.Column>
                                         <PaneMedia media={this.state.picture} name={this.state.name} type={this.state.type} mp4={this.state.mp4Data && this.state.mp4Data.link} />
                                         <Divider />
+                                        {this.state.isThumbnail && 
+                                            <Button color='red' 
+                                                onClick={this.loadFullVideo}
+                                                loading={this.state.loadingFullVideo}>
+                                                <Icon name='play circle outline'/>
+                                                Load
+                                            </Button>}
                                         {this.getDownload()}
                                         <Button onClick={this.favorite}>
                                             {!this.state.favorited && <Icon name='favorite' />}

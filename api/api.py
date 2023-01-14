@@ -1,5 +1,5 @@
 from genericpath import exists
-from flask import Flask, request, jsonify, redirect, url_for
+from flask import Flask, request, jsonify, redirect, url_for, send_file
 from flask_restful import Resource, Api
 import urllib.parse
 from werkzeug.utils import secure_filename
@@ -14,6 +14,7 @@ from user_api import *
 from album_api import *
 from imagepane_api import *
 from utils import *
+from moviepy.video.io.VideoFileClip import VideoFileClip
 import json
 import subprocess
 import ffmpeg
@@ -21,17 +22,19 @@ from iso6709 import Location
 import re
 import os
 import time
+from io import BytesIO
 
 #todo change for raspi integration
 UPLOAD_FOLDER='C:/Users/corey/Pictures/dbtest'
 CONVERSIONS_FOLDER='C:/Users/corey/Pictures/dbconversions'
 # ROOT_DIR = 'C:/Users/corey/'
-# ROOT_DIR = 'E:/'
-ROOT_DIR = '/media/pi/Elements SE/'
+ROOT_DIR = 'E:/'
+# ROOT_DIR = '/media/pi/Elements SE/'
 # assumes we are in ROOT_DIR
 FFMPEG_DIR = '../../FFmpeg/bin/ffmpeg'
 
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg'}
+VIDEO_EXTENSIONS = ['mov', 'mp4']
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -41,27 +44,34 @@ api = Api(app)
 def home():
     return "<html><body><h1>Flask backend. Visit port 3000 to view front end</h1></body></html>"
 
+def serve_pil_image(pil_img):
+    img_io = BytesIO()
+    pil_img.save(img_io, 'JPEG', quality=70)
+    img_io.seek(0)
+    return send_file(img_io, mimetype='image/jpeg')
+
 @app.route('/files/<path:path>/<name>', methods=['GET'])
 def getpic(path, name):
     name_str = urllib.parse.unquote(name)
     path_str = urllib.parse.unquote(path)
-    #decode UTF-8
-    # sql = """
-    #     SELECT name, filepath
-    #     FROM files
-    #     WHERE id = %s;
-    # """
-    # res = exec_get_one(sql, (id, ))
-    # filename_str = res[0]
-    # path_str = res[1]
+    
+    # if video, get a thumbnail instead of loading the whole thing first
+    if name_str.rsplit('.', 1)[1].lower() in VIDEO_EXTENSIONS:
+        clips = VideoFileClip(os.path.join(ROOT_DIR + '/' + path_str, name_str))
+        frame = clips.get_frame(0)
+        thumb = Image.fromarray(frame)
+        return serve_pil_image(thumb)
 
-    # path_str = urllib.parse.unquote(path)
-    # filename_str = urllib.parse.unquote(filename)
 
-    # FIXME ADD for RASPI
-    # For windows, assume we know everything is in C:/Users/corey/...
     path_str = ROOT_DIR + path_str
     # print(image.info)
+    return send_from_directory(path_str, name_str)
+
+@app.route('/videofile/<path:path>/<name>', methods=['GET'])
+def getvidfile(path, name):
+    name_str = urllib.parse.unquote(name)
+    path_str = urllib.parse.unquote(path)
+    path_str = ROOT_DIR + path_str
     return send_from_directory(path_str, name_str)
 
 @app.route('/info/<path>/<filename>/<username>', methods=['GET'])

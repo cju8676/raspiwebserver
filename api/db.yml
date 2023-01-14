@@ -1,11 +1,11 @@
+# host: 127.0.0.1
+# database: postgres
+# user: pi
+# password: Urbanke
+# port: 5432
+
 host: 127.0.0.1
 database: postgres
-user: pi
-password: Urbanke
+user: vscode
+password: vscode
 port: 5432
-
-#host: 127.0.0.1
-#database: postgres
-#user: vscode
-#password: vscode
-#port: 5432
