@@ -14,6 +14,7 @@ class HomePage extends Component {
             currentName: JSON.parse(localStorage.getItem('name')) || null,
             logout: props.onChange,
             refresh: props.onRefresh,
+            windowWidth: window.innerWidth
         }
     }
 
@@ -27,6 +28,14 @@ class HomePage extends Component {
     // }
 
     handleTabChange = (e, { activeIndex }) => this.context.setActiveIndex(activeIndex)
+
+    handleWindowChange = () => {
+        this.setState({ windowWidth: window.innerWidth })
+    }
+
+    componentDidMount() {
+        window.addEventListener('resize', this.handleWindowChange)
+    }
 
     render() {
         const panes = [
@@ -63,20 +72,20 @@ class HomePage extends Component {
         ]
         return (
             <div className='segment-pad'>
-                <Segment>
+                <Segment clearing>
                     <Header as='h2'>
-                        <div>
+                        {/* <div> */}
                             Welcome, {this.context.name}.
 
                             <Button href='#settings' floated='right' size='large'>
                                 <Icon name='setting' />
-                                Settings
+                                {this.state.windowWidth > 530 && "Settings"}
                             </Button>
                             <Button onClick={this.state.logout} floated='right' size='large'>
                                 <Icon name='sign out' />
-                                Logout
+                                {this.state.windowWidth > 530 && "Logout"}
                             </Button>
-                        </div>
+                        {/* </div> */}
                     </Header>
                 </Segment>
                 <Tab 

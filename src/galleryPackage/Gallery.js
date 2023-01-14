@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from 'react'
-import { Divider, Header, Card, Message, Button } from 'semantic-ui-react'
+import { Divider, Header, Card, Message, Button, Icon } from 'semantic-ui-react'
 import SearchBar from '../SearchBar'
 import { UserContext } from '../UserContext';
 import { sortByYear, mapByYear, sortByMonth } from '../imageUtils'
@@ -19,6 +19,7 @@ export default function Gallery({ onRefresh, albums }) {
     const [category, setCategory] = useState('filename')
     const [shownTags, setShownTags] = useState([])
     const [quickButtons, setQuickButtons] = useState([])
+    const [mobile, setMobile] = useState(false)
 
     function searchResults(val, category) {
         setCategory(category)
@@ -155,6 +156,17 @@ export default function Gallery({ onRefresh, albums }) {
         }
     }, [cardGroups, years])
 
+    const handleMobile = () => {
+        if (window.innerWidth < 560) setMobile(true)
+        else setMobile(false)
+    }
+
+    useEffect(() => {
+        window.addEventListener('resize', handleMobile)
+        return () => {
+            window.removeEventListener('resize', handleMobile``)
+        }
+    }, [])
 
     const onScroll = (e) => {
         const currentScrollY = e.target.scrollTop;
@@ -172,7 +184,9 @@ export default function Gallery({ onRefresh, albums }) {
         <div>
             <div>
                 <Header as='h3'>
-                    <Button className='rightButton' color="orange" href="#upload" size='large' content='Upload'/>
+                    <Button floated='right' color="orange" href="#upload" size='large'>
+                    {mobile ? <Icon name='upload'/> : "Upload"}
+                    </Button>
                     <SearchBar onChange={searchResults} source={img} shownTags={shownTags} />
                 </Header>
             </div>
